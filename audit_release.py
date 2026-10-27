@@ -11,7 +11,7 @@ import zipfile
 from PyInstaller.archive.readers import CArchiveReader
 
 ROOT=Path(__file__).resolve().parent
-EXE=ROOT/'dist/AzerothSurvivorsMayhemNative-0.6.0.exe'
+EXE=ROOT/'dist/AzerothSurvivorsMayhemNative-0.7.0.exe'
 
 def main():
     failures=[]
@@ -45,12 +45,13 @@ def main():
     def code(label,obj):
         if isinstance(obj,types.CodeType):
             scan(label+':filename',obj.co_filename.encode())
+            if any(x in obj.co_names for x in ('unlock_save','native_unlock')):failures.append({'file':label,'reason':'private collection code'})
             for index,value in enumerate(obj.co_consts):code(label+':const'+str(index),value)
         elif isinstance(obj,str):scan(label,obj.encode())
         elif isinstance(obj,bytes):scan(label,obj)
         elif isinstance(obj,(tuple,list)):
             for index,value in enumerate(obj):code(label+':item'+str(index),value)
-    allowed={'app.py','native_runtime.py','agent.js','native-profile.json','build_windows.py','audit_release.py','requirements-build.txt','README.md','README.txt','PRIVACY.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore'}
+    allowed={'app.py','overlay.py','settings.py','native_runtime.py','agent.js','native-profile.json','build_windows.py','audit_release.py','requirements-build.txt','README.md','README.txt','PRIVACY.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore'}
     public=[]
     for path in sorted(ROOT.rglob('*')):
         if not path.is_file():continue
@@ -65,6 +66,7 @@ def main():
             failures.append({'file':relative.as_posix(),'reason':'private/development artifact type'});continue
         public.append(relative.as_posix());scan(relative.as_posix(),path.read_bytes())
     scan(EXE.name,EXE.read_bytes())
+    forbidden=(b'private-unlock-catalog',b'unlock_save',b'Unlock everything',b'PrivateUnlockBackups')
     archive=CArchiveReader(str(EXE))
     for name,entry in archive.toc.items():
         if entry[-1]=='z':
@@ -75,9 +77,11 @@ def main():
                 elif isinstance(obj,bytes):scan(name+'!'+module,obj)
         else:
             payload=archive.extract(name)
-            if isinstance(payload,bytes):scan('EXE!'+name,payload)
+            if isinstance(payload,bytes):
+                scan('EXE!'+name,payload)
+                if any(marker in payload for marker in forbidden):failures.append({'file':name,'reason':'private feature in public EXE'})
     failures=list({(item['file'],item['reason']):item for item in failures}.values())
-    result={'passed':not failures,'version':'0.6.0','exe':EXE.name,'sha256':hashlib.sha256(EXE.read_bytes()).hexdigest(),
+    result={'passed':not failures,'version':'0.7.0','exe':EXE.name,'sha256':hashlib.sha256(EXE.read_bytes()).hexdigest(),
             'scannedPayloads':scanned,'publicSourceFiles':public,'findings':failures,
             'upstreamRuntimeExceptions':[{'file':'frida/_frida.pyd','sha256':'2157c0a2d83222cfb377e7c4526ac4fd117635ee3c883867af4e919d57d8a753','scope':'Exact unmodified upstream binary: generic documentation placeholder and GitHub Actions runneradmin build paths only; build-account and token scans still apply.'}],
             'checks':['allowlisted public source','decompressed EXE archive','Python module filenames and constants',

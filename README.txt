@@ -1,4 +1,4 @@
-# Legendary Mayhem — native edition 0.6.0
+# Legendary Mayhem — native edition 0.7.0
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
@@ -7,9 +7,11 @@ legacy; its older releases remain available in the release history.
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.6.0.exe.
+2. Run AzerothSurvivorsMayhemNative-0.7.0.exe.
 3. Browse to your game's AzerothSurvivors.exe.
-4. Choose your settings, then click Launch native Mayhem.
+4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
+   Use windowed or borderless mode; exclusive fullscreen is unsupported.
+   Choose your settings and press Apply. INSERT or Escape closes the panel.
 5. Pick a character/map and start a match using the normal game menus.
 6. Keep the launcher open while playing. Closing it closes its game too.
 
@@ -23,7 +25,7 @@ install game assets, or transfer browser saves. It uses your ordinary native
 save. Back up/export your save before experimenting with a custom mode.
 Close the normal game before starting the launcher.
 
-## Pre-match settings
+## Insert overlay settings
 
 Boss health and Boss damage are separate dropdowns:
 Easy / Hard / Brutal / Insane.
@@ -39,8 +41,22 @@ Guarantees apply to eligible upgrade choices, cap at three, and leave
 ordinary item drops and exhausted-pool gold rewards alone.
 
 Enable or disable Treasure Rush, Guardian Hunt, Berserker Rush and Rune Storm.
-Preferences are saved locally. Settings lock when a match starts and stay
-locked through victory/endless. Leave the match to change them.
+Preferences are saved locally. Press Apply to commit your edits. You can change
+settings during a match: boss tuning affects new spawns, event durations affect
+the next event, and hazard tuning affects new circles. Online play continues
+while the overlay is open. The overlay is visible only to its host; native
+Mayhem event announcements and mechanics still reach guests.
+
+Combat: separate boss difficulties, boss interval (60–600 seconds), Legendary timing.
+Events: enabled pool, first-event time, minimum/maximum breaks, individual durations.
+Hazards: normal/storm/barrage circle counts and intervals, barrage duration, camping
+trigger, obstacle damage difficulty and optional damage growth per minute.
+Obstacle damage presets multiply base damage by 0.5 / 1 / 1.5 / 2. Growth adds
+0–10% per minute, capped at an additional 300% (4x). Growth defaults to zero.
+The shared 128-circle safety cap and 2.5-second warning remain in place.
+Session: boss fireworks and automatic Endless. Extra waves, events and hazards
+can each be disabled. Restore defaults selects the defaults; Apply commits them.
+The values in the Mayhem rules below describe the defaults.
 
 ## Mayhem rules
 

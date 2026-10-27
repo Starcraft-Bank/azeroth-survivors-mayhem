@@ -3,14 +3,9 @@ from pathlib import Path
 import hashlib,json,os,queue,sys,threading,time
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.6.0'
-DEFAULTS=dict(damagePreset=1,healthPreset=3,legendaryStart=0,legendaryInterval=10,eventMask=15)
+VERSION='0.7.0'
+from settings import DEFAULTS, SCHEMA, validate_settings
 
-def validate_settings(value):
-    return (set(value)==set(DEFAULTS) and all(type(v) is int for v in value.values())
-            and value['damagePreset'] in range(4) and value['healthPreset'] in range(4)
-            and 0<=value['legendaryStart']<=30 and 1<=value['legendaryInterval']<=30
-            and 0<=value['eventMask']<=15)
 
 def check_game(path):
     exe=Path(path).resolve(strict=True)
@@ -44,7 +39,7 @@ class NativeGame:
             try:
                 self.session=self.device.attach(self.pid)
                 self.session.on('detached',self._detached)
-                source='globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+(ROOT/'agent.js').read_text(encoding='utf-8')
+                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+(ROOT/'agent.js').read_text(encoding='utf-8')
                 self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
                 self.agent.on('message',self._message);self.agent.load()
                 if not self.ready:raise RuntimeError('The native mode did not initialize; the game was not resumed.')
@@ -83,7 +78,7 @@ class NativeGame:
 
 def self_test(game,report,seconds=15):
     """Packaged launch check: isolated save, no combat/test memory writes."""
-    target=Path(report);target.parent.mkdir(parents=True,exist_ok=True)
+    target=Path(report).resolve();target.parent.mkdir(parents=True,exist_ok=True)
     session=NativeGame();result={'version':VERSION,'success':False}
     private=target.parent/'smoke-profile';private.mkdir(exist_ok=True)
     try:

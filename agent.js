@@ -40,15 +40,16 @@
     zones.push(row);
   }
   const definitionSet=new Set(defs.map(d=>String(d.pointer)));
-  let settings={damagePreset:1,healthPreset:3,legendaryStart:0,legendaryInterval:10,eventMask:15,...globalThis.MAYHEM_SETTINGS};
+  const schema=globalThis.MAYHEM_SCHEMA;
+  let settings={...Object.fromEntries(Object.entries(schema).map(([k,v])=>[k,v[0]])),...globalThis.MAYHEM_SETTINGS};
   let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
   let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
   let state;
   function reset(){
     for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];
-    state={clock:0,wave:0,nextWave:120,finalCursor:0,affix:0,endless:false,nextHazard:10,
-      stormNext:0,barrageUntil:0,barrageNext:0,event:0,eventUntil:0,nextEvent:45,eventCount:0,
+    state={clock:0,wave:0,nextWave:settings.bossInterval,finalCursor:0,affix:0,endless:false,nextHazard:settings.hazardInterval,
+      stormNext:0,barrageUntil:0,barrageNext:0,event:0,eventUntil:0,nextEvent:settings.eventFirst,eventCount:0,
       lastEvent:0,killCount:0,hazardBursts:0,campBursts:0,cursor:0,noticeUntil:0,transitionAt:0,transitions:0,goldAwards:0,lastGold:null};
     scope=[];leases.clear();bossRegistry.clear();camp.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();announcements=[];
     definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
@@ -231,10 +232,11 @@
   });
   const hazard=Memory.alloc(56);hazard.writeByteArray(base.add(profile.hazardDefinition).readByteArray(56));
   hazard.add(8).writeFloat(2.5);hazard.add(16).writeFloat(2.5);
-  function emitHazards(r,target,index,intense){
-    const existing=number(r,0x5c0),amount=Math.min(intense?8:6,128-existing);if(amount<=0)return false;
+  function emitHazards(r,target,index,intense,storm){
+    const existing=number(r,0x5c0),amount=Math.min(storm?settings.stormCount:intense?settings.barrageCount:settings.hazardCount,128-existing);if(amount<=0)return false;
     const source=r.add(0x588).readPointer().add(index*480),hp=target.add(0x4a0).readFloat();
-    const raw=Math.min(intense?350:250,Math.max(intense?35:25,hp*(intense?.25:.2)));
+    const multiplier=[.5,1,1.5,2][settings.hazardPreset]*(1+Math.min(3,time(r)/60*settings.hazardGrowth/100));
+    const raw=Math.min(intense?350:250,Math.max(intense?35:25,hp*(intense?.25:.2)))*multiplier;
     let damage=source.add(0x168).readFloat();if(source.add(0x18).readS64().toString()!=='-1'&&source.add(0x50).readU8())damage*=1.4;
     hazard.add(4).writeU32(amount);hazard.add(20).writeFloat(raw/(r.add(0xc90).readU8()?1:2)/Math.max(.001,damage));
     const xyz=[0x4f0,0x4f4,0x4f8].map(off=>r.add(off).readFloat());
@@ -244,10 +246,10 @@
   }
   function hazards(r,v,bosses){
     const t=state.clock,storm=state.event===4&&t<state.eventUntil;
-    if(!controls.hazards){camp.clear();state.nextHazard=t+10;state.stormNext=0;state.barrageNext=t+3;return;}
+    if(!controls.hazards){camp.clear();state.nextHazard=t+settings.hazardInterval;state.stormNext=0;state.barrageNext=t+settings.barrageIntervalTenths/10;return;}
     if(!bosses.some(e=>bossRegistry.has(guid(e))))state.barrageUntil=0;
     const barrage=t<state.barrageUntil,intense=storm||barrage;
-    if(!storm&&state.stormNext){state.stormNext=0;state.nextHazard=t+10;}
+    if(!storm&&state.stormNext){state.stormNext=0;state.nextHazard=t+settings.hazardInterval;}
     let source=-1;for(let i=0;i<v.n;i++)if(alive(v.p.add(i*480))){source=i;break;}
     if(source<0)return;
     const due=storm?t>=state.stormNext:barrage?t>=state.barrageNext:t>=state.nextHazard;
@@ -256,11 +258,11 @@
       const p=group[(state.cursor+i)%group.length],id=p.add(0x488).readU64().toString(),x=p.add(0x4f0).readFloat(),y=p.add(0x4f4).readFloat();
       let anchor=camp.get(id);if(!anchor){anchor={x,y,since:t,last:-8};camp.set(id,anchor);}
       if((x-anchor.x)**2+(y-anchor.y)**2>.25||phase(p)!==1){anchor.x=x;anchor.y=y;anchor.since=t;}
-      const stationary=phase(p)===1&&t-anchor.since>=6&&t-anchor.last>=8;
-      if((due||stationary)&&emitHazards(r,p,source,intense)){anchor.last=t;anchor.since=t;served++;if(stationary)state.campBursts++;}
+      const stationary=phase(p)===1&&t-anchor.since>=settings.campSeconds&&t-anchor.last>=8;
+      if((due||stationary)&&emitHazards(r,p,source,intense,storm)){anchor.last=t;anchor.since=t;served++;if(stationary)state.campBursts++;}
     }
     if(due&&served){state.cursor=(state.cursor+served)%Math.max(1,group.length);
-      if(storm)state.stormNext=t+2.5;else if(barrage)state.barrageNext=t+3;else state.nextHazard=t+10;}
+      if(storm)state.stormNext=t+settings.stormIntervalTenths/10;else if(barrage)state.barrageNext=t+settings.barrageIntervalTenths/10;else state.nextHazard=t+settings.hazardInterval;}
   }
   function summon(r,code){
     const def=defs[code];if(!def||def.final&&!state.endless)return false;
@@ -291,17 +293,17 @@
   }
   function events(r,bossCount){
     const t=state.clock;
-    if(!controls.events||!settings.eventMask){state.event=0;state.eventUntil=0;state.nextEvent=t+45;return;}
-    if(state.event&&t>=state.eventUntil){state.event=0;state.eventUntil=0;state.nextEvent=t+35+Math.floor(Math.random()*26);notice('Event complete.');return;}
+    if(!controls.events||!settings.eventMask){state.event=0;state.eventUntil=0;state.nextEvent=t+settings.eventFirst;return;}
+    if(state.event&&t>=state.eventUntil){state.event=0;state.eventUntil=0;state.nextEvent=t+settings.eventGapMin+Math.floor(Math.random()*(settings.eventGapMax-settings.eventGapMin+1));notice('Event complete.');return;}
     if(state.event||t<state.nextEvent)return;
     if(bossCount>=6||(state.affix===3&&t-state.lastSpawn<10)||state.nextWave-t<10||t<state.noticeUntil){state.nextEvent=t+1;return;}
     let available=[1,2,3,4,4].filter(kind=>settings.eventMask&(1<<(kind-1)));
     const distinct=new Set(available);if(distinct.size>1)available=available.filter(kind=>kind!==state.lastEvent);
     const kind=state.eventCount===0&&(settings.eventMask&8)?4:available[Math.floor(Math.random()*available.length)];
     if(kind===2&&!hunt(r)){state.nextEvent=t+10;return;}
-    state.event=kind;state.lastEvent=kind;state.eventUntil=t+(kind===1||kind===4?30:20);state.eventCount++;
+    state.event=kind;state.lastEvent=kind;state.eventUntil=t+[0,settings.treasureDuration,settings.huntDuration,settings.berserkerDuration,settings.stormDuration][kind];state.eventCount++;
     if(kind===4)state.stormNext=t;
-    notice(['','Treasure Rush — double pickups!','Guardian Hunt — a foreign rare arrives!','Berserker Rush — reinforcements accelerate!','Rune Storm — keep moving for 30 seconds!'][kind],3);
+    notice(['','Treasure Rush — double pickups!','Guardian Hunt — a foreign rare arrives!','Berserker Rush — reinforcements accelerate!','Rune Storm — keep moving for '+settings.stormDuration+' seconds!'][kind],3);
   }
   function tick(r){
     if(fault||inMode)return;inMode=true;
@@ -312,7 +314,7 @@
       state.endless=!!r.add(0xc90).readU8()&&!!r.add(0xb10).readU32();
       const v=enemies(r),bosses=[];for(let i=0;i<v.n;i++){const e=v.p.add(i*480);if(alive(e)&&isBoss(e))bosses.push(e);}
       events(r,bosses.length);hazards(r,v,bosses);
-      if(!controls.waves){state.nextWave=t+120;return;}
+      if(!controls.waves){state.nextWave=t+settings.bossInterval;return;}
       if(t<state.nextWave||bosses.length>=8)return;
       const zone=Math.max(0,zoneIndex(r)),extra=state.wave%4===3;state.affix=state.wave%4;
       const code=state.endless?((zone+state.finalCursor+1)%12)*5+4:((zone+state.wave+1)%12)*5+(state.wave+Math.floor(state.wave/12))%4;
@@ -320,7 +322,7 @@
       if(state.endless)state.finalCursor++;
       if(extra&&bosses.length<7){const second=state.endless?((zone+state.finalCursor+1)%12)*5+4:((zone+state.wave+7)%12)*5+(state.wave+Math.floor(state.wave/12))%4;
         if(summon(r,second)&&state.endless)state.finalCursor++;}
-      state.wave++;state.lastSpawn=t;state.nextWave=t+120;state.barrageUntil=t+30;state.barrageNext=t;
+      state.wave++;state.lastSpawn=t;state.nextWave=t+settings.bossInterval;state.barrageUntil=t+settings.barrageDuration;state.barrageNext=t;
       notice(['Crossroads','Frenzy','Spellstorm','Double Trouble'][state.affix]+' — '+defs[code].name+'! Dodge the arrival barrage.',3);
     }finally{inMode=false;}
   }
@@ -341,11 +343,16 @@
   }
   rpc.exports={
     status,
-    configure(candidate){if(!run.isNull()&&run.add(0xca2).readU8()!==0)return false;
-      if(![0,1,2,3].includes(candidate.damagePreset)||![0,1,2,3].includes(candidate.healthPreset)||
-        !Number.isInteger(candidate.legendaryStart)||candidate.legendaryStart<0||candidate.legendaryStart>30||
-        !Number.isInteger(candidate.legendaryInterval)||candidate.legendaryInterval<1||candidate.legendaryInterval>30||
-        !Number.isInteger(candidate.eventMask)||candidate.eventMask<0||candidate.eventMask>15)return false;
+    configure(candidate){
+      if(!candidate||Object.keys(candidate).length!==Object.keys(schema).length||
+        Object.entries(schema).some(([key,spec])=>!Number.isInteger(candidate[key])||candidate[key]<spec[1]||candidate[key]>spec[2])||
+        candidate.eventGapMin>candidate.eventGapMax)return false;
+      const t=state.clock;
+      if(candidate.bossInterval!==settings.bossInterval)state.nextWave=t+candidate.bossInterval;
+      if(candidate.hazardInterval!==settings.hazardInterval)state.nextHazard=t+candidate.hazardInterval;
+      if(candidate.eventFirst!==settings.eventFirst&&state.eventCount===0)state.nextEvent=Math.max(t+1,candidate.eventFirst);
+      if((candidate.eventGapMin!==settings.eventGapMin||candidate.eventGapMax!==settings.eventGapMax)&&!state.event&&state.eventCount>0)
+        state.nextEvent=t+candidate.eventGapMin;
       settings={...candidate};return true;},
     control(name,enabled){if(!Object.hasOwn(controls,name))return false;controls[name]=!!enabled;return true;}
   };
