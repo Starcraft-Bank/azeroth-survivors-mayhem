@@ -1,0 +1,9 @@
+/build/
+/dist/
+__pycache__/
+*.pyc
+*.sav
+*.log
+/Browser/
+/Backups/
+/Exported Saves/
