@@ -1,9 +1,6 @@
-/build/
-/dist/
+build/
+dist/
 __pycache__/
-*.pyc
-*.sav
-*.log
-/Browser/
-/Backups/
-/Exported Saves/
+*.spec
+test_*.py
+probe_*.py

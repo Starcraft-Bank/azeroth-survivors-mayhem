@@ -1,114 +1,123 @@
-"""Windows GUI and isolated packaged-app diagnostics."""
+"""Native Legendary Mayhem launcher. No browser or legacy cheat controls."""
 from pathlib import Path
-import json
-import os
-import queue
-import sys
-import tempfile
-import threading
+import argparse,json,os,queue,sys,threading
 import tkinter as tk
-from tkinter import messagebox
-import webbrowser
-from trainer_runtime import APP_NAME, VERSION, RESOURCE_ROOT, data_root, launch, verified_backup
+from tkinter import filedialog,messagebox,ttk
+from native_runtime import DEFAULTS,ROOT,VERSION,NativeGame,self_test,validate_settings
 
+PRESETS=('Easy','Hard','Brutal','Insane')
+PREFS=Path(os.environ.get('LOCALAPPDATA',Path.home()))/'LegendaryMayhemNative'/'settings.json'
 
-def smoke_test(output):
-    result = {'version': VERSION, 'packaged': bool(getattr(sys, 'frozen', False))}
-    try:
-        with tempfile.TemporaryDirectory(prefix='azs-trainer-test-') as folder:
-            result['game'] = launch(lambda _: None, threading.Event(), headless=True, temporary_root=folder, smoke=True)
-            text = 'isolated-backup-integrity-check'
-            import hashlib
-            record = {'text':text, 'sha256':hashlib.sha256(text.encode()).hexdigest()}
-            saved = verified_backup(record, Path(folder)/'Backups')
-            result['backupVerified'] = saved['verified'] and (Path(folder)/'Backups'/saved['filename']).read_text() == text
-            result['success'] = result['game']['ready'] and result['game']['mayhem']=='object' and result['game']['defaults'] and result['game']['modeOnly'] and result['backupVerified']
-    except Exception as error:
-        result['success'] = False
-        result['error'] = type(error).__name__ + ': ' + str(error)
-    Path(output).write_text(json.dumps(result,indent=2),encoding='utf-8')
-    return 0 if result['success'] else 1
+class App:
+    def __init__(self,window):
+        self.window=window;self.game=None;self.launching=False;self.last_locked=None;self.controls=[]
+        self.saved={}
+        try:self.saved=json.loads(PREFS.read_text(encoding='utf-8'))
+        except (OSError,ValueError):pass
+        settings=self.saved.get('settings',{})
+        if not validate_settings(settings):settings=dict(DEFAULTS)
+        window.title('Legendary Mayhem · Native '+VERSION);window.geometry('640x810');window.minsize(620,800)
+        try:window.iconbitmap(str(ROOT/'assets/wow.ico'))
+        except tk.TclError:pass
+        window.configure(bg='#101722');style=ttk.Style(window);style.theme_use('clam')
+        style.configure('.',background='#172334',foreground='#e5edf8',font=('Segoe UI',10))
+        style.configure('TFrame',background='#101722');style.configure('TLabel',background='#101722')
+        style.configure('Title.TLabel',font=('Segoe UI',22,'bold'),foreground='#ffd275')
+        style.configure('TButton',padding=8);style.map('TCombobox',fieldbackground=[('readonly','#25384f')],foreground=[('readonly','#ffffff')])
+        frame=ttk.Frame(window,padding=22);frame.pack(fill='both',expand=True)
+        ttk.Label(frame,text='LEGENDARY MAYHEM',style='Title.TLabel').pack(anchor='w')
+        ttk.Label(frame,text='Native game mode · host runs the mode · '+VERSION).pack(anchor='w',pady=(0,16))
+        ttk.Label(frame,text='Game executable (native 0.120.5 · e0e2410c)').pack(anchor='w')
+        row=ttk.Frame(frame);row.pack(fill='x',pady=(5,12))
+        beside=Path(sys.executable).parent/'AzerothSurvivors.exe'
+        self.path=tk.StringVar(value=self.saved.get('game','') or (str(beside)if beside.exists()else''))
+        self.path_entry=ttk.Entry(row,textvariable=self.path);self.path_entry.pack(side='left',fill='x',expand=True)
+        self.browse=ttk.Button(row,text='Browse…',command=self.choose);self.browse.pack(side='right',padx=(8,0))
+        self.panel=ttk.LabelFrame(frame,text='Pre-match settings',padding=12);self.panel.pack(fill='x')
+        self.damage=tk.StringVar(value=PRESETS[settings['damagePreset']]);self.health=tk.StringVar(value=PRESETS[settings['healthPreset']])
+        self.start=tk.IntVar(value=settings['legendaryStart']);self.interval=tk.IntVar(value=settings['legendaryInterval'])
+        for label,var in [('Boss health',self.health),('Boss damage',self.damage)]:
+            line=ttk.Frame(self.panel);line.pack(fill='x',pady=4);ttk.Label(line,text=label).pack(side='left')
+            box=ttk.Combobox(line,textvariable=var,values=PRESETS,state='readonly',width=14);box.pack(side='right');self.controls.append(box)
+        for label,var,minimum in [('First Legendary (minutes)',self.start,0),('Add another every (minutes)',self.interval,1)]:
+            line=ttk.Frame(self.panel);line.pack(fill='x',pady=4);ttk.Label(line,text=label).pack(side='left')
+            box=ttk.Spinbox(line,from_=minimum,to=30,textvariable=var,width=14,state='readonly');box.pack(side='right');self.controls.append(box)
+        self.event_vars=[]
+        for i,name in enumerate(['Treasure Rush','Guardian Hunt','Berserker Rush','Rune Storm']):
+            var=tk.BooleanVar(value=bool(settings['eventMask']&(1<<i)));self.event_vars.append(var)
+            box=ttk.Checkbutton(self.panel,text=name,variable=var);box.pack(anchor='w',pady=2);self.controls.append(box)
+        self.defaults=ttk.Button(self.panel,text='Restore defaults',command=self.restore);self.defaults.pack(anchor='e',pady=(6,0));self.controls.append(self.defaults)
+        self.status=tk.StringVar(value='Choose your game EXE, then launch. Settings lock during matches.')
+        ttk.Label(frame,textvariable=self.status,wraplength=560).pack(anchor='w',fill='x',pady=14)
+        line=ttk.Frame(frame);line.pack(fill='x')
+        self.launch=ttk.Button(line,text='Launch native Mayhem',command=self.open_game);self.launch.pack(side='left')
+        self.stop=ttk.Button(line,text='Close game',command=self.close_game,state='disabled');self.stop.pack(side='right')
+        ttk.Label(frame,text='Bosses every 2 minutes · 30-second arrival barrages\nRune Storm: 8 circles/player every 2.5 seconds\nKeep this launcher open. Closing it also closes its game.',wraplength=560).pack(anchor='w',pady=14)
+        ttk.Button(frame,text='Open guide',command=self.guide).pack(anchor='w')
+        for var in [self.damage,self.health,self.start,self.interval,*self.event_vars]:var.trace_add('write',self.changed)
+        window.protocol('WM_DELETE_WINDOW',self.quit);window.after(200,self.poll)
 
+    def choose(self):
+        path=filedialog.askopenfilename(title='Select AzerothSurvivors.exe',filetypes=[('Game executable','AzerothSurvivors.exe'),('Windows executable','*.exe')])
+        if path:self.path.set(path);self.save()
 
-def main():
-    root = tk.Tk()
-    root.title(APP_NAME + ' ' + VERSION)
-    root.geometry('640x610')
-    root.resizable(False, False)
-    root.configure(bg='#101720')
-    root.iconbitmap(str(RESOURCE_ROOT/'assets/wow.ico'))
-    events = queue.Queue()
-    stop = threading.Event()
-    running = False
-    closing = False
-    gold, white, muted = '#e4bc69', '#eef3f8', '#b1c0cf'
-    panel = tk.Frame(root,bg='#101720',padx=26,pady=20)
-    panel.pack(fill='both',expand=True)
-    icon = tk.PhotoImage(file=str(RESOURCE_ROOT/'assets/wow.png'))
-    heading = tk.Frame(panel,bg='#101720');heading.pack(fill='x')
-    tk.Label(heading,image=icon,bg='#101720').pack(side='left',padx=(0,12))
-    tk.Label(heading,text='LEGENDARY MAYHEM',fg=gold,bg='#101720',font=('Segoe UI',19,'bold')).pack(anchor='w')
-    tk.Label(panel,text='Custom game mode  '+VERSION,fg=muted,bg='#101720',font=('Segoe UI',11)).pack(anchor='w',pady=(4,14))
-    tk.Label(panel,text='Cross-map bosses every 2 minutes\nTougher bosses · Hazards every 20 seconds + camping\nPre-match settings · Boss damage, Legendary timing, events',justify='left',fg=white,bg='#1b2734',padx=14,pady=12,font=('Segoe UI',11)).pack(fill='x')
-    tk.Label(panel,text='Rune Storm · Treasure Rush · Guardian Hunt · Berserker Rush\nPriority game announcements · Boss-kill fireworks',justify='left',fg=white,bg='#101720',font=('Segoe UI',11)).pack(anchor='w',pady=12)
-    tk.Label(panel,text='HOST runs this mode; friends join with the normal game.\nNormal gold costs. Defaults: Legendary guarantees at 0 / 10 / 20 minutes.\nSeparate local profile; import your save if wanted.',justify='left',fg=muted,bg='#101720',font=('Segoe UI',10)).pack(anchor='w')
-    status = tk.StringVar(value='Ready. Requires Windows 10/11, current Edge or Chrome, and internet.')
-    tk.Label(panel,textvariable=status,wraplength=580,justify='left',fg=gold,bg='#101720',font=('Segoe UI',10),height=3).pack(fill='x',pady=(14,6))
-
-    def folder(name):
-        path=data_root()/name;path.mkdir(parents=True,exist_ok=True);os.startfile(path)
-
-    def worker():
+    def settings(self):return dict(damagePreset=PRESETS.index(self.damage.get()),healthPreset=PRESETS.index(self.health.get()),legendaryStart=self.start.get(),legendaryInterval=self.interval.get(),eventMask=sum((1<<i)for i,v in enumerate(self.event_vars)if v.get()))
+    def save(self):
+        PREFS.parent.mkdir(parents=True,exist_ok=True);temp=PREFS.with_suffix('.tmp')
+        temp.write_text(json.dumps({'game':self.path.get(),'settings':self.settings()},indent=2),encoding='utf-8');temp.replace(PREFS)
+    def changed(self,*args):
         try:
-            launch(lambda text:events.put(('status',text)),stop)
-        except Exception as error:
-            message=str(error)
-            if 'ProcessSingleton' in message or 'profile' in message.lower() and 'lock' in message.lower():
-                message='This Mayhem profile is already open. Close its existing browser window, then launch again.'
-            events.put(('error',message))
-        finally:
-            events.put(('done',None))
-
-    def start():
-        nonlocal running
-        if running:return
-        running=True;stop.clear();play.configure(state='disabled');status.set('Starting Legendary Mayhem…')
-        threading.Thread(target=worker,daemon=True,name='trainer-browser').start()
-
-    play=tk.Button(panel,text='Launch Legendary Mayhem',command=start,bg='#715221',fg='white',activebackground='#936c2c',activeforeground='white',font=('Segoe UI',12,'bold'),relief='flat',pady=10)
-    play.pack(fill='x',pady=(6,10))
-    row=tk.Frame(panel,bg='#101720');row.pack(fill='x')
-    for label,callback in [('Instructions',lambda:os.startfile(RESOURCE_ROOT/'README.txt')),('Backups',lambda:folder('Backups')),('Exported saves',lambda:folder('Exported Saves'))]:
-        tk.Button(row,text=label,command=callback,bg='#263544',fg=white,relief='flat',font=('Segoe UI',10),padx=12,pady=6).pack(side='left',padx=(0,8))
-    tk.Label(panel,text='Unofficial tool. Not affiliated with Blizzard or the game developer.\nClosing this launcher also closes its game browser.',justify='left',fg=muted,bg='#101720',font=('Segoe UI',9)).pack(anchor='w',pady=(14,0))
-
-    def close():
-        nonlocal closing
-        if running:
-            closing=True;stop.set();status.set('Closing the game browser…')
-        else:root.destroy()
-
-    def poll():
-        nonlocal running
-        try:
-            while True:
-                kind,text=events.get_nowait()
-                if kind=='status':status.set(text)
-                elif kind=='error':
-                    status.set('Could not open Legendary Mayhem.');messagebox.showerror(APP_NAME,text,parent=root)
-                elif kind=='done':
-                    running=False;play.configure(state='normal')
-                    if closing:root.destroy();return
-                    status.set('Game closed. Your progress stays in this Windows account.')
-        except queue.Empty:pass
-        root.after(200,poll)
-    root.protocol('WM_DELETE_WINDOW',close)
-    root.after(200,poll)
-    if '--ui-smoke-test' in sys.argv:root.after(1500,root.destroy)
-    root.mainloop()
-
+            settings=self.settings()
+            if not validate_settings(settings):return
+            if self.game and self.game.ready and not self.game.configure(settings):return
+            self.save()
+        except (ValueError,tk.TclError,OSError):pass
+    def restore(self):
+        self.health.set('Insane');self.damage.set('Hard');self.start.set(0);self.interval.set(10)
+        for var in self.event_vars:var.set(True)
+    def guide(self):os.startfile(str(ROOT/'README.txt'))
+    def open_game(self):
+        if self.launching or self.game:return
+        self.launching=True;self.launch.configure(state='disabled');self.browse.configure(state='disabled');self.path_entry.configure(state='disabled')
+        self.status.set('Checking the native game and starting Mayhem…');self.save();self.game=NativeGame()
+        # Capture Tk values on its owning thread.
+        path,settings=self.path.get(),self.settings();current=self.game
+        def worker():
+            try:current.start(path,settings)
+            except Exception as error:current.events.put({'kind':'launch-error','error':str(error)})
+        threading.Thread(target=worker,daemon=True).start()
+    def unlocked(self,enabled):
+        if self.last_locked==enabled:return
+        self.last_locked=enabled
+        for widget in self.controls:widget.configure(state=('readonly'if isinstance(widget,(ttk.Combobox,ttk.Spinbox))else'normal')if enabled else'disabled')
+    def poll(self):
+        if self.game:
+            try:
+                while True:
+                    item=self.game.events.get_nowait();kind=item.get('kind')
+                    if kind=='ready':self.launching=False;self.stop.configure(state='normal');self.status.set('Native Mayhem ready. Host a lobby or start a solo match normally.')
+                    elif kind=='status':
+                        match=item.get('match');self.unlocked(not match or match['phase']==0)
+                        if item.get('fault'):self.status.set('Mode error. Close the game and relaunch: '+item['fault'].splitlines()[0])
+                        elif match:
+                            clock=match['clock'];state=item['state'];self.status.set(f"{'Endless'if state['endless']else'Match'} {int(clock)//60}:{int(clock)%60:02} · wave {state['wave']} · gold ×{item['scaling']['gold']:.2f}\nNext boss in {max(0,int(state['nextWave']-clock))}s · {'Rune Storm active'if state['event']==4 else'events enabled'}")
+                        else:self.status.set('Native Mayhem ready. Host a match; guests use the normal game.')
+                    elif kind in ('launch-error','closed'):
+                        self.status.set(item.get('error')or('The game closed unexpectedly.'if item.get('crashed')else'Game closed. Ready to launch again.'))
+                        self.game=None;self.launching=False;self.launch.configure(state='normal');self.stop.configure(state='disabled');self.browse.configure(state='normal');self.path_entry.configure(state='normal');self.unlocked(True);break
+                    elif kind=='fault':self.status.set('Native mode error: '+item['error'].splitlines()[0])
+            except queue.Empty:pass
+        self.window.after(200,self.poll)
+    def close_game(self):
+        if self.game and messagebox.askyesno('Close game?','This closes the game launched by Mayhem. Finish or leave your match first.'):self.game.close()
+    def quit(self):
+        if self.game and not messagebox.askyesno('Close Mayhem?','Closing Mayhem also closes its game. Finish or leave your match first.'):return
+        if self.game:self.game.close()
+        self.window.destroy()
 
 if __name__=='__main__':
-    if len(sys.argv)==3 and sys.argv[1]=='--smoke-test':
-        raise SystemExit(smoke_test(sys.argv[2]))
-    main()
+    parser=argparse.ArgumentParser();parser.add_argument('--self-test',action='store_true');parser.add_argument('--game');parser.add_argument('--report');parser.add_argument('--seconds',type=int,default=15);args=parser.parse_args()
+    if args.self_test:
+        if not args.game or not args.report:parser.error('--self-test requires --game and --report')
+        raise SystemExit(self_test(args.game,args.report,args.seconds))
+    window=tk.Tk();app=App(window);window.mainloop()

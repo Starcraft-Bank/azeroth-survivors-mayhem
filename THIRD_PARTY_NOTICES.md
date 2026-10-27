@@ -1,11 +1,19 @@
 # Third-party notices
 
-This is an unofficial community launcher for [Azeroth Survivors](https://wow.aethus.pl/), created by Aethus. It is not affiliated with or endorsed by the game developer or Blizzard Entertainment.
+Legendary Mayhem is an unofficial community mode for Azeroth Survivors by
+Aethus. It is not affiliated with the game developer or Blizzard Entertainment.
+The game executable, game code and MPQ assets are not redistributed.
 
-The game itself, its WebAssembly binary and its game assets are **not bundled**. The launcher opens the official website and downloads the game normally at runtime. The small exact-build patch specification is included with the trainer.
+The World of Warcraft icon is Blizzard's official website favicon. Its source
+and attribution are included in `assets/ATTRIBUTION.txt` and the release ZIP.
+Warcraft and World of Warcraft are Blizzard trademarks.
 
-The World of Warcraft icon is Blizzard Entertainment's official website favicon. Warcraft and World of Warcraft are Blizzard trademarks. The original asset URL is recorded in `assets/ATTRIBUTION.txt` and the release ZIP's icon attribution notice.
+The Windows executable bundles Python (PSF), Tcl/Tk, the PyInstaller bootloader
+(GPL with its distribution exception), and the unmodified Frida 17.2.17 Python
+runtime (wxWindows Library Licence 3.1 and its binary distribution exception).
+License texts are included under `third_party_licenses/` in the EXE and ZIP.
+Frida source and build instructions: https://github.com/frida/frida-python
+and https://github.com/frida/frida/releases/tag/17.2.17.
 
-The EXE bundles Python (PSF license), Playwright and its driver (Apache 2.0 and included notices), Node.js and its dependencies (included driver license), greenlet, pyee, typing_extensions, Tcl/Tk, and the PyInstaller bootloader. PyInstaller's license includes its bootloader distribution exception. The available runtime license texts are included inside the EXE and alongside it in the ZIP under `third_party_licenses/`.
-
-Microsoft Edge or Google Chrome is supplied by the user and is not redistributed.
+Original launcher/hook code is MIT licensed. Independently derived executable
+fingerprints and runtime layout metadata describe the supported artifact.

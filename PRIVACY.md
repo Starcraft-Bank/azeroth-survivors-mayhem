@@ -1,11 +1,18 @@
-# Privacy and local data
+# Privacy
 
-The Windows EXE and ZIP contain custom-mode code, runtime libraries, an icon and documentation. They do not contain the creator's browser profile, cookies, game saves, screenshots, private logs, account credentials or local development data.
+The native launcher checks the selected game's fingerprint and launches that
+one child process with its in-memory mode hooks. Original game files and
+assets are neither bundled nor edited. The launcher contains no analytics,
+credential reader, browser-profile access, or save upload functionality.
 
-The launcher creates a separate persistent profile under %LOCALAPPDATA%\Azeroth Survivors Custom Mode\Browser for the person running it. Saves and preferences belong to that Windows user. Explicit save exports go to the sibling Exported Saves folder. A Backups folder can remain from earlier launcher versions.
+The selected game path and mode preferences remain in the user's own local
+settings file under `%LOCALAPPDATA%/LegendaryMayhemNative`. They are never
+included in the downloadable release. The game uses its ordinary native save
+and networking. Gameplay may persist rewards through the game's normal save
+processing. Closing Mayhem also closes the game it launched.
 
-There are no collection-unlock controls or automatic save imports. To transfer progress, export a copy from the original browser and import it through the game's normal save interface.
-
-The launcher opens the official game site. The site and its asset/co-op services receive their normal network traffic. This launcher adds no analytics, telemetry, remote control or automatic file-upload service.
-
-Only distribute release files. Do not distribute the generated Browser, Backups or Exported Saves folders. Release assets include a content audit and SHA-256 checksums. The source tree is published from an explicit runtime-file allowlist.
+The release is built from an explicit allowlist. Private native test fixtures,
+save files, developer paths/settings, game assets, browser profiles, logs,
+screenshots and credentials are excluded. A release-specific audit and SHA-256
+checksums accompany downloads. No launcher can control a game's own privacy
+behavior; see the original game's information for that.
