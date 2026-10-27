@@ -1,4 +1,4 @@
-# Legendary Mayhem — native edition 0.7.0
+# Legendary Mayhem — native edition 0.8.0-preview.1
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
@@ -7,7 +7,7 @@ legacy; its older releases remain available in the release history.
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.7.0.exe.
+2. Run AzerothSurvivorsMayhemNative-0.8.0-preview.1.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.
@@ -15,9 +15,25 @@ legacy; its older releases remain available in the release history.
 5. Pick a character/map and start a match using the normal game menus.
 6. Keep the launcher open while playing. Closing it closes its game too.
 
-Requires Windows 10/11 x64 and native game 0.120.5 (build e0e2410c).
-The complete executable fingerprint is checked before launch. Other builds
-are rejected without installing hooks. Administrator access and a separate
+Requires Windows 10/11 x64. Automatic compatibility detection reads the selected
+EXE without starting or attaching to a game. This preview includes adapters for
+0.120.5 / e0e2410c and 0.122.0 / 508416ff. The older gameplay behavior has been
+preserved; the 0.122.0 adapter has static code/ABI/layout review only. Native
+playtesting of that adapter is pending. Use this as a preview, not a proven
+replacement for an ongoing session.
+
+Detection scans instruction patterns and independently verifies the reviewed
+loaded code/data image. It accepts compatible timestamp/checksum/certificate
+or preferred-base packaging differences, instead of requiring one exact file
+size/hash. Changed logic/layout still requires a new adapter. This does not
+promise universal compatibility with every past or future version.
+
+Use Check compatibility in the launcher before playing. It never opens a game.
+The local compatibility-report.json has file hashes, sizes and match results,
+without personal file paths, saves or process access. Share that report when a
+new build needs support. It is saved under %LOCALAPPDATA%/LegendaryMayhemNative.
+The --diagnose --game <EXE> --report <JSON> command performs the same offline
+check without showing a window. Unknown/incompatible builds are not launched. Administrator access and a separate
 Python installation are not needed. This community executable is unsigned.
 
 This launches your existing native game. It does not replace game files,

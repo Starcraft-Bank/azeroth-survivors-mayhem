@@ -10,7 +10,8 @@ Warcraft and World of Warcraft are Blizzard trademarks.
 
 The Windows executable bundles Python (PSF), Tcl/Tk, the PyInstaller bootloader
 (GPL with its distribution exception), and the unmodified Frida 17.2.17 Python
-runtime (wxWindows Library Licence 3.1 and its binary distribution exception).
+runtime (wxWindows Library Licence 3.1 and its binary distribution exception),
+and pefile 2024.8.26 (MIT).
 License texts are included under `third_party_licenses/` in the EXE and ZIP.
 Frida source and build instructions: https://github.com/frida/frida-python
 and https://github.com/frida/frida/releases/tag/17.2.17.
