@@ -1,13 +1,35 @@
-# Legendary Mayhem — native edition 0.7.0
+# Legendary Mayhem — native edition 0.9.1
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
 legacy; its older releases remain available in the release history.
 
+## New in 0.9.1
+
+- **Permanent Endless rewards:** cross-map Mayhem bosses now qualify for native
+  final-boss rewards during confirmed Endless on game 0.123.0. Class Marks and
+  native gear rewards use each player's normal save and upgrade system. Only
+  the host runs Mayhem. Payouts follow native rules, not a fixed per-kill amount.
+- Boss gold/XP bounties; Mayhem bosses pay twice the base bounty. Every three
+  boss kills gives a chest and powerup and adds 10% to later bounties, capped
+  at +200%. Bounty tiers reset each match.
+- Extra powerups every 25 seconds and chests every 75 seconds near living players.
+- Scatter, broken-ring, cross, lane and spiral rune formations, plus native
+  cone and line attacks during storms, arrival barrages and idle checks.
+  Warnings remain 2.5 seconds; these are damaging attacks, not physical walls.
+- Rerolls cost 100 / 300 / 900, then at most 1,000 gold by default.
+- Luck-stat chest jewelry is filtered by default (currently Mark of the Chosen).
+  Existing equipment is unchanged. Reward settings are in the Insert overlay.
+- Native announcement sounds and colored boss-death bursts at the death position.
+
+An in-world shop is **not included**. Permanent progression currently uses the
+game's existing class Marks and gear upgrades between matches. There is no
+new custom currency, guest addon, or public collection-unlock feature.
+
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.7.0.exe.
+2. Run AzerothSurvivorsMayhemNative-0.9.1.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.
@@ -15,15 +37,35 @@ legacy; its older releases remain available in the release history.
 5. Pick a character/map and start a match using the normal game menus.
 6. Keep the launcher open while playing. Closing it closes its game too.
 
-Requires Windows 10/11 x64 and native game 0.120.5 (build e0e2410c).
-The complete executable fingerprint is checked before launch. Other builds
-are rejected without installing hooks. Administrator access and a separate
+Requires Windows 10/11 x64. Automatic compatibility detection reads the selected
+EXE without starting or attaching to a game. Use **0.123.0 / 425f2391**
+on both host and guests for the current tested mode. Reviewed adapters for
+0.120.5 and 0.122.0 remain included, but the new permanent-reward eligibility
+fix is specific to 0.123.0. The packaged 0.9.1 launcher was smoke-tested on
+0.123.0. Native two-client LAN tests verified shared hazards and Endless;
+ordinary combat verified saved class Marks for host and unmodified guest.
+Long Internet sessions and balance still need playtesting.
+
+Detection scans instruction patterns and independently verifies the reviewed
+loaded code/data image. It accepts compatible timestamp/checksum/certificate
+or preferred-base packaging differences, instead of requiring one exact file
+size/hash. Changed logic/layout still requires a new adapter. This does not
+promise universal compatibility with every past or future version.
+
+Use Check compatibility in the launcher before playing. It never opens a game.
+The local compatibility-report.json has file hashes, sizes and match results,
+without personal file paths, saves or process access. Share that report when a
+new build needs support. It is saved under %LOCALAPPDATA%/LegendaryMayhemNative.
+The --diagnose --game <EXE> --report <JSON> command performs the same offline
+check without showing a window. Unknown/incompatible builds are not launched. Administrator access and a separate
 Python installation are not needed. This community executable is unsigned.
 
 This launches your existing native game. It does not replace game files,
 install game assets, or transfer browser saves. It uses your ordinary native
 save. Back up/export your save before experimenting with a custom mode.
-Close the normal game before starting the launcher.
+Close the normal game before starting the launcher. The game updater is disabled
+for the launched session so it cannot replace the checked binary. Update the
+ordinary game separately between sessions, then check compatibility again.
 
 ## Insert overlay settings
 
@@ -54,7 +96,9 @@ trigger, obstacle damage difficulty and optional damage growth per minute.
 Obstacle damage presets multiply base damage by 0.5 / 1 / 1.5 / 2. Growth adds
 0–10% per minute, capped at an additional 300% (4x). Growth defaults to zero.
 The shared 128-circle safety cap and 2.5-second warning remain in place.
-Session: boss fireworks and automatic Endless. Extra waves, events and hazards
+Rewards: bounty cadence, extra pickups/chests, reroll cap and luck-item filter.
+Hazards also offers rune formations and extra native cone/line attacks.
+Session: announcement sound, boss fireworks and automatic Endless. Extra waves, events and hazards
 can each be disabled. Restore defaults selects the defaults; Apply commits them.
 The values in the Mayhem rules below describe the defaults.
 
@@ -72,7 +116,7 @@ and 20% shorter cooldowns. Wave modifiers include Frenzy, Spellstorm and
 Double Trouble. Ordinary mobs also grow stronger over time.
 
 Gold income starts at 1.25x, gains 0.15x per minute and caps at 8x.
-Treasure Rush doubles this for 30 seconds. Prices stay normal; there is no
+Treasure Rush doubles this for 30 seconds. Rerolls are capped as described above; there is no
 unlimited-gold balance or automatic refill.
 
 Defeating the map's final boss completes the game's native victory processing,

@@ -3,18 +3,22 @@ from pathlib import Path
 import hashlib,json,os,queue,sys,threading,time
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.7.0'
+VERSION='0.9.1'
 from settings import DEFAULTS, SCHEMA, validate_settings
 
 
-def check_game(path):
+def compatibility_check(path, report_path=None):
+    from compatibility import analyze_game,write_report
     exe=Path(path).resolve(strict=True)
-    profile=json.loads((ROOT/'native-profile.json').read_text(encoding='utf-8'))
-    if not exe.is_file() or exe.stat().st_size!=profile['bytes']:
-        raise ValueError('Select the supported AzerothSurvivors.exe (native 0.120.5, e0e2410c).')
-    with exe.open('rb') as stream:digest=hashlib.file_digest(stream,'sha256').hexdigest()
-    if digest!=profile['sha256']:
-        raise ValueError('This native game build is unsupported. No hooks were installed. Use 0.120.5 (e0e2410c).')
+    if not exe.is_file():raise ValueError('Select AzerothSurvivors.exe.')
+    profile,report=analyze_game(exe,ROOT/'compatibility-manifest.json')
+    if report_path:write_report(report_path,report)
+    return exe,profile,report
+
+def check_game(path):
+    report_path=Path(os.environ.get('LOCALAPPDATA',Path.home()))/'LegendaryMayhemNative'/'compatibility-report.json'
+    exe,profile,report=compatibility_check(path,report_path)
+    if not profile:raise ValueError(report['message']+' Report: '+str(report_path))
     if not (exe.parent/'Data').is_dir():raise ValueError('The game needs its Data folder beside AzerothSurvivors.exe.')
     return exe,profile
 
@@ -39,7 +43,8 @@ class NativeGame:
             try:
                 self.session=self.device.attach(self.pid)
                 self.session.on('detached',self._detached)
-                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+(ROOT/'agent.js').read_text(encoding='utf-8')
+                self.events.put({'kind':'compatible','version':profile['version'],'stamp':profile['stamp']})
+                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['patterns.js','rewards.js','effects.js','permanent-rewards.js','agent.js'])
                 self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
                 self.agent.on('message',self._message);self.agent.load()
                 if not self.ready:raise RuntimeError('The native mode did not initialize; the game was not resumed.')
@@ -88,5 +93,8 @@ def self_test(game,report,seconds=15):
         result.update(success=session.ready and bool(session.latest) and not session.latest.get('fault'),status=session.latest)
     except Exception as error:result['error']=str(error)
     finally:
+        records=[]
+        while not session.events.empty():records.append(session.events.get_nowait())
+        result['events']=records[-20:]
         session.close();target.write_text(json.dumps(result,indent=2),encoding='utf-8')
     return 0 if result['success'] else 1

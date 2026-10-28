@@ -1,6 +1,6 @@
 # Privacy
 
-The native launcher checks the selected game's fingerprint and launches that
+The native launcher scans the selected game's instruction patterns and reviewed runtime identity and launches that
 one child process with its in-memory mode hooks. Original game files and
 assets are neither bundled nor edited. The launcher contains no analytics,
 credential reader, browser-profile access, or save upload functionality.
@@ -16,3 +16,5 @@ save files, developer paths/settings, game assets, browser profiles, logs,
 screenshots and credentials are excluded. A release-specific audit and SHA-256
 checksums accompany downloads. No launcher can control a game's own privacy
 behavior; see the original game's information for that.
+
+Compatibility reports remain local and include hashes, sizes and pattern matches. They exclude the selected path and save contents. The detector does not access running processes or upload reports.

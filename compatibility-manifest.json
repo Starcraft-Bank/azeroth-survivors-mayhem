@@ -1,0 +1,963 @@
+{
+  "schema": 1,
+  "adapters": [
+    {
+      "profile": {
+        "schema": 1,
+        "version": "0.120.5",
+        "stamp": "e0e2410c",
+        "exeName": "AzerothSurvivors.exe",
+        "sha256": "522e1c831b3b4627875a28a1030368ef9d2e7f98c5606c34cb30448d3b7d776e",
+        "bytes": 145498624,
+        "functions": {
+          "gameUpdate": 95509520,
+          "runTick": 96108288,
+          "bossSpawn": 96315536,
+          "mobSpawn": 96324496,
+          "entitySpawn": 96320912,
+          "hazardCast": 96186000,
+          "hazardUpdate": 96148624,
+          "offer": 96483408,
+          "card": 96502720,
+          "enemyAi": 96354064,
+          "enemyDamage": 96328320,
+          "keepFighting": 96019856,
+          "banner": 95037616,
+          "packetMessage": 96847472,
+          "reserveMessages": 100323584,
+          "allocate": 8640,
+          "partySwap": 96140176,
+          "emitEvent": 96130480,
+          "deallocate": 8656,
+          "flushMessages": 96008784,
+          "reserveUi": 100322912,
+          "setField": 94891488,
+          "writeGuid": 96851648,
+          "writeFields": 96849616
+        },
+        "functionHeadSha256": {
+          "gameUpdate": "ebc032f234e986b569081925edcf93b071230d694e28dd330e5c9cb4de5a7628",
+          "runTick": "4a0c05d2c9b11d48031bbe8a8afd2cf0a9a04580e7f54a17da92efd9febb6f50",
+          "bossSpawn": "c6b4c596b2416da71d5fd4c9fbb5640a15f7c85c7e020f4cd1752790dcec3a95",
+          "mobSpawn": "e91e5b5fbd9f5b829a1c75c1e2f48583e4e9b59261ac9d6ef91f0cfe46ae27c5",
+          "entitySpawn": "cdbf92e49b289b1ceb3390a0e98766c91e86909c80cba6cb41bb1fbd0c63f04b",
+          "hazardCast": "b420fcadd7eee50196c2e63e6d5c23e39f3d2fe3cc521719f3996e697dbba346",
+          "hazardUpdate": "44232df7c7c579701558a751d797211e803080c9c66c2bb8a3172a3f72e64ee9",
+          "offer": "00305913c9370d0ba73e97252e2f9e87fcd88c8ef65a647ac0104fa90ac7101b",
+          "card": "ff11791a8799daf720d3040122cad3c12b8163dd7dae0c8217ccd10d5567145b",
+          "enemyAi": "f61d7ca3ce08039e4a067e00995b3f11fd4efd3eaa4b366c339acbd42471f144",
+          "enemyDamage": "b420fcadd7eee50196c2e63e6d5c23e39f3d2fe3cc521719f3996e697dbba346",
+          "keepFighting": "3a9c36762234963f570bd98268f35a1a8cce5ced7c295ab94ff50266964a934a",
+          "banner": "818f19c80997870758018f2c856f03b03900acaf2bdece9b04e588ca461db7a1",
+          "packetMessage": "d5b9e7a616d4a6b5ee3a66a3c322b41717637c332fdf7ddfde9859c129e9119d",
+          "reserveMessages": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "allocate": "4f9bc5b7bcd457ccefeb236e03c104a1bed3e7231576c48841b0181679c5f79c",
+          "partySwap": "b649a934b2ec804b30fa87e63f4cb9e4d9c84eeea7f39977563cc7ccdfb75174",
+          "emitEvent": "4b886e0352cd25b934bd6589dea23b8a3d5fa74b3177c5798d9acd45678a2b07",
+          "deallocate": "9a482af530fc677cc0266507c0ebb8048c26d9bb0d29182152f46a7de3e3223e",
+          "flushMessages": "92e2e5b7477a34c26a5f3e9b12ddb2da9aa915b131a997c05a9c90f448de554e",
+          "reserveUi": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "setField": "2f77bb73374cabada939163b8461cfbca239a4fb7de38df063046aaf5c48dc5a",
+          "writeGuid": "e418a1572c461c11cf8302682e4aa7f8d2c41f0300e1060eeec2483bb966d7f9",
+          "writeFields": "5904d6f35e436aed59f69f08cfb305a6c621b82250f04c1bfa06f27ae996fae0"
+        },
+        "zoneTable": 116916720,
+        "zoneCount": 12,
+        "zoneStride": 240,
+        "bossStride": 104,
+        "abilityStride": 56,
+        "hazardDefinition": 116869968,
+        "enemyStride": 480,
+        "hazardStride": 128,
+        "partyStride": 2448,
+        "goldAwards": [
+          {
+            "rva": 95775215,
+            "runRegister": "rsi",
+            "headSha256": "71486b8078ea58a223277577bcdd4ca7be42e88e0ac06f933930a80ef2a89887"
+          },
+          {
+            "rva": 95975851,
+            "runRegister": "r13",
+            "headSha256": "69967fe2c63b87b328d2f87166b3b3e320331b15f60c59ed596008449338aa71"
+          },
+          {
+            "rva": 96137797,
+            "runRegister": "rsi",
+            "headSha256": "71486b8078ea58a223277577bcdd4ca7be42e88e0ac06f933930a80ef2a89887"
+          }
+        ]
+      },
+      "runtimeSha256": "3aaaa221474b29803616423d33ddce2df7457ebfa006cfb8503709cecd6f79c9",
+      "signatures": {
+        "gameUpdate": {
+          "rva": 95509520,
+          "pattern": "5541574156415541545657534881ec980d0000488dac248000000066440f2995000d000066440f298df00c000066440f2985e00c00000f29bdd00c00000f29b5c00c000048c785b80c0000feffffff660f28f10f57ff8339017524660f28c6f20f5c4108660f57c9f20f5fc8f20f1005eca98700f20f5dc10f57fff20f5af848c70101000000f20f1171084c8b81f00f0000488b81f80f0000488b910010000048c781f00f00000000000048c781f80f00000800000048c7810010000000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "runTick": {
+          "rva": 96108288,
+          "pattern": "554157415641545657534881ec70010000488dac2480000000440f29b5e0000000440f29add0000000440f29a5c0000000440f299db0000000440f2995a0000000440f298d90000000440f2985800000000f297d700f29756048c74558feffffff0f28f14889ce80b99d0c000000745c4889f10f28ce0f2875600f287d70440f288580000000440f288d90000000440f2895a0000000440f289db0000000440f28a5c0000000440f28add0000000440f28b5e00000004881c4700100005b5f5e",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "bossSpawn": {
+          "rva": 96315536,
+          "pattern": "5541574156415541545657534881ecf8020000488dac2480000000440f299560020000440f298d50020000440f298540020000660f7fbd300200000f29b52002000048c78518020000feffffff4989d54889ce488b89b8020000488b96c0020000e82a71eaff4889c34869c0f00000004c8d35e9583a018b8ef8040000898db0010000488b8ef004000048898da8010000488d8da801000048898dd00100004e8b7c30684a8b7c3070498d04ff4c897dc8488945d0488d85d0010000488945d8",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "mobSpawn": {
+          "rva": 96324496,
+          "pattern": "5541574156415541545657534881ece8020000488dac2480000000440f29bd50020000440f29b540020000440f29ad30020000440f29a520020000440f299d10020000440f299500020000440f298df0010000440f2985e00100000f29bdd00100000f29b5c001000048c785b8010000feffffff4c89c74889d34889ce488b91900500004885d2741a488b868805000089d183e1034883fa0473104531c04531f6eb664531f6e99c0000004883e2fc4c8d88500600004531c04531f60f1f4000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffff00ffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "entitySpawn": {
+          "rva": 96320912,
+          "pattern": "55415741565657534881ecf8000000488dac24800000000f29756048c74558feffffff4489cb4589c74889d74889ce0fb685e00000008d044003810005000083f83f41be3f000000440f42f048c745380000000048c7454800000000488d4d3831d24189f8e8e62feaff904989f849c1e820488d4d3866ba0100e8d12feaff90488d4d3866ba020041b809000000e8bd2feaff90488d4d3866ba03004589f8e8ac2feaff90660f6eb5d000000066410f7ef0488d4d3866ba0400e8912feaff90",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffff00000000ff",
+          "referenceCandidateCount": 1
+        },
+        "hazardCast": {
+          "rva": 96186000,
+          "pattern": "5541574156415541545657534881ecb8020000488dac2480000000440f29bd20020000440f29b510020000440f29ad00020000440f29a5f0010000440f299de0010000440f2995d0010000440f298dc0010000440f2985b00100000f29bda00100000f29b59001000048c78588010000feffffff483b9190050000731b4889ce488b81880500004869dae001000080bc18b00000000074620f28b5900100000f28bda0010000440f2885b0010000440f288dc0010000440f2895d0010000440f289de0010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "hazardUpdate": {
+          "rva": 96148624,
+          "pattern": "5541574156415541545657534881ecc8030000488dac2480000000440f29bd30030000440f29b520030000440f29ad10030000440f29a500030000440f299df0020000440f2995e0020000440f298dd0020000440f2985c00200000f29bdb00200000f29b5a002000048c78598020000fefffffff30f118dd00100004889cff30f1081f40b0000f30f118528020000f30f1089000c00000f57d20f2eca767f0f2ec1727ac787000c000000000000448b8770050000418d4001898770050000488b9788040000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "offer": {
+          "rva": 96483408,
+          "pattern": "5541574156415541545657534881ec38020000488dac2480000000440f2995a0010000440f298d9001000066440f7f8580010000660f7fbd700100000f29b56001000048c78558010000feffffff448885260100004889ce8895270100000fb6c284c048898d28010000488945b0740e488d4df083f80175220f57d2eb250fb6863c03000004fe3c0977250fb6c0488d0d93ec9f01488b3cc1eb1cf30f1015012f58004889f2e8857a0000e9010c0000488d3d39ec370148c785d000000000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ffffffff00ffffffffffffffffffffffff00ffffffffffff00000000ffffffffff00ffffffff00000000ffffffff00000000ff00000000ffffff00000000ffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "card": {
+          "rva": 96502720,
+          "pattern": "5541574156415541545657534881ece8020000488dac24800000000f29b55002000048c78548020000feffffff4c89cb4989d64989cd4c898d580100000f1082e00400000f2945f00f1082a00400000f108ab00400000f1092c00400000f109ad00400000f295de00f2955d00f294dc0498b0848ba00000000000000804889c84831d048898d980000004885c9b901000000480f48c80f2945b0488d05a7a99f0148630c884801c14c898550010000ffe14c89adf8010000498b7808498b5810",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyAi": {
+          "rva": 96354064,
+          "pattern": "5541574156415541545657534881ece8040000488dac2480000000440f29bd50040000440f29b540040000440f29ad30040000440f29a520040000440f299d10040000440f299500040000440f298df0030000440f2985e00300000f29bdd00300000f29b5c003000048c785b8030000fefffffff30f118d5c0200004989ccf30f10b1f40b0000f20f10b9f0040000f3440f1081f8040000488b89b8020000498b9424c0020000e864dae9ff4889c7410fb684249d0c00008885300300004180bc24a20c000002",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyDamage": {
+          "rva": 96328320,
+          "pattern": "5541574156415541545657534881ecb8020000488dac2480000000440f29bd20020000440f29b510020000440f29ad00020000440f29a5f0010000440f299de0010000440f2995d0010000440f298dc0010000440f2985b00100000f29bda00100000f29b59001000048c78588010000feffffff80b9a20c0000010f85833600000f28f24889d7440fb6a5b0020000f30f1089f40b00004c8bb188050000488bb1900500004869c6e001000031d2f30f1005daec59004d89f00f1f8000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "keepFighting": {
+          "rva": 96019856,
+          "pattern": "554157415641545657534883ec50488d6c245048c745f8feffffff80b9a20c0000050f85410100004889ce0fb699900c0000c681900c000001c681a20c000001f30f1081f40b0000f30f580550264201f30f1181500c0000488db940060000488b9188040000448b8170050000488d4dd8e83a27f1ff4c8bb6500600004c3bb64006000075094889f9e8e2aa410090488b86480600004c89f148c1e1050f1045d80f104de80f114c08100f11040849ffc64c89b650060000ff867005000084db",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "banner": {
+          "rva": 95037616,
+          "pattern": "554157415641545657534881ec80000000488dac248000000048c745f8feffffff4c89cf4c89c34989d64889cee81ef955fab920000000ba01000000e8cff855fa4885c00f84f3020000c6005ac740010000000048c745b020000000488945b848c745c00500000066c745c89600b805000000b10184c90f84eb0100008d4b01488b55b8890c024883c004488945c0488b45b0488945d0488b45b8488945d8488b45c0488945e00fb745c8668945e88b45ca8945ea0fb745ce668945ee4c8b7de0",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "packetMessage": {
+          "rva": 96847472,
+          "pattern": "55415741565657534883ec58488d6c245048c74500feffffff4989d74889cee86c5b3afab920000000ba01000000e81d5b3afa4885c00f84cc000000418b4f18890848c745d820000000488945e066c745f0a900c640040048c745e805000000498b7f08498b5f10488b45d84883c0fb4839c3776141be050000004885db7412488b4de04c01f14889fa4989d8e8a90235004901de4c8975e80f1045d80f1106488b45e848894610488b45f048894618498b174885d2740e41b8010000004889f9",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffff00ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveMessages": {
+          "rva": 100323584,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282000000048c744242008000000488d4c24304989f9e810010000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e8b2701a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282800000048c744242008000000488d4c24304989f9e8a0000000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 2
+        },
+        "allocate": {
+          "rva": 8640,
+          "pattern": "e94b3ef505cccccccccccccccccccccce99b3ef505cccccccccccccccccccccce9cb3ef505cccccccccccccccccccccce91b40f505ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc564881ec800000004889ce488b422048894424700f1042100f29442460488b024c8b52080fb64a284c894c24384c89442430884c242048c744242800000000488d4c2440488d5424604989c04d89d1e8accf05000f2844244048837c2440007409488b442450488946100f11064889f0",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00ffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "partySwap": {
+          "rva": 96140176,
+          "pattern": "0f1081b00100000f1089c00100000f1092b00100000f109ac00100000f1191b00100000f1199c00100000f1182b00100000f118ac00100000f1081d00100000f1089e00100000f1092d00100000f109ae00100000f1191d00100000f1199e00100000f1182d00100000f118ae00100000f1081f00100000f1089000200000f1092f00100000f109a000200000f1191f00100000f1199000200000f1182f00100000f118a000200000f1081100200000f1089200200000f1092100200000f109a20020000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "emitEvent": {
+          "rva": 96130480,
+          "pattern": "555657534881ec88000000488dac248000000048c74500feffffff4889cebf01000000f00fc13d95a09802488d4dd0488955f84189f8e8f531f2ff90488b9e68060000483b9e58060000750d488d8e58060000e858f83f0090488b8660060000488d0c5b488b55e0488954c8100f1045d00f1104c848ffc348899e68060000488b9e88040000488d4db8488b55f84189f8e8ca25f2ff90488b4dc0488b45c8488944242848894df048894c24204c8d052f2da501488d4dd041b9090000004889da",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "deallocate": {
+          "rva": 8656,
+          "pattern": "e99b3ef505cccccccccccccccccccccce9cb3ef505cccccccccccccccccccccce91b40f505ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc564881ec800000004889ce488b422048894424700f1042100f29442460488b024c8b52080fb64a284c894c24384c89442430884c242048c744242800000000488d4c2440488d5424604989c04d89d1e8accf05000f2844244048837c2440007409488b442450488946100f11064889f04881c4800000005ec3cccccccccccccc",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "flushMessages": {
+          "rva": 96008784,
+          "pattern": "56574883ec5880b99d0c0000010f85450100004889ce488b81980b000048894424504881c1480a0000488d8640060000488b96480600004c8b865006000048c78650060000000000004c8944243849c1e0054901d048c74424400000000048895424204c894424284889442430488d7c245048897c2448488d542420e83faf0900488d8e600a0000488d8658060000488b96600600004c8b866806000048c78668060000000000004f8d0c404e8d0cca4c8944243848c7442440000000004889542420",
+          "mask": "ffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveUi": {
+          "rva": 100322912,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424281800000048c744242008000000488d4c24304989f9e8b0030000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e852731a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424284800000048c744242008000000488d4c24304989f9e840030000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "setField": {
+          "rva": 94891488,
+          "pattern": "5657534883ec704489c789d34889ce488b014885c0746b488b5608440fb740364589c14501c948c7c1ffffffff0f1f004d85c9742b663b5c483a410f97c24180da0048ffc14983c1fe4180fa0174e1450fb6c24585c07418eb09660f1f4400004c89c14883ea01721b488b44c850ebab8b548808897c8808b801000000e98600000031c00fb7d34889742430488944243848c74424400000000048894c244848895424504885c07421488d542438488d4424304889442420488d4c24584189d8",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "writeGuid": {
+          "rva": 96851648,
+          "pattern": "41574156565755534883ec284889d64889cf488b5a10483b1a75084889f1e82d6a4f00488b4608c60418004c8d73014c8976104084ff7428488b4608800c18014c8b76104c3b3675084889f1e8ff694f00488b460842883c3049ffc64c89761089fdc1ed084084ed74314c39f30f838e010000488b4608800c18024c8b76104c3b3675084889f1e8c4694f00488b460842882c3049ffc64c89761089fdc1ed104084ed74314c39f30f8353010000488b4608800c18044c8b76104c3b3675084889f1",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffff",
+          "referenceCandidateCount": 1
+        },
+        "writeFields": {
+          "rva": 96849616,
+          "pattern": "5541574156415541545657534883ec68488d6c246048c74500feffffff4889d64c8b294c8b79084d85ed410f95c44c8b71104c89f7490f44fd4885ff0f84ac0000004d85ed0f84740600004c89e84d85ff0f84870000004c89f94883e1070f84b205000031d24c89e80f1f8000000000440fb740364a8b44c05048ffc24839d175ee4c89f94829d14983ff08725066900fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffff00000000ffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "goldAward0": {
+          "rva": 95775215,
+          "pattern": "8b8e1005000001c1898e100500000186bc0700004469c1102700004881c6780b00004889f166ba9804e8c383f2ff0f11370f287424204883c4305b5d5f5e415ec34157415641554154565755534881eca8000000440f298424900000000f29bc24800000000f297424704c89ce4c89c74885c90f95c04883fa020f94c220c280fa017571668139656e746eb801000000668139706c746b6681396373746b6681396465746b6681397074746b6681396573746b6681396672746b668139726f746b",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00",
+          "referenceCandidateCount": 1
+        },
+        "goldAward1": {
+          "rva": 95975851,
+          "pattern": "418b8d1005000001c141898d10050000410185bc0700004469c110270000498d8d780b000066ba9804e80774efff904c89e9e86e800000904983bd98090000000f848f0100004d8db588090000498b461048898540090000410f10060f29853009000049c785880900000000000049c785900900000800000049c78598090000000000004869854009000090090000488b95380900004801d04889858813000031ff488db520130000483b95881300004889959013000074756666662e0f1f840000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "goldAward2": {
+          "rva": 96137797,
+          "pattern": "8b8e1005000001c1898e100500000186bc0700004469c1102700004881c6780b00004889f166ba98040f287424204883c4385b5f5e415ee95ffbecffcccccccccccccccccccccccccccccc565755534881ec980000004889d34889ce440fb6823c0300000fb6aa3d030000400fb6fd89fae81557f5ff8b83f002000085c074664080fd08775eb9640100000fa3f973543da0860100724d8d886079feff81f9df2e0000773fbacdcccccc480fafd148c1ea2301d28d14924189c84129d0752569c9cdcc0000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffff00ffffffffff00ffffffffffffffffff00ffffffffffff00ffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffff",
+          "referenceCandidateCount": 1
+        }
+      }
+    },
+    {
+      "profile": {
+        "schema": 1,
+        "version": "0.122.0",
+        "stamp": "508416ff",
+        "exeName": "AzerothSurvivors.exe",
+        "sha256": "ec3a5b15fa39fed63ce4516c4fc159bdac92691ca44f88befc849010338d14f7",
+        "bytes": 146183168,
+        "functions": {
+          "gameUpdate": 96507616,
+          "runTick": 95513488,
+          "bossSpawn": 95811696,
+          "mobSpawn": 95735088,
+          "entitySpawn": 95731504,
+          "hazardCast": 95595792,
+          "hazardUpdate": 95556512,
+          "offer": 95911632,
+          "card": 95930944,
+          "enemyAi": 95768848,
+          "enemyDamage": 95738864,
+          "keepFighting": 95423104,
+          "banner": 96750240,
+          "packetMessage": 95198224,
+          "reserveMessages": 100646112,
+          "allocate": 8640,
+          "partySwap": 95548000,
+          "emitEvent": 95537536,
+          "deallocate": 8656,
+          "flushMessages": 95412032,
+          "reserveUi": 100645440,
+          "setField": 95058784,
+          "writeGuid": 95282752,
+          "writeFields": 95275008
+        },
+        "functionHeadSha256": {
+          "gameUpdate": "f417d896c7e60a1229ce569cc4f7e9414256fc9da085aeba27b74e7d3cb13a44",
+          "runTick": "4a0c05d2c9b11d48031bbe8a8afd2cf0a9a04580e7f54a17da92efd9febb6f50",
+          "bossSpawn": "a614c11ed55e8564d86d7e13160b3eff89a69b39c130cbf4a4d7c5748cc2b476",
+          "mobSpawn": "9411dbf4f1f4935deaefeb74049e1599424e6b0db94baa488d2f374bef03f770",
+          "entitySpawn": "cdbf92e49b289b1ceb3390a0e98766c91e86909c80cba6cb41bb1fbd0c63f04b",
+          "hazardCast": "b420fcadd7eee50196c2e63e6d5c23e39f3d2fe3cc521719f3996e697dbba346",
+          "hazardUpdate": "44232df7c7c579701558a751d797211e803080c9c66c2bb8a3172a3f72e64ee9",
+          "offer": "00305913c9370d0ba73e97252e2f9e87fcd88c8ef65a647ac0104fa90ac7101b",
+          "card": "63b141ca96cfd87b55f7c7e1f11b73a5b902d2c36ad49ed36d36c4f1c37963b8",
+          "enemyAi": "35b1f6509e2542cc6b29ed70e0ea97ae93c4a99c70974e3fa5ea3702f3c59d4f",
+          "enemyDamage": "77105efe65ecef61b39890c2e17b0501c828fb61bb5db148fd5d37544a75f148",
+          "keepFighting": "7bb77eeaae3fa720b275427b792fe4392ee497cfd66116100c6f93d1aaa1f5fa",
+          "banner": "818f19c80997870758018f2c856f03b03900acaf2bdece9b04e588ca461db7a1",
+          "packetMessage": "d5b9e7a616d4a6b5ee3a66a3c322b41717637c332fdf7ddfde9859c129e9119d",
+          "reserveMessages": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "allocate": "6924316b681e193c01291364fce9298b24fd2e11c9ba06618769cf081696460e",
+          "partySwap": "b649a934b2ec804b30fa87e63f4cb9e4d9c84eeea7f39977563cc7ccdfb75174",
+          "emitEvent": "4b886e0352cd25b934bd6589dea23b8a3d5fa74b3177c5798d9acd45678a2b07",
+          "deallocate": "e2236be1a9dc8495c54961fcdef1758eca26c62abb749e4cbf170eec0fac5f43",
+          "flushMessages": "e9a7cb5f2835df37c774be6676990b2035aa173e03ff971f5b2438d670bcc8d2",
+          "reserveUi": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "setField": "2f77bb73374cabada939163b8461cfbca239a4fb7de38df063046aaf5c48dc5a",
+          "writeGuid": "adab3ab4bd07b8ea641cad86a301635b40d2acdb9e3021607ca773c323f6b0d5",
+          "writeFields": "2433cc144d6da2056c5ee8cb007a995c69b1cf0a395dc46e1dc4cb317fcc0cd8"
+        },
+        "zoneTable": 117246640,
+        "zoneCount": 12,
+        "zoneStride": 240,
+        "bossStride": 104,
+        "abilityStride": 56,
+        "hazardDefinition": 117199872,
+        "enemyStride": 480,
+        "hazardStride": 128,
+        "partyStride": 2536,
+        "goldAwards": [
+          {
+            "rva": 96140367,
+            "runRegister": "rsi",
+            "headSha256": "465b926b89a87118c8fd60b1ed977dc4ac41509887054732112e73dd0b9cf1e4"
+          },
+          {
+            "rva": 95378875,
+            "runRegister": "r13",
+            "headSha256": "438ca8033b5cbbe88a30d56cad251f363e222a063cd3e6dd170d57fc071d26ae"
+          },
+          {
+            "rva": 95545621,
+            "runRegister": "rsi",
+            "headSha256": "465b926b89a87118c8fd60b1ed977dc4ac41509887054732112e73dd0b9cf1e4"
+          }
+        ],
+        "fieldOffsets": {
+          "0x2b8": 720,
+          "0x2c0": 728,
+          "0x488": 1200,
+          "0x4a0": 1224,
+          "0x4f0": 1312,
+          "0x4f4": 1316,
+          "0x4f8": 1320,
+          "0x500": 1328,
+          "0x508": 1336,
+          "0x510": 1344,
+          "0x580": 1456,
+          "0x588": 1464,
+          "0x590": 1472,
+          "0x5b0": 1504,
+          "0x5b8": 1512,
+          "0x5c0": 1520,
+          "0x640": 1648,
+          "0x648": 1656,
+          "0x650": 1664,
+          "0x658": 1672,
+          "0x660": 1680,
+          "0x668": 1688,
+          "0x7bc": 2060,
+          "0x988": 2592,
+          "0x98c": 2528,
+          "0x990": 2600,
+          "0x998": 2608,
+          "0xb10": 2984,
+          "0xb98": 3120,
+          "0xbf4": 3212,
+          "0xc90": 3380,
+          "0xc9d": 3394,
+          "0xca2": 3399,
+          "0xca3": 3400
+        },
+        "enemyOffsets": {},
+        "bossSpawnHpArgument": true,
+        "validation": "static-review-only",
+        "runtimeTested": false
+      },
+      "runtimeSha256": "c1b921c3d13593cc4cb1bba5098705b08df6cf5c7e0d40433267e1dc888baf34",
+      "signatures": {
+        "gameUpdate": {
+          "rva": 96507616,
+          "pattern": "5541574156415541545657534881ec280e0000488dac248000000066440f299d900d0000440f2995800d000066440f298d700d000066440f2985600d00000f29bd500d00000f29b5400d000048c785380d0000feffffff660f28f14889ce0f57ff8339017524660f28c6f20f5c4608660f57c9f20f5fc8f20f1005a1e97a00f20f5dc10f57fff20f5af848c70601000000f20f117608488b8ee0100000488b86e8100000488b96f010000048c786e01000000000000048c786e810000008000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "runTick": {
+          "rva": 95513488,
+          "pattern": "554157415641545657534881ec70010000488dac2480000000440f29b5e0000000440f29add0000000440f29a5c0000000440f299db0000000440f2995a0000000440f298d90000000440f2985800000000f297d700f29756048c74558feffffff0f28f14889ce80b9420d000000745c4889f10f28ce0f2875600f287d70440f288580000000440f288d90000000440f2895a0000000440f289db0000000440f28a5c0000000440f28add0000000440f28b5e00000004881c4700100005b5f5e",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "bossSpawn": {
+          "rva": 95811696,
+          "pattern": "5541574156415541545657534881ece8020000488dac2480000000440f298d5002000066440f7f85400200000f29bd300200000f29b52002000048c78518020000feffffff0f28f24989d54889ce488b89d0020000488b96d8020000e8afb5f4ff4889c34869c0f00000004c8d35ce1147018b8e28050000898db0010000488b8e2005000048898da8010000488d8da801000048898dd00100004e8b7c30684a8b7c3070498d04ff4c897dc8488945d0488d85d0010000488945d8488d8df0010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "mobSpawn": {
+          "rva": 95735088,
+          "pattern": "5541574156415541545657534881ecf8020000488dac2480000000440f29bd60020000440f29b550020000440f29ad40020000440f29a530020000440f299d20020000440f299510020000440f298d00020000440f2985f00100000f29bde00100000f29b5d001000048c785c8010000feffffff4c89c74889d34889ce488b91c00500004885d2741a488b86b805000089d183e1034883fa0473104531c04531f6eb664531f6e99c0000004883e2fc4c8d88500600004531c04531f60f1f4000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffff00ffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "entitySpawn": {
+          "rva": 95731504,
+          "pattern": "55415741565657534881ecf8000000488dac24800000000f29756048c74558feffffff4489cb4589c74889d74889ce0fb685e00000008d044003813005000083f83f41be3f000000440f42f048c745380000000048c7454800000000488d4d3831d24189f8e8c6bbf5ff904989f849c1e820488d4d3866ba0100e8b1bbf5ff90488d4d3866ba020041b809000000e89dbbf5ff90488d4d3866ba03004589f8e88cbbf5ff90660f6eb5d000000066410f7ef0488d4d3866ba0400e871bbf5ff90",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffff00000000ff",
+          "referenceCandidateCount": 1
+        },
+        "hazardCast": {
+          "rva": 95595792,
+          "pattern": "5541574156415541545657534881ecb8020000488dac2480000000440f29bd20020000440f29b510020000440f29ad00020000440f29a5f0010000440f299de0010000440f2995d0010000440f298dc0010000440f2985b00100000f29bda00100000f29b59001000048c78588010000feffffff483b91c0050000731c4889ce488b81b80500004c69f2e00100004280bc30b00000000074620f28b5900100000f28bda0010000440f2885b0010000440f288dc0010000440f2895d0010000440f289de0010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "hazardUpdate": {
+          "rva": 95556512,
+          "pattern": "5541574156415541545657534881ecc8030000488dac2480000000440f29bd30030000440f29b520030000440f29ad10030000440f29a500030000440f299df0020000440f2995e0020000440f298dd0020000440f2985c00200000f29bdb00200000f29b5a002000048c78598020000fefffffff30f118dd00100004889cff30f10818c0c0000f30f118528020000f30f1089980c00000f57d20f2eca767f0f2ec1727ac787980c000000000000448b87a0050000418d40018987a0050000488b97b0040000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "offer": {
+          "rva": 95911632,
+          "pattern": "5541574156415541545657534881ec38020000488dac2480000000440f2995a0010000440f298d9001000066440f7f8580010000660f7fbd700100000f29b56001000048c78558010000feffffff448885260100004889ce8895270100000fb6c284c048898d28010000488945b0740e488d4df083f80175220f57d2eb250fb6865403000004fe3c0977250fb6c0488d0dcbb77a01488b3cc1eb1cf30f10153df262004889f2e8a57a0000e9010c0000488d3d79ae450148c785d000000000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ffffffff00ffffffffffffffffffffffff00ffffffffffff00000000ffffffffff00ffffffff00000000ffffffff00000000ff00000000ffffff00000000ffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "card": {
+          "rva": 95930944,
+          "pattern": "5541574156415541545657534881ecf8020000488dac24800000000f29b56002000048c78558020000feffffff4c89cb4989d64989cd4c898d68010000488b8218050000488945000f1082080500000f2945f00f1082c80400000f108ad80400000f1092e80400000f109af80400000f295de00f2955d00f294dc0498b0848ba00000000000000804889c84831d048898da80000004885c9b901000000480f48c80f2945b0488d0504757a0148630c884801c14c898560010000ffe14c89ad08020000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyAi": {
+          "rva": 95768848,
+          "pattern": "5541574156415541545657534881ecf8040000488dac2480000000440f29bd60040000440f29b550040000440f29ad40040000440f29a530040000440f299d20040000440f299510040000440f298d00040000440f2985f00300000f29bde00300000f29b5d003000048c785c8030000fefffffff30f118d640200004989ccf30f10b18c0c0000f20f10b920050000f3440f108128050000488b89d0020000498b9424d8020000e8c45cf5ff4989c5410fb68424420d00008885400300004180bc24470d000002",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyDamage": {
+          "rva": 95738864,
+          "pattern": "5541574156415541545657534881ec28030000488dac2480000000440f29bd90020000440f29b580020000440f29ad70020000440f29a560020000440f299d50020000440f299540020000440f298d30020000440f2985200200000f29bd100200000f29b50002000048c785f8010000feffffff80b9470d0000010f85b54000004589cf0f28f24889d74989caf30f10898c0c00004c8ba1b80500004c8b99c00500004d69ebe001000031c0f30f10055c9565004c89e1660f1f840000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "keepFighting": {
+          "rva": 95423104,
+          "pattern": "554157415641545657534883ec50488d6c245048c745f8feffffff80b9470d0000050f85410100004889ce0fb699340d0000c681340d000001c681470d000001f30f10818c0c0000f30f580510f48101f30f1181ec0c0000488db970060000488b91b0040000448b81a0050000488d4dd8e83a6414004c8bb6800600004c3bb67006000075094889f9e8d2b14f0090488b86780600004c89f148c1e1050f1045d80f104de80f114c08100f11040849ffc64c89b680060000ff86a005000084db",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "banner": {
+          "rva": 96750240,
+          "pattern": "554157415641545657534881ec80000000488dac248000000048c745f8feffffff4c89cf4c89c34989d64889cee82ed73bfab920000000ba01000000e8dfd63bfa4885c00f84f3020000c6005ac740010000000048c745b020000000488945b848c745c00500000066c745c89600b805000000b10184c90f84eb0100008d4b01488b55b8890c024883c004488945c0488b45b0488945d0488b45b8488945d8488b45c0488945e00fb745c8668945e88b45ca8945ea0fb745ce668945ee4c8b7de0",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "packetMessage": {
+          "rva": 95198224,
+          "pattern": "55415741565657534883ec58488d6c245048c74500feffffff4989d74889cee8cc8553fab920000000ba01000000e87d8553fa4885c00f84cc000000418b4f18890848c745d820000000488945e066c745f0a900c640040048c745e805000000498b7f08498b5f10488b45d84883c0fb4839c3776141be050000004885db7412488b4de04c01f14889fa4989d8e8290c53004901de4c8975e80f1045d80f1106488b45e848894610488b45f048894618498b174885d2740e41b8010000004889f9",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffff00ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveMessages": {
+          "rva": 100646112,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282000000048c744242008000000488d4c24304989f9e880010000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e892721a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282800000048c744242008000000488d4c24304989f9e810010000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 2
+        },
+        "allocate": {
+          "rva": 8640,
+          "pattern": "e96b1dfa05cccccccccccccccccccccce9bb1dfa05cccccccccccccccccccccce9eb1dfa05cccccccccccccccccccccce93b1ffa05ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc5541574156415541545657534881ec08040000488dac248000000048c78580030000feffffff48899550030000488b314885f60f8401020000c6857f030000014889f1e888330a05904989c689d34189d74180e7014c8b6828488975a84c896db0488d4db841b890030000488bbd50030000",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "partySwap": {
+          "rva": 95548000,
+          "pattern": "0f1081b00100000f1089c00100000f1092b00100000f109ac00100000f1191b00100000f1199c00100000f1182b00100000f118ac00100000f1081d00100000f1089e00100000f1092d00100000f109ae00100000f1191d00100000f1199e00100000f1182d00100000f118ae00100000f1081f00100000f1089000200000f1092f00100000f109a000200000f1191f00100000f1199000200000f1182f00100000f118a000200000f1081100200000f1089200200000f1092100200000f109a20020000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "emitEvent": {
+          "rva": 95537536,
+          "pattern": "555657534881ec88000000488dac248000000048c74500feffffff4889cebf01000000f00fc13d950cac02488d4dd0488955f84189f8e86564f9ff90488b9e98060000483b9e88060000750d488d8e88060000e868f04d0090488b8690060000488d0c5b488b55e0488954c8100f1045d00f1104c848ffc348899e98060000488b9eb0040000488d4db8488b55f84189f8e83a58f9ff90488b4dc0488b45c8488944242848894df048894c24204c8d057f4a8001488d4dd041b9090000004889da",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "deallocate": {
+          "rva": 8656,
+          "pattern": "e9bb1dfa05cccccccccccccccccccccce9eb1dfa05cccccccccccccccccccccce93b1ffa05ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc5541574156415541545657534881ec08040000488dac248000000048c78580030000feffffff48899550030000488b314885f60f8401020000c6857f030000014889f1e888330a05904989c689d34189d74180e7014c8b6828488975a84c896db0488d4db841b890030000488bbd500300004889fae84186ff05e871ffffffb9d0030000",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ff00000000ffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "flushMessages": {
+          "rva": 95412032,
+          "pattern": "56574883ec5880b9420d0000010f85450100004889ce488b81300c000048894424504881c1e00a0000488d8670060000488b96780600004c8b868006000048c78680060000000000004c8944243849c1e0054901d048c74424400000000048895424204c894424284889442430488d7c245048897c2448488d542420e8dfee1600488d8ef80a0000488d8688060000488b96900600004c8b869806000048c78698060000000000004f8d0c404e8d0cca4c8944243848c7442440000000004889542420",
+          "mask": "ffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveUi": {
+          "rva": 100645440,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424281800000048c744242008000000488d4c24304989f9e820040000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e832751a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424284800000048c744242008000000488d4c24304989f9e8b0030000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "setField": {
+          "rva": 95058784,
+          "pattern": "5657534883ec704489c789d34889ce488b014885c0746b488b5608440fb740364589c14501c948c7c1ffffffff0f1f004d85c9742b663b5c483a410f97c24180da0048ffc14983c1fe4180fa0174e1450fb6c24585c07418eb09660f1f4400004c89c14883ea01721b488b44c850ebab8b548808897c8808b801000000e98600000031c00fb7d34889742430488944243848c74424400000000048894c244848895424504885c07421488d542438488d4424304889442420488d4c24584189d8",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "writeGuid": {
+          "rva": 95282752,
+          "pattern": "41574156565755534883ec284889d64889cf488b5a10483b1a75084889f1e86d486c00488b4608c60418004c8d73014c8976104084ff7428488b4608800c18014c8b76104c3b3675084889f1e83f486c00488b460842883c3049ffc64c89761089fdc1ed084084ed74314c39f30f838e010000488b4608800c18024c8b76104c3b3675084889f1e804486c00488b460842882c3049ffc64c89761089fdc1ed104084ed74314c39f30f8353010000488b4608800c18044c8b76104c3b3675084889f1",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffff",
+          "referenceCandidateCount": 1
+        },
+        "writeFields": {
+          "rva": 95275008,
+          "pattern": "5541574156415541545657534881ecb8000000488dac248000000048c74530feffffff4889d64c8b294c8b79084531e44d85ed410f95c44c8b71104c89f7490f44fd4c8965b048c745b8000000004c896dc04c897dc84c8965d048c745d8000000004c896de04c897de848897df0488d4db0e89921fdff4885c074740fb710c1ea0548ffc2488b5e10483b1e48895520750c4889f1e836666c00488b5520488b460888141848ffc348895e108d1c95000000004885d248895d007445e83f5952fa",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffff00ffffffffffffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff00000000",
+          "referenceCandidateCount": 1
+        },
+        "goldAward0": {
+          "rva": 96140367,
+          "pattern": "8b8e4005000001c1898e4005000001860c0800004469c1102700004881c6100c00004889f166ba9804e8e37eefff0f11370f287424204883c4305b5d5f5e415ec34157415641554154565755534881eca8000000440f298424900000000f29bc24800000000f297424704c89ce4c89c74885c90f95c04883fa020f94c220c280fa017571668139656e746eb801000000668139706c746b6681396373746b6681396465746b6681397074746b6681396573746b6681396672746b668139726f746b",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00",
+          "referenceCandidateCount": 1
+        },
+        "goldAward1": {
+          "rva": 95378875,
+          "pattern": "418b8d4005000001c141898d400500004101850c0800004469c110270000498d8d100c000066ba9804e8771dfbff904c89e9e84e810000904983bd300a0000000f848f0100004d8db5200a0000498b4610488985a0090000410f10060f29859009000049c785200a00000000000049c785280a00000800000049c785300a000000000000486985a0090000e8090000488b95980900004801d04889854814000031ff488db5e0130000483b95481400004889955014000074756666662e0f1f840000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "goldAward2": {
+          "rva": 95545621,
+          "pattern": "8b8e4005000001c1898e4005000001860c0800004469c1102700004881c6100c00004889f166ba98040f287424204883c4385b5f5e415ee90f92f8ffcccccccccccccccccccccccccccccc565755534881ec980000004889d34889ce440fb682540300000fb6aa55030000400fb6fd89fae885520d008b830003000085c074664080fd08775eb9640100000fa3f973543da0860100724d8d886079feff81f9df2e0000773fbacdcccccc480fafd148c1ea2301d28d14924189c84129d0752569c9cdcc0000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffff00ffffffffff00ffffffffffffffffff00ffffffffffff00ffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffff",
+          "referenceCandidateCount": 1
+        }
+      }
+    },
+    {
+      "profile": {
+        "schema": 1,
+        "version": "0.123.0",
+        "stamp": "425f2391",
+        "exeName": "AzerothSurvivors.exe",
+        "sha256": "de7147a2a3a01b4fb84f3a7f036bc940f9e7d4fdfc42a7fdb79f3f1b2bd798be",
+        "bytes": 146228736,
+        "functions": {
+          "gameUpdate": 96518160,
+          "runTick": 95516992,
+          "bossSpawn": 95832928,
+          "mobSpawn": 95753104,
+          "entitySpawn": 95746960,
+          "hazardCast": 95601344,
+          "hazardUpdate": 95562048,
+          "offer": 95937008,
+          "card": 95956288,
+          "enemyAi": 95789440,
+          "enemyDamage": 95756880,
+          "keepFighting": 95417216,
+          "banner": 96883088,
+          "packetMessage": 95066624,
+          "reserveMessages": 100688992,
+          "allocate": 8640,
+          "partySwap": 95552544,
+          "emitEvent": 95541920,
+          "deallocate": 8656,
+          "flushMessages": 95405856,
+          "reserveUi": 100688320,
+          "setField": 95072896,
+          "writeGuid": 95087472,
+          "writeFields": 95074048
+        },
+        "functionHeadSha256": {
+          "gameUpdate": "600793144a06be68330fc6e2f2c91217143b304a46f3a304c749fed5e34207e4",
+          "runTick": "4a0c05d2c9b11d48031bbe8a8afd2cf0a9a04580e7f54a17da92efd9febb6f50",
+          "bossSpawn": "a614c11ed55e8564d86d7e13160b3eff89a69b39c130cbf4a4d7c5748cc2b476",
+          "mobSpawn": "9411dbf4f1f4935deaefeb74049e1599424e6b0db94baa488d2f374bef03f770",
+          "entitySpawn": "c52abe19710549796a2e1c710211bdaa3debc65cbe17c04be0c5b6ca233fc4d0",
+          "hazardCast": "b420fcadd7eee50196c2e63e6d5c23e39f3d2fe3cc521719f3996e697dbba346",
+          "hazardUpdate": "44232df7c7c579701558a751d797211e803080c9c66c2bb8a3172a3f72e64ee9",
+          "offer": "00305913c9370d0ba73e97252e2f9e87fcd88c8ef65a647ac0104fa90ac7101b",
+          "card": "63b141ca96cfd87b55f7c7e1f11b73a5b902d2c36ad49ed36d36c4f1c37963b8",
+          "enemyAi": "35b1f6509e2542cc6b29ed70e0ea97ae93c4a99c70974e3fa5ea3702f3c59d4f",
+          "enemyDamage": "29a6206d191902e6ab320301a19231b1fad4b41a110b59cc965fcde771240d72",
+          "keepFighting": "d28ca157dbd8e25ab66910fe62e4daf905660b6c77971846f10b9147f71c8817",
+          "banner": "818f19c80997870758018f2c856f03b03900acaf2bdece9b04e588ca461db7a1",
+          "packetMessage": "d5b9e7a616d4a6b5ee3a66a3c322b41717637c332fdf7ddfde9859c129e9119d",
+          "reserveMessages": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "allocate": "f4c540808dc194f45e663184df8c382870574a0bab4c3b1d28932417c658f9c9",
+          "partySwap": "b649a934b2ec804b30fa87e63f4cb9e4d9c84eeea7f39977563cc7ccdfb75174",
+          "emitEvent": "4b886e0352cd25b934bd6589dea23b8a3d5fa74b3177c5798d9acd45678a2b07",
+          "deallocate": "31d36a497dea45255ff365675dadfef86c3b9b483ba79f2d072064b3a83beb63",
+          "flushMessages": "9db0970be35b03cf19435dfbe2b1842b4b596b4ebc786eddd538d77ef4b4889d",
+          "reserveUi": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+          "setField": "166e183424d34186de92d366583a6cad1d37def393681f71a642c9be74598633",
+          "writeGuid": "0d5d675d0685df650ec724309c9f96a5b08e4492493265ce7dfe374c3ce809b2",
+          "writeFields": "5904d6f35e436aed59f69f08cfb305a6c621b82250f04c1bfa06f27ae996fae0"
+        },
+        "zoneTable": 117280624,
+        "zoneCount": 12,
+        "zoneStride": 240,
+        "bossStride": 104,
+        "abilityStride": 56,
+        "hazardDefinition": 117233856,
+        "enemyStride": 480,
+        "hazardStride": 128,
+        "partyStride": 2544,
+        "goldAwards": [
+          {
+            "rva": 96173583,
+            "runRegister": "rsi",
+            "amountRegister": "rax",
+            "headSha256": "a3d81549bc7fb9eb29be3bcb51c3c16abfcce0d182588cabce02007c1fe085f6"
+          },
+          {
+            "rva": 95371787,
+            "runRegister": "r13",
+            "amountRegister": "rcx",
+            "headSha256": "c97828fca135e82ed17d9b6dcb03a05fcad74f57c4a40573af72b5f09408309d"
+          },
+          {
+            "rva": 95550008,
+            "runRegister": "rsi",
+            "amountRegister": "rcx",
+            "headSha256": "91b25b91e78009b8fdb13c0a67753d69a3a70c612f4d3629b1d9706ad0b4c4c4"
+          }
+        ],
+        "fieldOffsets": {
+          "0x2b8": 720,
+          "0x2c0": 728,
+          "0x488": 1200,
+          "0x4a0": 1224,
+          "0x4f0": 1312,
+          "0x4f4": 1316,
+          "0x4f8": 1320,
+          "0x500": 1328,
+          "0x508": 1336,
+          "0x510": 1344,
+          "0x580": 1456,
+          "0x588": 1464,
+          "0x590": 1472,
+          "0x5b0": 1504,
+          "0x5b8": 1512,
+          "0x5c0": 1520,
+          "0x640": 1648,
+          "0x648": 1656,
+          "0x650": 1664,
+          "0x658": 1672,
+          "0x660": 1680,
+          "0x668": 1688,
+          "0x7bc": 2060,
+          "0x988": 2592,
+          "0x98c": 2536,
+          "0x990": 2600,
+          "0x998": 2608,
+          "0xb10": 2984,
+          "0xb98": 3152,
+          "0xbf4": 3224,
+          "0xc90": 3396,
+          "0xc9d": 3410,
+          "0xca2": 3415,
+          "0xca3": 3416
+        },
+        "enemyOffsets": {},
+        "bossSpawnHpArgument": true,
+        "validation": "isolated-native-solo-and-lan-tested",
+        "runtimeTested": true,
+        "rewards": {
+          "spawnLoot": 95784128,
+          "reroll": 95992928,
+          "jewelryBuilder": 95968544,
+          "jewelryLoop": 95969424,
+          "jewelryTable": 120713816,
+          "jewelryStride": 72,
+          "jewelryCount": 23,
+          "jewelryStatOffset": 68,
+          "luckStat": 14,
+          "lootLengthOffset": 1640,
+          "lootPointerOffset": 1632,
+          "lootStride": 72,
+          "costSites": [
+            {
+              "rva": 95340906,
+              "costRegister": "rcx",
+              "overflowRegister": "r9",
+              "headSha256": "adae9e0b01a985ba4ea1e63953feb661c427fae4235c1331e5d3219cf83a3a8b"
+            },
+            {
+              "rva": 95482472,
+              "costRegister": "rcx",
+              "overflowRegister": "r9",
+              "headSha256": "87c89061874ac8a1383ec2fa67fde66653540f8db6fa13ccd02241516e8d9428"
+            },
+            {
+              "rva": 95946676,
+              "costRegister": "rcx",
+              "overflowRegister": "r9",
+              "headSha256": "8412384fdd9f0f3387ebe787b1bdde73e43f0b1df2b7628c27ecfd5bec51e02b"
+            },
+            {
+              "rva": 95951279,
+              "costRegister": "rcx",
+              "overflowRegister": "r9",
+              "headSha256": "35cac738448b84ecbdfb9c5884440b279c5826498b7fbea25effd5c5d1e0a5d5"
+            },
+            {
+              "rva": 95993155,
+              "costRegister": "r8",
+              "overflowRegister": "r10",
+              "headSha256": "6d8251af6de30d711a7ef69be8ab252a721c162443348e4a740d5f96bc267844"
+            }
+          ],
+          "headSha256": {
+            "spawnLoot": "fda81edf5056cd85d4a0e2d9b3927491b302b42dff4e581b11368ec85e0e5dc7",
+            "reroll": "85bc4cfef7100fb2ea8e4c2a6263ff9d97e55b0052a18d2644b5598436053f93",
+            "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
+            "jewelryLoop": "6011b87328a3ad68eb6f0d705acaad5222dc83d6713f77e5ec5c73f0d621fb80"
+          }
+        },
+        "permanentRewards": {
+          "bossReward": 95745184,
+          "headSha256": "7586d881f8c48191751a7c692ed826a5424dce8727533414c93cfab012e98d19"
+        }
+      },
+      "runtimeSha256": "8b5fb74cef144454ba739920e605ca13f0e1d989355105eb04d5768d261a0ee4",
+      "signatures": {
+        "gameUpdate": {
+          "rva": 96518160,
+          "pattern": "5541574156415541545657534881ec380e0000488dac248000000066440f299da00d0000440f2995900d000066440f298d800d000066440f2985700d00000f29bd600d00000f29b5500d000048c785480d0000feffffff660f28f14889ce0f57ff8339017524660f28c6f20f5c4608660f57c9f20f5fc8f20f100581707b00f20f5dc10f57fff20f5af848c70601000000f20f117608488b8e50110000488b8658110000488b966011000048c786501100000000000048c7865811000008000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "runTick": {
+          "rva": 95516992,
+          "pattern": "554157415641545657534881ec70010000488dac2480000000440f29b5e0000000440f29add0000000440f29a5c0000000440f299db0000000440f2995a0000000440f298d90000000440f2985800000000f297d700f29756048c74558feffffff0f28f14889ce80b9520d000000745c4889f10f28ce0f2875600f287d70440f288580000000440f288d90000000440f2895a0000000440f289db0000000440f28a5c0000000440f28add0000000440f28b5e00000004881c4700100005b5f5e",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "bossSpawn": {
+          "rva": 95832928,
+          "pattern": "5541574156415541545657534881ece8020000488dac2480000000440f298d5002000066440f7f85400200000f29bd300200000f29b52002000048c78518020000feffffff0f28f24989d54889ce488b89d0020000488b96d8020000e88fa3f4ff4889c34869c0f00000004c8d359e4347018b8e28050000898db0010000488b8e2005000048898da8010000488d8da801000048898dd00100004e8b7c30684a8b7c3070498d04ff4c897dc8488945d0488d85d0010000488945d8488d8df0010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "mobSpawn": {
+          "rva": 95753104,
+          "pattern": "5541574156415541545657534881ecf8020000488dac2480000000440f29bd60020000440f29b550020000440f29ad40020000440f29a530020000440f299d20020000440f299510020000440f298d00020000440f2985f00100000f29bde00100000f29b5d001000048c785c8010000feffffff4c89c74889d34889ce488b91c00500004885d2741a488b86b805000089d183e1034883fa0473104531c04531f6eb664531f6e99c0000004883e2fc4c8d88500600004531c04531f60f1f4000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffff00ffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "entitySpawn": {
+          "rva": 95746960,
+          "pattern": "5541574156415541545657534881ec08010000488dac2480000000660f7f757048c74568feffffff4589cf4589c54889d74889ce0fb685000100008d044003813005000083f83f41bc3f000000440f42e048c745d80000000048c745e800000000488d5dd84889d931d24989f8e8deb8f5ff904989c6488b004885c0746d498b4e0866ba0200440fb748364589ca4501d249c7c0ffffffff0f1f8400000000004d85d2742b66423b54403a410f97c34180db0049ffc04983c2fe4180fb0174e0",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+          "referenceCandidateCount": 1
+        },
+        "hazardCast": {
+          "rva": 95601344,
+          "pattern": "5541574156415541545657534881ecb8020000488dac2480000000440f29bd20020000440f29b510020000440f29ad00020000440f29a5f0010000440f299de0010000440f2995d0010000440f298dc0010000440f2985b00100000f29bda00100000f29b59001000048c78588010000feffffff483b91c0050000731c4889ce488b81b80500004c69f2e00100004280bc30b00000000074620f28b5900100000f28bda0010000440f2885b0010000440f288dc0010000440f2895d0010000440f289de0010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "hazardUpdate": {
+          "rva": 95562048,
+          "pattern": "5541574156415541545657534881ecc8030000488dac2480000000440f29bd30030000440f29b520030000440f29ad10030000440f29a500030000440f299df0020000440f2995e0020000440f298dd0020000440f2985c00200000f29bdb00200000f29b5a002000048c78598020000fefffffff30f118dd00100004889cff30f1081980c0000f30f118528020000f30f1089a40c00000f57d20f2eca767f0f2ec1727ac787a40c000000000000448b87a0050000418d40018987a0050000488b97b0040000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "offer": {
+          "rva": 95937008,
+          "pattern": "5541574156415541545657534881ec38020000488dac2480000000440f2995a0010000440f298d9001000066440f7f8580010000660f7fbd700100000f29b56001000048c78558010000feffffff448885260100004889ce8895270100000fb6ca84c94889b52801000048894db0740e83f9017526488d4df00f57d2eb290fb6865403000004fe3c0977290fb6c0488d0da3fc7a01488b3cc1eb20488d4df0f30f1015193f63004889f2e8817a0000e9fd0b0000488d3d15d0450148c785d000000000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00ffffffffffffffff00ffffffffffffffffffffffff00ffffffffffff00000000ffffffffff00ffffffffffffffff00000000ffffffff00000000ff00000000ffffff00000000ffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "card": {
+          "rva": 95956288,
+          "pattern": "5541574156415541545657534881ecf8020000488dac24800000000f29b56002000048c78558020000feffffff4c89cb4989d64989cd4c898d68010000488b8218050000488945000f1082080500000f2945f00f1082c80400000f108ad80400000f1092e80400000f109af80400000f295de00f2955d00f294dc0498b0848ba00000000000000804889c84831d048898da80000004885c9b901000000480f48c80f2945b0488d0508ba7a0148630c884801c14c898560010000ffe14c89ad08020000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyAi": {
+          "rva": 95789440,
+          "pattern": "5541574156415541545657534881ecf8040000488dac2480000000440f29bd60040000440f29b550040000440f29ad40040000440f29a530040000440f299d20040000440f299510040000440f298d00040000440f2985f00300000f29bde00300000f29b5d003000048c785c8030000fefffffff30f118d440200004989cdf30f10b1980c0000f20f10b920050000f3440f108128050000488b89d0020000498b95d8020000e8254df5ff4989c4410fb685520d00008885400300004180bd570d000002",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "enemyDamage": {
+          "rva": 95756880,
+          "pattern": "5541574156415541545657534881ec78030000488dac2480000000440f29bde002000066440f7fb5d0020000440f29adc0020000440f29a5b0020000440f299da0020000440f299590020000440f298d80020000440f2985700200000f29bd600200000f29b55002000048c78548020000feffffff80b9570d0000010f85764300004589cf0f28f24989caf30f1089980c0000488bb9b8050000488bb1c00500004c69eee001000031c0f30f1005fefe65004889f966662e0f1f840000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "keepFighting": {
+          "rva": 95417216,
+          "pattern": "554157415641545657534883ec50488d6c245048c745f8feffffff80b9570d0000050f85410100004889ce0fb699440d0000c681440d000001c681570d000001f30f1081980c0000f30f5805f0b28201f30f1181fc0c0000488db970060000488b91b0040000448b81a0050000488d4dd8e82a8216004c8bb6800600004c3bb67006000075094889f9e85270500090488b86780600004c89f148c1e1050f1045d80f104de80f114c08100f11040849ffc64c89b680060000ff86a005000084db",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "banner": {
+          "rva": 96883088,
+          "pattern": "554157415641545657534881ec80000000488dac248000000048c745f8feffffff4c89cf4c89c34989d64889cee83ed039fab920000000ba01000000e8efcf39fa4885c00f84f3020000c6005ac740010000000048c745b020000000488945b848c745c00500000066c745c89600b805000000b10184c90f84eb0100008d4b01488b55b8890c024883c004488945c0488b45b0488945d0488b45b8488945d8488b45c0488945e00fb745c8668945e88b45ca8945ea0fb745ce668945ee4c8b7de0",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "packetMessage": {
+          "rva": 95066624,
+          "pattern": "55415741565657534883ec58488d6c245048c74500feffffff4989d74889cee8dc8755fab920000000ba01000000e88d8755fa4885c00f84cc000000418b4f18890848c745d820000000488945e066c745f0a900c640040048c745e805000000498b7f08498b5f10488b45d84883c0fb4839c3776141be050000004885db7412488b4de04c01f14889fa4989d8e8b9b555004901de4c8975e80f1045d80f1106488b45e848894610488b45f048894618498b174885d2740e41b8010000004889f9",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffff00ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveMessages": {
+          "rva": 100688992,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282000000048c744242008000000488d4c24304989f9e880010000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e892781a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424282800000048c744242008000000488d4c24304989f9e810010000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 2
+        },
+        "allocate": {
+          "rva": 8640,
+          "pattern": "e9ebc4fa05cccccccccccccccccccccce93bc5fa05cccccccccccccccccccccce96bc5fa05cccccccccccccccccccccce9bbc6fa05ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc5541574156415541545657534881ec08040000488dac248000000048c78580030000feffffff48899550030000488b314885f60f8401020000c6857f030000014889f1e8c8330a05904989c689d34189d74180e7014c8b6828488975a84c896db0488d4db841b890030000488bbd50030000",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "partySwap": {
+          "rva": 95552544,
+          "pattern": "0f1081b00100000f1089c00100000f1092b00100000f109ac00100000f1191b00100000f1199c00100000f1182b00100000f118ac00100000f1081d00100000f1089e00100000f1092d00100000f109ae00100000f1191d00100000f1199e00100000f1182d00100000f118ae00100000f1081f00100000f1089000200000f1092f00100000f109a000200000f1191f00100000f1199000200000f1182f00100000f118a000200000f1081100200000f1089200200000f1092100200000f109a20020000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "emitEvent": {
+          "rva": 95541920,
+          "pattern": "555657534881ec88000000488dac248000000048c74500feffffff4889cebf01000000f00fc13d75abac02488d4dd0488955f84189f8e80564f9ff90488b9e98060000483b9e88060000750d488d8e88060000e8c8864e0090488b8690060000488d0c5b488b55e0488954c8100f1045d00f1104c848ffc348899e98060000488b9eb0040000488d4db8488b55f84189f8e8da57f9ff90488b4dc0488b45c8488944242848894df048894c24204c8d054fe18001488d4dd041b9090000004889da",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "deallocate": {
+          "rva": 8656,
+          "pattern": "e93bc5fa05cccccccccccccccccccccce96bc5fa05cccccccccccccccccccccce9bbc6fa05ccccccccccccccccccccccc3cccccccccccccccccccccccccccccc5541574156415541545657534881ec08040000488dac248000000048c78580030000feffffff48899550030000488b314885f60f8401020000c6857f030000014889f1e8c8330a05904989c689d34189d74180e7014c8b6828488975a84c896db0488d4db841b890030000488bbd500300004889fae8c12d0006e871ffffffb9d0030000",
+          "mask": "ff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ff00000000ffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "flushMessages": {
+          "rva": 95405856,
+          "pattern": "56574883ec5880b9520d0000010f85450100004889ce488b81500c000048894424504881c1e00a0000488d8670060000488b96780600004c8b868006000048c78680060000000000004c8944243849c1e0054901d048c74424400000000048895424204c894424284889442430488d7c245048897c2448488d542420e86ffc1800488d8ef80a0000488d8688060000488b96900600004c8b869806000048c78698060000000000004f8d0c404e8d0cca4c8944243848c7442440000000004889542420",
+          "mask": "ffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reserveUi": {
+          "rva": 100688320,
+          "pattern": "56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424281800000048c744242008000000488d4c24304989f9e820040000837c2430017413488b4424384889460848893e4883c4485f5ec3488b4c2438488b542440e8327b1a000f0bcccccccccc56574883ec484889ce488b11488d04124883f805bf04000000480f43f84c8b410848c74424284800000048c744242008000000488d4c24304989f9e8b0030000837c2430017413488b44243848894608",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00ffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "setField": {
+          "rva": 95072896,
+          "pattern": "5657534883ec704489c789d34889ce488b014885c07462488b5608440fb740364589c14501c948c7c1ffffffff0f1f004d85c9742b663b5c483a410f97c24180da0048ffc14983c1fe4180fa0174e1450fb6c24585c07418eb09660f1f4400004c89c14883ea017212488b44c850ebab897c8808e98400000031c00fb7d34889742430488944243848c74424400000000048894c244848895424504885c07421488d542438488d4424304889442420488d4c24584189d84189f9e8117affffeb38",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffffffffffffffff00ffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ff00",
+          "referenceCandidateCount": 1
+        },
+        "writeGuid": {
+          "rva": 95087472,
+          "pattern": "41574156565755534883ec284889d64889cf488b5a10483b1a75084889f1e8bdf06f00488b4608c60418004c8d73014c8976104084ff7428488b4608800c18014c8b76104c3b3675084889f1e88ff06f00488b460842883c3049ffc64c89761089fdc1ed084084ed74314c39f30f838e010000488b4608800c18024c8b76104c3b3675084889f1e854f06f00488b460842882c3049ffc64c89761089fdc1ed104084ed74314c39f30f8353010000488b4608800c18044c8b76104c3b3675084889f1",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffffffffffffffffffff00ffffff",
+          "referenceCandidateCount": 1
+        },
+        "writeFields": {
+          "rva": 95074048,
+          "pattern": "5541574156415541545657534883ec68488d6c246048c74500feffffff4889d64c8b29488b4108488945e04531d24d85ed0f95c04c8b79104d89fe4d0f44f54d85f60f84c40100004d85ed0f84800700004c89e948837de0000f84a70000004c8b4de04c89ca4883e2070f84b00600004531c04c89e9662e0f1f840000000000440fb749364a8b4cc95049ffc04c39c275ee4c8b4de04c89ca4c29c24983f908726466666666662e0f1f840000000000440fb741364a8b4cc150440fb741364a8b4cc150",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "goldAward0": {
+          "rva": 96173583,
+          "pattern": "8b8e4005000001c1898e4005000001860c0800004469c1102700004881c6300c00004889f166ba9804e84334efff0f11370f287424204883c4305b5d5f5e415ec34157415641554154565755534881eca8000000440f298424900000000f29bc24800000000f297424704c89ce4c89c74885c90f95c04883fa020f94c220c280fa017571668139656e746eb801000000668139706c746b6681396373746b6681396465746b6681397074746b6681396573746b6681396672746b668139726f746b",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00ffffffffffff00",
+          "referenceCandidateCount": 1
+        },
+        "goldAward1": {
+          "rva": 95371787,
+          "pattern": "418b854005000001c84189854005000041018d0c0800004469c010270000498b85300c00004885c0746c498b8d380c0000ba98040000440fb750364589d34501db49c7c1ffffffff666666662e0f1f8400000000004d85db7425420fb774483a39f20f97c380db0049ffc14983c3fe80fb0174e1440fb6d34585d27412eb034d89d14883e90172104a8b44c850eba74689448808eb4531c0498d8d300c000048898d900900004889859809000048c785a0090000000000004c898da809000048c785b009000098040000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffff00ffffffffffff00ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "goldAward2": {
+          "rva": 95550008,
+          "pattern": "8b864005000001c8898640050000018e0c0800004469c010270000488b86300c00004885c07468488b8e380c000041b998040000440fb750364589d34501db48c7c2ffffffff66904d85db742b0fb77c503a4139f90f97c380db0048ffc24983c3fe80fb0174e1440fb6d34585d27418eb09660f1f4400004c89d24883e9017210488b44d050ebac4489449008eb3931c04881c6300c00004889742428488944243048c744243800000000488954244048c744244898040000488d4c2450488d542428",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffffffffffffffff00ffffffffffff00ffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reward_spawnLoot": {
+          "rva": 95784128,
+          "pattern": "5541574156415541545657534881ec68010000488dac248000000066440f7f8dd0000000440f2985c00000000f29bdb00000000f29b5a000000048c78598000000feffffff4d89ce4589c54189d44889cf488b89d0020000488b97d8020000e82c62f5ff4869f0f0000000488d1d3e024801f2410f1036f20f10bc1ec8000000440f28c6440f5cc7f3410f16c8410f28c0e82bc34a00f30f108c1ed8000000f30f580d1df96b00f30f5f0d919465000f2ec87351f30f12c0440f5ec0f30f12c1",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffff00000000ffffffff00ffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reward_reroll": {
+          "rva": 95992928,
+          "pattern": "5657534883ec7080b9570d0000020f85e00000000fb699550d000080fbff0f84d00000008b819805000085c07419ffc889819805000089da4531c04883c4705b5f5ee94925ffff448b899c050000b8010000004585c9747d41f6c101740bb8030000004183f901746c41f6c102740e8d04c04489ca83e2fe83fa02745841f6c10474118d04c08d04c04489ca83e2fc83fa04744141f6c108741169c0a11900004489ca83e2f883fa08742a41b20141b89cffffff41f6c1107429ba41d79002f7e2",
+          "mask": "ffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00ffffffffff00ffffffffffffffffffff00ffffffffff00ffffffffffffffffffffffffff00ffffffffff00ffffffffffffffffffffffffffffffff00ffffffffff00ffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffff00ffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reward_jewelryBuilder": {
+          "rva": 95968544,
+          "pattern": "5541574156415541545657534881ec18030000488dac2480000000440f29bd80020000440f29b570020000440f29ad60020000440f29a550020000440f299d40020000440f299530020000440f298d20020000440f2985100200000f29bd000200000f29b5f001000048c785e8010000fefffffff30f1195540100004889d348c785a00100000000000048c785a80100000800000048c785b001000000000000488bba980300004885ff48894d507413488b83900300004883ff01751931d231c9",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffff00ffffffff",
+          "referenceCandidateCount": 1
+        },
+        "reward_jewelryLoop": {
+          "rva": 95969424,
+          "pattern": "4981fe780600000f846f020000488d05b49179014c01f0488985d80100004983c6484c89b5c80100004883bd5801000000744d488b85d8010000488b184c8b70084531edeb13662e0f1f8400000000004983c5184c39ee74274f39742f1075f04b8b4c2f084889da4d89f0e851ef470085c075dc4c8bb5c8010000eb830f1f004883bd60010000000f84a2000000488b85d8010000488b184c8b70084531edeb186666666666662e0f1f8400000000004983c5184c39ef74774b8b042c4c397008",
+          "mask": "ffffffffffffffffff00000000ffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffff00ffffffffffff00ffffffffffffffffffffffff00000000ffffff00ffffffffffffffff00ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "rewardCost0": {
+          "rva": 95340906,
+          "pattern": "41f6c1010f85cf050000898d58030000f20f11b5b0020000f20f1087b0070000e82e875100f20f1185a80200008b87ac0c00008b8fb00c000001c1038fb40c000080bf480d000000898d540300000f45d8899d50030000488bb5900200000f57ff0f57c04885f6488b8598020000480f44c6b901000000480f45ce48898d7002000048898578020000741df30f103507586c00f30f1085a0020000f30f59c6e89d865100f30f5ec6488d87280c000048898528030000488d9f980c00004c8daf30050000",
+          "mask": "ffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "rewardCost1": {
+          "rva": 95482472,
+          "pattern": "41f6c1010f859e2900004889bd080200004c89bd00020000c6856702000001c6856602000001c6856502000001c6856402000001c6856302000001894c24204c8d0508c88101488d8d10020000488d954002000041b90a000000e8894808009031c0488b8de801000080b9480d000000740d488b85e80100008b80ac0c00004889bd080200004c89bd00020000c6856702000001c6856602000001c6856502000001c6856402000001c6856302000001894424204c8d059dc78101488d8d40020000",
+          "mask": "ffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "rewardCost2": {
+          "rva": 95946676,
+          "pattern": "41f6c1017518894da8398e40050000731d4c8b4d18488b5d20e9d4000000b9ffffffff894da8398e4005000072e3488d1d3ad17a0141be14000000ba140000004889d9e854f70300904989d04885c0480f45d84d0f44c6488d0525d17a01488945d848c745e00400000048897de8488d051fab7a01488945f048c744242001000000488d4df84c8d4dd84889dae8eafa030090488b45f848894538488b450048894530488b7d08488b5d20483b5d10750a488d4d10e8f25b4800904c8b4d184889d8",
+          "mask": "ffffffffff00ffffffffffffffffffff00ffffffffffffffffff00000000ffffffffffffffffffffffffffffff00ffffff00000000ffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffff00000000ffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "rewardCost3": {
+          "rva": 95951279,
+          "pattern": "41f6c1010f85d6020000c6855f01000001894c24204c8d05eba07a01488d8d38010000488d950001000041b90a000000e86c21010090418b8640050000c6855f01000001894424204c8d0598a07a01488d8d00010000488d953801000041b904000000e83921010090c6855f0100000144896c24204c8d0594bf7a01488d8d38010000488d950001000041b908000000e80c21010090458abeca020000488d1574bf7a01488d8d3801000041b804000000e88b9a010090410fb6f74883f605488b8538010000",
+          "mask": "ffffffffffff00000000ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "rewardCost4": {
+          "rva": 95993155,
+          "pattern": "41f6c20175138b81400500004429c073194883c4705b5f5ec341b8ffffffff8b81400500004429c072e789814005000041ffc14489899c0500004469c010270000488b81300c00004885c07468488b91380c000041b998040000440fb758364489de01f649c7c2ffffffff66904885f67429420fb77c503a4139f9400f97c74080df0049ffc24883c6fe4080ff0174dd440fb6df4585db7412eb034d89da4883ea0172134a8b44d050ebaf4689449008e99efeffff31c0488d91300c00004889542428",
+          "mask": "ffffffffff00ffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff00ff00ffffffffffffffff00ffffffffffff00ffffffffffff00000000ffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "permanentBossReward": {
+          "rva": 95745184,
+          "pattern": "5541574156415541545657534881ec88000000488dac2480000000440f2945f00f297de00f2975d048c745c8feffffff4889d34889ce488b89d0020000488b96d8020000e867faf5ff4869c8f0000000488d05799a4801488b9401880000004839da74384c8d42684939d874334c8d82d00000004939d8742e4c8d82380100004939d874294881c2a00100004839da0f8519040000bf04000000eb1731ffeb13bf01000000eb0cbf02000000eb05bf030000004801c8488b4808488b5010e8edf9f5ff",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffff00ffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffffff00000000ffffffffffff00ffffff00ffffffffffff00ffffffffffff00ffffffffffffffffffffffffffffffffff00000000",
+          "referenceCandidateCount": 1
+        }
+      }
+    }
+  ]
+}

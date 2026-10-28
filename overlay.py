@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from settings import DEFAULTS, SCHEMA, PRESETS, CONTROLS, validate_settings
 
+CHOICES={'hazardPattern':('Mixed','Scatter','Broken ring','Cross','Lanes','Spiral'),'banLuck':('Off','On'),'soundEnabled':('Off','On'),'extraHazards':('Off','On')}
 BG='#101722'; CARD='#182334'; TEXT='#e6edf7'; MUTED='#99abc2'; GOLD='#ffd183'
 
 class InsertHotkey:
@@ -108,11 +109,11 @@ class Overlay:
         self.summary=tk.StringVar(value='HOST CONTROL PANEL  ·  Ready')
         tk.Label(body,textvariable=self.summary,bg=BG,fg=MUTED,font=('Segoe UI',10),anchor='w').pack(fill='x',padx=24,pady=(0,14))
         self.tabs=ttk.Notebook(body);self.tabs.pack(fill='both',expand=True,padx=18)
-        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else str(value)) for key,value in settings.items() if key!='eventMask'}
+        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key!='eventMask'}
         self.flags={key:tk.BooleanVar(value=value) for key,value in controls.items()}
         self.events=[tk.BooleanVar(value=bool(settings['eventMask']&(1<<i))) for i in range(4)]
         self.pages={}
-        for title in ['Combat','Events','Hazards','Session']:
+        for title in ['Combat','Events','Hazards','Rewards','Session']:
             outer=ttk.Frame(self.tabs);self.tabs.add(outer,text='  '+title+'  ')
             canvas=tk.Canvas(outer,bg=BG,highlightthickness=0)
             bar=ttk.Scrollbar(outer,orient='vertical',command=canvas.yview)
@@ -145,10 +146,18 @@ class Overlay:
         p=self.pages['Hazards']
         self.heading(p,'Make the whole party move','2.5-second warnings · maximum 128 active circles shared across players.')
         self.check(p,'Arena hazards enabled','hazards')
+        self.field(p,'Obstacle formation','hazardPattern')
+        self.field(p,'Native cone and line attacks','extraHazards')
+        self.note(p,'Mixed rotates rings, crosses, lanes, spirals and scatter. Formations leave escape routes; these are damaging runes, not solid walls.')
         for label,key in [('Obstacle damage','hazardPreset'),('Damage growth · % per minute','hazardGrowth'),('Normal circles · per player','hazardCount'),('Normal interval · seconds','hazardInterval'),('Rune Storm circles · per player','stormCount'),('Rune Storm interval · tenths of a second','stormIntervalTenths'),('Boss barrage circles · per player','barrageCount'),('Boss barrage interval · tenths of a second','barrageIntervalTenths'),('Boss barrage duration · seconds','barrageDuration'),('Camping trigger · seconds still','campSeconds')]:self.field(p,label,key)
         self.note(p,'Easy 0.5× · Hard 1× · Brutal 1.5× · Insane 2×. Base damage: 20% max HP (25–250), or 25% (35–350) during storms/barrages, before defenses. Growth adds up to 4× over time. Example: 25 tenths = 2.5 seconds.')
+        p=self.pages['Rewards']
+        self.heading(p,'Give every boss a purpose','Boss bounties and recurring chest milestones use native collectible drops.')
+        for label,key in [('Exclude Luck chest items','banLuck'),('Maximum reroll price · gold','rerollCap'),('Extra powerup interval · seconds','pickupInterval'),('Extra chest interval · seconds','chestInterval'),('Boss kills per chest milestone','rewardEvery')]:self.field(p,label,key)
+        self.note(p,'A bounty drops at each defeated boss. Milestones increase bounty rewards during this run; loot and collection progress follow the game’s normal rules. Luck filtering applies to future chest choices, not equipped items.')
         p=self.pages['Session']
         self.heading(p,'Session controls','These controls affect the match you host.')
+        self.field(p,'Announcement sounds','soundEnabled')
         self.check(p,'Boss-kill fireworks','fireworks');self.check(p,'Automatically continue into Endless','autoEndless')
         self.note(p,'Press Insert to show or hide this panel. It follows the game window and hides when you switch apps. Use windowed or borderless mode. Online matches continue while this panel is open.')
         self.live=tk.StringVar(value='Waiting for game…')
@@ -173,11 +182,12 @@ class Overlay:
         row=ttk.Frame(p);row.pack(fill='x',pady=6)
         ttk.Label(row,text=label).pack(side='left')
         if key.endswith('Preset'):box=ttk.Combobox(row,textvariable=self.vars[key],values=PRESETS,state='readonly',width=12)
+        elif key in CHOICES:box=ttk.Combobox(row,textvariable=self.vars[key],values=CHOICES[key],state='readonly',width=12)
         else:
             _,lo,hi=SCHEMA[key];box=ttk.Spinbox(row,from_=lo,to=hi,textvariable=self.vars[key],width=12)
         box.pack(side='right')
     def values(self):
-        values={k:PRESETS.index(v.get()) if k.endswith('Preset') else int(v.get()) for k,v in self.vars.items()}
+        values={k:PRESETS.index(v.get()) if k.endswith('Preset') else CHOICES[k].index(v.get()) if k in CHOICES else int(v.get()) for k,v in self.vars.items()}
         values['eventMask']=sum(1<<i for i,v in enumerate(self.events) if v.get())
         if not validate_settings(values):raise ValueError('Check the values and ensure minimum event break is no greater than maximum.')
         return values,{k:v.get() for k,v in self.flags.items()}
@@ -187,7 +197,7 @@ class Overlay:
             self.feedback.set('Applied. New spawns and future events use these settings.')
         except Exception as e:self.feedback.set(str(e))
     def restore(self):
-        for k,v in self.vars.items():v.set(PRESETS[DEFAULTS[k]] if k.endswith('Preset') else str(DEFAULTS[k]))
+        for k,v in self.vars.items():v.set(PRESETS[DEFAULTS[k]] if k.endswith('Preset') else CHOICES[k][DEFAULTS[k]] if k in CHOICES else str(DEFAULTS[k]))
         for v in self.events:v.set(True)
         for k,v in self.flags.items():v.set(CONTROLS[k])
         self.feedback.set('Defaults selected. Press Apply to use them.')
@@ -198,6 +208,8 @@ class Overlay:
         elif match:
             event=['Quiet','Treasure Rush','Guardian Hunt','Berserker Rush','Rune Storm'][state.get('event',0)]
             self.live.set(f'Next boss: {max(0,int(state.get("nextWave",0)-clock))}s\nEvent: {event}\nBosses defeated: {state.get("killCount",0)}\nHazard bursts: {state.get("hazardBursts",0)}\nGold drops: ×{item["scaling"]["gold"]:.2f}')
+            reward=item.get('rewards') or {}
+            if reward.get('supported'):self.live.set(self.live.get()+f'\nBounty tier: {reward.get("tier",0)} · next chest in {max(1,item.get("settings",{}).get("rewardEvery",3))-reward.get("kills",0)%max(1,item.get("settings",{}).get("rewardEvery",3))} boss kills\nBonus drops: {reward.get("pickups",0)} powerups · {reward.get("chests",0)} chests')
         else:self.live.set('Ready. Start a solo match or host a lobby normally.')
     def show(self):
         if not self.app.game or not self.app.game.ready:return
