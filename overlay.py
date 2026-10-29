@@ -153,8 +153,8 @@ class Overlay:
         self.note(p,'Easy 0.5× · Hard 1× · Brutal 1.5× · Insane 2×. Base damage: 20% max HP (25–250), or 25% (35–350) during storms/barrages, before defenses. Growth adds up to 4× over time. Example: 25 tenths = 2.5 seconds.')
         p=self.pages['Rewards']
         self.heading(p,'Give every boss a purpose','Boss bounties and recurring chest milestones use native collectible drops.')
-        for label,key in [('Exclude Luck chest items','banLuck'),('Maximum reroll price · gold','rerollCap'),('Extra powerup interval · seconds','pickupInterval'),('Extra chest interval · seconds','chestInterval'),('Boss kills per chest milestone','rewardEvery')]:self.field(p,label,key)
-        self.note(p,'A bounty drops at each defeated boss. Milestones increase bounty rewards during this run; loot and collection progress follow the game’s normal rules. Luck filtering applies to future chest choices, not equipped items.')
+        for label,key in [('Exclude Luck rings / trinkets','banLuck'),('Maximum reroll price · gold','rerollCap'),('Extra powerup interval · seconds','pickupInterval'),('Extra chest interval · seconds','chestInterval'),('Boss kills per chest milestone','rewardEvery')]:self.field(p,label,key)
+        self.note(p,'A bounty drops at each defeated boss. Milestones increase bounty rewards during this run; loot and collection progress follow the game’s normal rules. Luck filtering covers future ring/trinket choices; amulet affixes and equipped items are unchanged.')
         p=self.pages['Session']
         self.heading(p,'Session controls','These controls affect the match you host.')
         self.field(p,'Announcement sounds','soundEnabled')
