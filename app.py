@@ -66,6 +66,11 @@ class App:
             except Exception as e:self.check_events.put(str(e))
         threading.Thread(target=worker,daemon=True).start()
     def extend_session(self,page,overlay):pass
+    def travel(self,zone):
+        if not self.game or not self.game.ready:raise ValueError('Start a solo match or host a match first.')
+        result=self.game.travel(zone)
+        if not result or isinstance(result,dict) and result.get('ok') is False:
+            raise ValueError((result.get('error') or result.get('reason') or 'Map transfer is unavailable.') if isinstance(result,dict) else 'Map transfer is unavailable.')
     def choose(self):
         path=filedialog.askopenfilename(title='Select AzerothSurvivors.exe',filetypes=[('Game executable','AzerothSurvivors.exe'),('Windows executable','*.exe')])
         if path:self.path.set(path);self.save()
@@ -106,7 +111,7 @@ class App:
                         if item.get('fault'):self.status.set('Mode error. Relaunch the game: '+item['fault'].splitlines()[0])
                     elif kind in ('launch-error','closed'):
                         self.status.set(item.get('error') or ('The game closed unexpectedly.' if item.get('crashed') else 'Game closed. Ready to launch again.'))
-                        self.game=None;self.launching=False;self.launch.configure(state='normal');self.stop.configure(state='disabled');self.panel_button.configure(state='disabled');self.browse.configure(state='normal');self.path_entry.configure(state='normal');self.overlay.hide(False);self.overlay.bridge.hwnd=None;break
+                        self.game=None;self.launching=False;self.launch.configure(state='normal');self.stop.configure(state='disabled');self.panel_button.configure(state='disabled');self.browse.configure(state='normal');self.path_entry.configure(state='normal');self.overlay.update_travel({});self.overlay.hide(False);self.overlay.bridge.hwnd=None;break
                     elif kind=='fault':self.status.set('Native mode error: '+item['error'].splitlines()[0])
             except queue.Empty:pass
         self.window.after(200,self.poll)

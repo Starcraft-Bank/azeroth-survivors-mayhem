@@ -1,10 +1,28 @@
-# Legendary Mayhem — native edition 0.9.2
+# Legendary Mayhem — native edition 0.9.3
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
 legacy; its older releases remain available in the release history.
 
-## New in 0.9.2
+## New in 0.9.3
+
+Mayhem moves the whole party to a randomly selected map every **three minutes
+of match time**. A ten-second game announcement warns players to collect drops.
+Rotation waits for reward choices to close. Only the host needs Mayhem.
+
+The boss pool and map rotation are shuffled each match, with no immediate
+repeats. Final bosses enter the Mayhem pool only after confirmed Endless.
+The wave count, elapsed time, growing enemy difficulty and bounty milestones
+continue across map changes. Insert > Session shows the rotation countdown.
+
+Levels, learned skills, carried items and gold are kept. Existing enemies,
+hazards and uncollected ground drops are cleared without kill rewards.
+Players receive five seconds of damage protection while loading.
+Completion rewards retain the original run's map identity; travelling does not
+award extra map clears or increase the lobby size. Map rotation requires the
+reviewed native 0.127.0 build; older supported adapters keep the existing mode.
+
+## Game compatibility
 
 Support for native game **0.127.0 / d1c85453**, with reviewed player/enemy
 layouts and native reward hooks. The game itself raises the level cap to 120.
@@ -35,7 +53,7 @@ new custom currency, guest addon, or public collection-unlock feature.
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.9.2.exe.
+2. Run AzerothSurvivorsMayhemNative-0.9.3.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.
@@ -164,6 +182,9 @@ Use the game's normal hosting/joining controls and wait until every guest
 has picked a character and appears in the roster before starting the map.
 Native networking and the host's simulation carry shared changes.
 
+Two-client LAN checks verified repeated map transfers, preserved progression
+fields, loading protection and native saved Marks. Automatic rotation and
+randomized selection have additional regression checks.
 This is an early native edition. Solo integration checks cover real native
 boss/hazard creation, a full Rune Storm, arrival barrages, Legendary choices,
 earned-gold scaling and victory-to-endless. A two-client native LAN test also

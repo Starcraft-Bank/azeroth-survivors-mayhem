@@ -4,7 +4,7 @@ import ctypes,hashlib,json,os,queue,sys,threading,time
 from ctypes import wintypes
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.9.2'
+VERSION='0.9.3'
 from settings import DEFAULTS, SCHEMA, validate_settings
 
 
@@ -74,7 +74,7 @@ class NativeGame:
                 self.session=self.device.attach(self.pid)
                 self.session.on('detached',self._detached)
                 self.events.put({'kind':'compatible','version':profile['version'],'stamp':profile['stamp']})
-                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['patterns.js','rewards.js','effects.js','permanent-rewards.js','agent.js'])
+                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['patterns.js','rewards.js','effects.js','permanent-rewards.js','map_travel.js','agent.js'])
                 self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
                 self.agent.on('message',self._message);self.agent.load()
                 if not self.ready:raise RuntimeError('The native mode did not initialize; the game was not resumed.')
@@ -100,6 +100,8 @@ class NativeGame:
     def configure(self,settings):
         if not validate_settings(settings):return False
         return self.agent.exports_sync.configure(settings)
+
+    def travel(self,zone):return self.agent.exports_sync.travel(zone)
 
     def control(self,name,value):return self.agent.exports_sync.control(name,bool(value))
 

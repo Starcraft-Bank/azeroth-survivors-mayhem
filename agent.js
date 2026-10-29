@@ -47,11 +47,34 @@
   let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
   let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
-  let state,rewards=null,effects=null,permanentRewards=null;
+  let state,rewards=null,effects=null,permanentRewards=null,travel=null;
+  // Shuffle bags avoid a fixed sequence and repeats before a pool is exhausted.
+  function shuffleBag(random=Math.random){
+    let bag=[],last=null;
+    return {reset(){bag=[];last=null;},take(pool,excluded=null){
+      if(!bag.length){bag=[...pool];for(let i=bag.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
+      const allowed=value=>value!==excluded&&value!==last;
+      if(!allowed(bag[bag.length-1])){const i=bag.findIndex(allowed);if(i>=0)[bag[i],bag[bag.length-1]]=[bag[bag.length-1],bag[i]];}
+      // A remaining current map is consumed; it must never become a no-op transfer.
+      let value=bag.pop();if(value===excluded)return this.take(pool,excluded);last=value;return value;
+    }};
+  }
+  const mapBag=shuffleBag(),bossBag=shuffleBag(),finalBag=shuffleBag();
+  const normalPool=defs.map((d,i)=>i).filter(i=>!defs[i].final),endlessPool=defs.map((d,i)=>i);
+  function nextBoss(){const code=state.endless?finalBag.take(endlessPool,state.lastBossCode):bossBag.take(normalPool);state.lastBossCode=code;return code;}
+  function rotateMap(r,t){
+    if(!travel?.status().supported)return false;
+    if(t>=state.nextMap-10&&t<state.nextMap&&state.mapWarning!==state.nextMap){state.mapWarning=state.nextMap;notice('Map shift in '+Math.ceil(state.nextMap-t)+' seconds — collect your drops!',3);}
+    if(t<state.nextMap||t<state.mapRetryAt||!travel.status().canTravel)return false;
+    const destination=mapBag.take(zones.map(z=>z.index),zoneIndex(r));
+    travel.request(zones[destination].key);
+    state.mapRetryAt=t+5;return true;
+  }
   function reset(){
+    mapBag.reset();bossBag.reset();finalBag.reset();
     if(rewards?.reset)rewards.reset();if(effects?.reset)effects.reset();
     for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];
-    state={clock:0,wave:0,nextWave:settings.bossInterval,finalCursor:0,affix:0,endless:false,nextHazard:settings.hazardInterval,
+    state={clock:0,wave:0,nextMap:180,mapChanges:0,mapWarning:0,mapRetryAt:0,lastBoss:null,lastBossCode:-1,nextWave:settings.bossInterval,finalCursor:0,affix:0,endless:false,nextHazard:settings.hazardInterval,
       shapeNext:0,shapedBursts:0,stormNext:0,barrageUntil:0,barrageNext:0,event:0,eventUntil:0,nextEvent:settings.eventFirst,eventCount:0,
       lastEvent:0,killCount:0,hazardBursts:0,campBursts:0,cursor:0,noticeUntil:0,transitionAt:0,transitions:0,goldAwards:0,lastGold:null};
     scope=[];leases.clear();bossRegistry.clear();camp.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();announcements=[];
@@ -339,23 +362,24 @@
       if(t+.5<state.clock||(p===0&&state.clock>0))reset();state.clock=t;
       if((r.add(F(0xc9d)).readU8()?world:p)!==1)return;
       state.endless=!!r.add(F(0xc90)).readU8()&&!!r.add(F(0xb10)).readU32();
+      if(rotateMap(r,t))return;
       const v=enemies(r),bosses=[];for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(isBoss(e)){if(alive(e))bosses.push(e);else if(livingBossIds.has(guid(e)))bossDied(r,guid(e),enemyPosition(r,e),bossRegistry.has(guid(e)));}}
       events(r,bosses.length);hazards(r,v,bosses);if(rewards)rewards.tick(r);if(effects?.tick)effects.tick(r);
       if(!controls.waves){state.nextWave=t+settings.bossInterval;return;}
       if(t<state.nextWave||bosses.length>=8)return;
-      const zone=Math.max(0,zoneIndex(r)),extra=state.wave%4===3;state.affix=state.wave%4;
-      const code=state.endless?((zone+state.finalCursor+1)%12)*5+4:((zone+state.wave+1)%12)*5+(state.wave+Math.floor(state.wave/12))%4;
+      const extra=state.wave%4===3;state.affix=state.wave%4;
+      const code=nextBoss();
       if(!summon(r,code))return;
       if(state.endless)state.finalCursor++;
-      if(extra&&bosses.length<7){const second=state.endless?((zone+state.finalCursor+1)%12)*5+4:((zone+state.wave+7)%12)*5+(state.wave+Math.floor(state.wave/12))%4;
+      if(extra&&bosses.length<7){const second=nextBoss();
         if(summon(r,second)&&state.endless)state.finalCursor++;}
-      state.wave++;state.lastSpawn=t;state.nextWave=t+settings.bossInterval;state.barrageUntil=t+settings.barrageDuration;state.barrageNext=t;
+      state.lastBoss=defs[code].name;state.wave++;state.lastSpawn=t;state.nextWave=t+settings.bossInterval;state.barrageUntil=t+settings.barrageDuration;state.barrageNext=t;
       notice(['Crossroads','Frenzy','Spellstorm','Double Trouble'][state.affix]+' — '+defs[code].name+'! Dodge the arrival barrage.',3);
     }finally{inMode=false;}
   }
-  Interceptor.attach(at('runTick'),{onEnter(args){guarded(()=>tick(args[0]));}});
+  Interceptor.attach(at('runTick'),{onEnter(args){guarded(()=>{run=args[0];travel?.tick(run);if(!travel?.status().busy)tick(run);});}});
   Interceptor.attach(at('gameUpdate'),{onEnter(args){game=args[0];},onLeave(){guarded(()=>{
-    if(game.add(16).readU64().toString()==='2'){run=NULL;state.transitionAt=0;return;}
+    if(game.add(16).readU64().toString()==='2'){run=NULL;travel?.reset(true);state.transitionAt=0;return;}
     const r=game.add(16);run=r;
     const victoryPhase=r.add(F(0xc9d)).readU8()?r.add(F(0xca3)).readU8():r.add(F(0xca2)).readU8();
     if(controls.autoEndless&&victoryPhase===5&&r.add(F(0xb10)).readU32()&&!r.add(F(0xc90)).readU8()){
@@ -367,12 +391,16 @@
   if(globalThis.MAYHEM_PERMANENT_REWARDS)permanentRewards=globalThis.MAYHEM_PERMANENT_REWARDS.setup({profile,base,F,getState:()=>state,knownBoss:p=>bossDefinitions.get(String(p)),homeFinal:r=>{const z=zones[zoneIndex(r)];return z?z.bosses[4].pointer:null;}});
   if(globalThis.MAYHEM_REWARDS)rewards=globalThis.MAYHEM_REWARDS.setup({profile,base,F,native,guarded,notice,time,players,getSettings:()=>settings});
   if(globalThis.MAYHEM_EFFECTS)effects=globalThis.MAYHEM_EFFECTS.setup({base,profile,F,E,allocate,appendMessage,players,getSettings:()=>settings,guarded});
+  travel=AZS_MAP_TRAVEL.setup({profile,base,F,getRun:()=>run.isNull()?null:run,getGame:()=>game.isNull()?null:game,notice,onCommit(){
+    state.mapChanges++;state.nextMap=(Math.floor(time(run)/180)+1)*180;if(rewards?.onTravel)rewards.onTravel(run);
+    for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];announcements=[];camp.clear();leases.clear();bossRegistry.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
+  }});
   function status(){
     let match=null;if(!run.isNull())guarded(()=>{match={clock:time(run),phase:run.add(F(0xca2)).readU8(),worldPhase:run.add(F(0xca3)).readU8(),coop:!!run.add(F(0xc9d)).readU8(),zone:zoneIndex(run)};});
-    return {ready:!fault,fault,settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
+    return {ready:!fault,fault,travel:travel.status(),settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
   }
   rpc.exports={
-    status,
+    status,travel(zone){if(fault)return false;return travel.request(zone);},
     configure(candidate){
       if(!candidate||Object.keys(candidate).length!==Object.keys(schema).length||
         Object.entries(schema).some(([key,spec])=>!Number.isInteger(candidate[key])||candidate[key]<spec[1]||candidate[key]>spec[2])||

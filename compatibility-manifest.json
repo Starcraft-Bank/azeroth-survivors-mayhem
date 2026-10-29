@@ -1176,6 +1176,16 @@
         "permanentRewards": {
           "bossReward": 96662224,
           "headSha256": "31b825124941cc53cb9d6bd09b1f72addd8b1de8bc7fe93d1f75d7f59e12bc67"
+        },
+        "mapTravelFunctions": {
+          "loadWorld": 96054784,
+          "worldDropSlow": 95952656,
+          "createHero": 96575344,
+          "sendLocalPacket": 96151392,
+          "encodeCoop": 97602192,
+          "flushPendingCoop": 96017456,
+          "buildSnapshot": 97608304,
+          "playerDamage": 96543536
         }
       },
       "runtimeSha256": "59e50d244f992e10dd40934656241e2caa9061da3f6592561bfbfeb6a830b3ff",
@@ -1322,6 +1332,54 @@
           "rva": 95740512,
           "pattern": "5541574156415541545657534883ec68488d6c246048c74500feffffff4889d64c8b294c8b79084d85ed410f95c44c8b71104c89f7490f44fd4885ff0f84ac0000004d85ed0f84740600004c89e84d85ff0f84870000004c89f94883e1070f84b205000031d24c89e80f1f8000000000440fb740364a8b44c05048ffc24839d175ee4c89f94829d14983ff08725066900fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036488b44d0500fb75036",
           "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffffffffff00000000ffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_loadWorld": {
+          "rva": 96054784,
+          "pattern": "5541574156415541545657534881ec98040000488dac2480000000440f29bd00040000440f29b5f0030000440f29ade0030000440f29a5d0030000440f299dc0030000440f2995b0030000440f298da0030000440f298590030000660f7fbd80030000660f7fb57003000048c78568030000feffffff4c89cb4c89c64889d748898d10010000488d4d40e891d43200488b45404531c04883f8ffba01000000480f455548490f44c0488985580300004c0f454550488d4d4048899548030000e8cc483a00",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000",
+          "referenceCandidateCount": 1
+        },
+        "travel_worldDropSlow": {
+          "rva": 95952656,
+          "pattern": "555657534883ec48488d6c244048c74500feffffff488b01488b4818488945f8488b4020488945e848c745f00000000048894de06666662e0f1f840000000000488b45f0483945e8741648ffc0488945f0488d7148e8d67a1600904889f1ebe0488b75f8488b46104885c07417488b4e1848c1e003488d14c041b808000000e83c0248fa488b56284885d27413488b4e3048c1e20441b804000000e8200248fa488b56404883faff74144885d2740f488b4e4841b801000000e8020248fa488b5668",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffff00000000ffffffffff00ffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffff00ffffffffffffffffffffffffffffff00000000ffffffffffffffffff00ffffffff00ffffffffffffffffffffff00000000ffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_createHero": {
+          "rva": 96575344,
+          "pattern": "5541565657534881ecd0000000488dac248000000048c74548feffffff4488c34889d74889ce4c8d75e84c89f1e86ea8ffffc745380000000048c745200000000048c745280100000048c745300000000048b800002040db0f4940488945100f10051a4f7c010f294500f30f1087dc040000f30f590506166300f30f114504488b97b0040000f30f10872c0500004881c720050000c64547014c897424384889e84889442430f30f1144242848897c2420488d4d2041b0044189d9e840f9f2ff",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000",
+          "referenceCandidateCount": 1
+        },
+        "travel_sendLocalPacket": {
+          "rva": 96151392,
+          "pattern": "55564883ec48488d6c244048c74500feffffff4939d04c894df80f83890000004889ce4969c0b00000004801c648c745e00000000048c745e80100000048c745f0000000004c8d45e04889f14c89cae87c85f9ff90488b8e900000004883c110488b55e84c8b45f0e8837b190090488b55e04885d2740f488b4de841b801000000e8eaf944fa488b45f8488b104885d27410488b480841b801000000e8cff944fa904883c4485e5dc3488d05c0074d014c89c14989c0e8e8646500900f0b6690",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffff00ffffffffffffffffffffff00000000ffffffffffffffffffffff00ffffffffffffffffffffff00000000ffffffffffffffffffffff00000000ffffffffffffff00000000ffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_encodeCoop": {
+          "rva": 97602192,
+          "pattern": "5541574156415541545657534881ecf8000000488dac248000000048c74570feffffff4889d74889ce48c745580000000048c7456001000000488b0248b900000000000000804831c14885c0b803000000480f48c148c7456800000000488d0dd0a5a001486304814801c8ffe0488d4d58b201e8d8c01a00908b57384889c1e86cc21a0090488b57104c8b47184889c1e85bc11a0090488b57284c8b47304889c1e84ac11a0090e954140000488d4d58b210e899c01a0090e943140000488d4d58",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff00000000ffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffffffffffffffffffffffffff00000000ffff00000000ffffffffffffff00000000ffff00000000ffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_flushPendingCoop": {
+          "rva": 96017456,
+          "pattern": "55415741565657534881ec88020000488dac248000000048c78500020000feffffff498b58104885db0f84280100004889d64889cf4883fb01756d49c7401000000000498b4008488b0848898df8010000488b50084c8b4010f04c0105b7f5ac02f048ff05bff5ac024889f9488995f0010000ff561890488b95f80100004885d20f84d000000041b801000000488b8df00100004881c4880200005b5f5e415e415f5de9f80447fa4d8b7008488d4da04c89f24d89c74989d8e82250180049c7471000000000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffff00000000ffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_buildSnapshot": {
+          "rva": 97608304,
+          "pattern": "5541574156415541545657534881ec78010000488dac248000000066440f7f9de000000066440f7f95d000000066440f7f8dc000000066440f7f85b00000000f29bda00000000f29b59000000048c78588000000feffffff4889d748894df0f30f10bac00c00000fb682830d00008845700fb6827e0d00008845710fb682840d00008845728b82300500008945608b82d00b000089455c8b82300800008945580fb6826f030000888586000000f20f10b2140800000fb6825c03000088457c0fb6825d030000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "travel_playerDamage": {
+          "rva": 96543536,
+          "pattern": "5541574156415541545657534881ecb8010000488dac2480000000440f29ad20010000440f29a510010000440f299d00010000440f2995f000000066440f298de0000000440f2985d00000000f29bdc00000000f29b5b000000048c785a8000000feffffff80b9830d0000010f85960f00004989cd80b9780d0000000f85860f00004489cb4d89c60f28f94180bd7e0d000001757c498b8dd0020000498b95d8020000e8282fefff31c983f8030f92c1498b85880c000048ffc87807f3480f2ac0",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00ffffffffff",
           "referenceCandidateCount": 1
         },
         "goldAward0": {

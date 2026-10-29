@@ -1,6 +1,6 @@
 """Owned-process Windows overlay. Insert is sampled only while the game/panel is focused."""
 import ctypes
-import queue,threading
+import math,queue,threading
 from ctypes import wintypes as w
 import tkinter as tk
 from tkinter import ttk
@@ -159,6 +159,10 @@ class Overlay:
         self.heading(p,'Session controls','These controls affect the match you host.')
         self.field(p,'Announcement sounds','soundEnabled')
         self.check(p,'Boss-kill fireworks','fireworks');self.check(p,'Automatically continue into Endless','autoEndless')
+        self.heading(p,'Automatic map rotation','A random map every three minutes of match time.')
+        self.travel_info=tk.StringVar(value='Start a solo match or host a match to begin map rotation.')
+        ttk.Label(p,textvariable=self.travel_info,wraplength=470,foreground=MUTED,justify='left').pack(fill='x',pady=(0,8))
+        self.note(p,'Rotation pauses during reward choices and resumes when play continues. The whole party moves together, keeping player levels, items and match time. Waves and difficulty continue growing; completion rewards remain tied to the original run.')
         self.note(p,'Press Insert to show or hide this panel. It follows the game window and hides when you switch apps. Use windowed or borderless mode. Online matches continue while this panel is open.')
         self.live=tk.StringVar(value='Waiting for game…')
         ttk.Label(p,textvariable=self.live,wraplength=475,justify='left').pack(fill='x',pady=14)
@@ -201,7 +205,23 @@ class Overlay:
         for v in self.events:v.set(True)
         for k,v in self.flags.items():v.set(CONTROLS[k])
         self.feedback.set('Defaults selected. Press Apply to use them.')
+    def update_travel(self,state,rotation=None,match=None):
+        state=state or {};rotation=rotation or {};catalog=state.get('catalog') or []
+        if not match:
+            self.travel_info.set('Start a solo match or host a match to begin map rotation.');return
+        names=lambda value:next((z['name'] for z in catalog if value in (z['key'],z['id'])),str(value if value is not None else '—'))
+        remaining=max(0,math.ceil(rotation.get('nextMap',180)-rotation.get('clock',0)))
+        changes=max(0,int(rotation.get('mapChanges',0)))
+        if state.get('busy'):reason='Moving the party…'
+        elif not state.get('supported'):reason=state.get('reason') or 'Map rotation is unavailable for this game version.'
+        elif match.get('phase')==2:reason='Paused during reward choices.'
+        elif not state.get('canTravel'):reason=state.get('reason') or 'Waiting for play to resume.'
+        else:reason='The next destination is chosen automatically.'
+        self.travel_info.set(f'Current: {names(state.get("currentZone"))} · Original: {names(state.get("originZone"))}\nNext change: {remaining//60:02}:{remaining%60:02} · Map changes: {changes}\n{reason}')
     def update_status(self,item):
+        travel=dict(item.get('travel') or {})
+        if item.get('fault'):travel.update(canTravel=False,reason='Resolve the mode error before transferring maps.')
+        self.update_travel(travel,item.get('state'),item.get('match'))
         state=item.get('state',{});match=item.get('match');clock=int(state.get('clock',0))
         self.summary.set(('ENDLESS' if state.get('endless') else 'HOST CONTROL PANEL')+f'  ·  {clock//60:02}:{clock%60:02}  ·  Wave {state.get("wave",0)}')
         if item.get('fault'):self.live.set('Mode error: '+item['fault'].splitlines()[0])

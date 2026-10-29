@@ -48,6 +48,6 @@
         const item=queued.shift();item.position.forEach((n,i)=>xyz.add(i*4).writeFloat(n));loot(r,item.kind,item.amount,xyz);spawned++;if(item.kind===2)chests++;else if(item.kind>=3)pickups++;
       }
     }
-    return {tick,bossReward,milestone,reset(){owner='';last=-1;queued=[];kills=0;tier=0;spawned=0;pickups=0;chests=0;},status:()=>({supported:true,kills,tier,queued:queued.length,spawned,pickups,chests,filtered,capped,nextPickup,nextChest})};
+    return {tick,bossReward,milestone,onTravel(r){const v=pos(r);queued.forEach((item,i)=>{const a=i*2.4;item.position=[v[0]+Math.cos(a)*3,v[1]+Math.sin(a)*3,v[2]];});},reset(){owner='';last=-1;queued=[];kills=0;tier=0;spawned=0;pickups=0;chests=0;},status:()=>({supported:true,kills,tier,queued:queued.length,spawned,pickups,chests,filtered,capped,nextPickup,nextChest})};
   }};
 })();
