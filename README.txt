@@ -1,10 +1,17 @@
-# Legendary Mayhem — native edition 0.9.4
+# Legendary Mayhem — native edition 0.9.5
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
 legacy; its older releases remain available in the release history.
 
-## Fixed in 0.9.4
+## New in 0.9.5
+
+**Insert > Session > Automatic map rotation ON / OFF** applies immediately and
+is saved between launches. Rotation is ON by default. OFF cancels queued travel;
+an already-started transfer finishes safely. ON starts a fresh three-minute
+countdown. Waves, events, rewards and scaling continue with rotation OFF.
+
+## Included map-transfer correction
 
 Corrects the map-zone layout used during transfers. Upgraded characters no longer
 fail the old owned-string check, and unrelated gameplay stats are kept intact.
@@ -59,7 +66,7 @@ new custom currency, guest addon, or public collection-unlock feature.
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.9.4.exe.
+2. Run AzerothSurvivorsMayhemNative-0.9.5.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.

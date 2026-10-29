@@ -11,7 +11,7 @@ import zipfile
 from PyInstaller.archive.readers import CArchiveReader
 
 ROOT=Path(__file__).resolve().parent
-EXE=ROOT/'dist/AzerothSurvivorsMayhemNative-0.9.4.exe'
+EXE=ROOT/'dist/AzerothSurvivorsMayhemNative-0.9.5.exe'
 
 def main():
     failures=[]
@@ -81,7 +81,7 @@ def main():
                 scan('EXE!'+name,payload)
                 if any(marker in payload for marker in forbidden):failures.append({'file':name,'reason':'private feature in public EXE'})
     failures=list({(item['file'],item['reason']):item for item in failures}.values())
-    result={'passed':not failures,'version':'0.9.4','exe':EXE.name,'sha256':hashlib.sha256(EXE.read_bytes()).hexdigest(),
+    result={'passed':not failures,'version':'0.9.5','exe':EXE.name,'sha256':hashlib.sha256(EXE.read_bytes()).hexdigest(),
             'scannedPayloads':scanned,'publicSourceFiles':public,'findings':failures,
             'upstreamRuntimeExceptions':[{'file':'frida/_frida.pyd','sha256':'2157c0a2d83222cfb377e7c4526ac4fd117635ee3c883867af4e919d57d8a753','scope':'Exact unmodified upstream binary: generic documentation placeholder and GitHub Actions runneradmin build paths only; build-account and token scans still apply.'}],
             'checks':['allowlisted public source','decompressed EXE archive','Python module filenames and constants',

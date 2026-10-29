@@ -77,6 +77,10 @@ class App:
     def save(self):
         PREFS.parent.mkdir(parents=True,exist_ok=True);temp=PREFS.with_suffix('.tmp')
         temp.write_text(json.dumps({'game':self.path.get(),'settings':self.current_settings,'controls':self.current_controls},indent=2),encoding='utf-8');temp.replace(PREFS)
+    def set_control(self,name,value):
+        if name not in CONTROLS or type(value) is not bool:raise ValueError('Invalid session control.')
+        if self.game and self.game.ready and not self.game.control(name,value):raise ValueError('The game rejected this control.')
+        self.current_controls[name]=value;self.save()
     def apply_settings(self,settings,controls):
         if self.game and self.game.ready:
             if not self.game.configure(settings):raise ValueError('The game rejected these settings.')

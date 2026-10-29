@@ -20,7 +20,7 @@ SCHEMA = {
     'barrageDuration': (30, 10, 120), 'campSeconds': (6, 3, 30),
 }
 DEFAULTS = {key: spec[0] for key, spec in SCHEMA.items()}
-CONTROLS = dict(waves=True, events=True, hazards=True, fireworks=True, autoEndless=True)
+CONTROLS = dict(waves=True, events=True, hazards=True, fireworks=True, autoEndless=True, autoMap=True)
 
 def validate_settings(value):
     return (isinstance(value, dict) and set(value) == set(SCHEMA)

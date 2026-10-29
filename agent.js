@@ -44,7 +44,7 @@
   const definitionSet=new Set(defs.map(d=>String(d.pointer)));
   const schema=globalThis.MAYHEM_SCHEMA;
   let settings={...Object.fromEntries(Object.entries(schema).map(([k,v])=>[k,v[0]])),...globalThis.MAYHEM_SETTINGS};
-  let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true};
+  let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true,autoMap:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
   let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
   let state,rewards=null,effects=null,permanentRewards=null,travel=null;
@@ -63,7 +63,7 @@
   const normalPool=defs.map((d,i)=>i).filter(i=>!defs[i].final),endlessPool=defs.map((d,i)=>i);
   function nextBoss(){const code=state.endless?finalBag.take(endlessPool,state.lastBossCode):bossBag.take(normalPool);state.lastBossCode=code;return code;}
   function rotateMap(r,t){
-    if(!travel?.status().supported)return false;
+    if(!controls.autoMap||!travel?.status().supported)return false;
     if(t>=state.nextMap-10&&t<state.nextMap&&state.mapWarning!==state.nextMap){state.mapWarning=state.nextMap;notice('Map shift in '+Math.ceil(state.nextMap-t)+' seconds — collect your drops!',3);}
     if(t<state.nextMap||t<state.mapRetryAt||!travel.status().canTravel)return false;
     const destination=mapBag.take(zones.map(z=>z.index),zoneIndex(r));
@@ -392,7 +392,7 @@
   if(globalThis.MAYHEM_REWARDS)rewards=globalThis.MAYHEM_REWARDS.setup({profile,base,F,native,guarded,notice,time,players,getSettings:()=>settings});
   if(globalThis.MAYHEM_EFFECTS)effects=globalThis.MAYHEM_EFFECTS.setup({base,profile,F,E,allocate,appendMessage,players,getSettings:()=>settings,guarded});
   travel=AZS_MAP_TRAVEL.setup({profile,base,F,getRun:()=>run.isNull()?null:run,getGame:()=>game.isNull()?null:game,notice,onCommit(){
-    state.mapChanges++;state.nextMap=(Math.floor(time(run)/180)+1)*180;if(rewards?.onTravel)rewards.onTravel(run);
+    state.mapChanges++;state.nextMap=time(run)+180;if(rewards?.onTravel)rewards.onTravel(run);
     for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];announcements=[];camp.clear();leases.clear();bossRegistry.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
   }});
   function status(){
@@ -412,7 +412,15 @@
       if((candidate.eventGapMin!==settings.eventGapMin||candidate.eventGapMax!==settings.eventGapMax)&&!state.event&&state.eventCount>0)
         state.nextEvent=t+candidate.eventGapMin;
       settings={...candidate};return true;},
-    control(name,enabled){if(!Object.hasOwn(controls,name))return false;controls[name]=!!enabled;return true;}
+    control(name,enabled){
+      if(!Object.hasOwn(controls,name))return false;
+      enabled=!!enabled;
+      if(name==='autoMap'&&controls.autoMap!==enabled){
+        if(!enabled)travel?.cancelQueued?.();
+        else {state.nextMap=state.clock+180;state.mapWarning=0;state.mapRetryAt=0;}
+      }
+      controls[name]=enabled;return true;
+    }
   };
   setInterval(()=>{if(Date.now()-lastStatus<950)return;lastStatus=Date.now();send({kind:'status',...status()});},1000);
   send({kind:'ready',version:profile.version,catalog:zones.map(z=>({key:z.key,name:z.name,bosses:z.bosses.map(b=>b.name)}))});

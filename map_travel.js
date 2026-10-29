@@ -297,6 +297,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
     }
     const sendLocal=fn(0x5bb2760,'void',['pointer','uint64','uint64','pointer']);
     function sendLogin(g,s,packet){let consumed=false;const errors=[];try{for(const row of s.recipients){try{transport.sendPacket(g,row.context,packet);}catch(e){errors.push('Player '+row.context+': '+String(e.message||e));}}consumed=true;sendLocal(s.clients.p,s.clients.n,s.clients.active[0],packet);}finally{if(!consumed)free(packet.add(8).readPointer(),packet.readU64(),1);}return errors;}
+    function cancelQueued(){const cancelled=queued!==null;queued=null;return {cancelled,finishing:!!pending};}
     function request(zone){const z=typeof zone==='string'?zones.find(x=>x.key===zone):zones.find(x=>x.id===zone);if(!z)throw Error('Choose a valid destination');if(queued!==null||pending)throw Error('A map transfer is already in progress');if(Date.now()<nextAt)throw Error('Wait a few seconds between map transfers');state(getRun(),getGame(),true);queued=z.id;lastError='';return {queued:true,zone:z.name};}
     function tick(r){
       const g=getGame();if(!r||r.isNull()||!g||g.isNull())return;
@@ -323,6 +324,6 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
     function status(){let reason='',currentZone='';const busy=queued!==null||!!pending;try{const r=getRun(),g=getGame();state(r,g,true);currentZone=readKey(r);if(busy)reason='A map transfer is in progress';else if(Date.now()<nextAt)reason='Wait a few seconds between transfers';}catch(e){reason=String(e.message||e);}return {supported:true,busy,canTravel:!reason,reason,currentZone,originZone:originalZone,catalog:catalog(),queued,completed,error:lastError,protectedHits,protectionSeconds:Math.max(0,(protectUntil-Date.now())/1000)};}
     // NativeFunction stores an address, not ownership of Memory.alloc storage.
     // Keep executable thunk memory explicitly rooted for the module's lifetime.
-    return {request,tick,status,catalog,reset,_nativeResources:[dropCode,dropArc,...damageCallbacks]};
+    return {request,cancelQueued,tick,status,catalog,reset,_nativeResources:[dropCode,dropArc,...damageCallbacks]};
   }};
 })();

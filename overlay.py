@@ -160,6 +160,8 @@ class Overlay:
         self.field(p,'Announcement sounds','soundEnabled')
         self.check(p,'Boss-kill fireworks','fireworks');self.check(p,'Automatically continue into Endless','autoEndless')
         self.heading(p,'Automatic map rotation','A random map every three minutes of match time.')
+        ttk.Checkbutton(p,text='Automatic map rotation ON / OFF',variable=self.flags['autoMap'],command=self.toggle_rotation).pack(anchor='w',pady=7)
+        self.note(p,'Applies immediately and is saved. Turning ON starts a fresh three-minute countdown. An already-started transfer finishes safely.')
         self.travel_info=tk.StringVar(value='Start a solo match or host a match to begin map rotation.')
         ttk.Label(p,textvariable=self.travel_info,wraplength=470,foreground=MUTED,justify='left').pack(fill='x',pady=(0,8))
         self.note(p,'Rotation pauses during reward choices and resumes when play continues. The whole party moves together, keeping player levels, items and match time. Waves and difficulty continue growing; completion rewards remain tied to the original run.')
@@ -205,7 +207,14 @@ class Overlay:
         for v in self.events:v.set(True)
         for k,v in self.flags.items():v.set(CONTROLS[k])
         self.feedback.set('Defaults selected. Press Apply to use them.')
-    def update_travel(self,state,rotation=None,match=None):
+    def toggle_rotation(self):
+        enabled=self.flags['autoMap'].get()
+        try:
+            self.app.set_control('autoMap',enabled)
+            self.feedback.set('Map rotation ON. New three-minute countdown.' if enabled else 'Map rotation OFF. Staying on this map after any active transfer finishes.')
+        except Exception as error:
+            self.flags['autoMap'].set(self.app.current_controls.get('autoMap',True));self.feedback.set(str(error))
+    def update_travel(self,state,rotation=None,match=None,enabled=True):
         state=state or {};rotation=rotation or {};catalog=state.get('catalog') or []
         if not match:
             self.travel_info.set('Start a solo match or host a match to begin map rotation.');return
@@ -214,14 +223,16 @@ class Overlay:
         changes=max(0,int(rotation.get('mapChanges',0)))
         if state.get('busy'):reason='Moving the party…'
         elif not state.get('supported'):reason=state.get('reason') or 'Map rotation is unavailable for this game version.'
+        elif not enabled:reason='Automatic map rotation is OFF. Waves and difficulty continue on this map.'
         elif match.get('phase')==2:reason='Paused during reward choices.'
         elif not state.get('canTravel'):reason=state.get('reason') or 'Waiting for play to resume.'
         else:reason='The next destination is chosen automatically.'
-        self.travel_info.set(f'Current: {names(state.get("currentZone"))} · Original: {names(state.get("originZone"))}\nNext change: {remaining//60:02}:{remaining%60:02} · Map changes: {changes}\n{reason}')
+        countdown=f'{remaining//60:02}:{remaining%60:02}' if enabled else 'OFF'
+        self.travel_info.set(f'Current: {names(state.get("currentZone"))} · Original: {names(state.get("originZone"))}\nNext change: {countdown} · Map changes: {changes}\n{reason}')
     def update_status(self,item):
         travel=dict(item.get('travel') or {})
         if item.get('fault'):travel.update(canTravel=False,reason='Resolve the mode error before transferring maps.')
-        self.update_travel(travel,item.get('state'),item.get('match'))
+        self.update_travel(travel,item.get('state'),item.get('match'),item.get('controls',{}).get('autoMap',True))
         state=item.get('state',{});match=item.get('match');clock=int(state.get('clock',0))
         self.summary.set(('ENDLESS' if state.get('endless') else 'HOST CONTROL PANEL')+f'  ·  {clock//60:02}:{clock%60:02}  ·  Wave {state.get("wave",0)}')
         if item.get('fault'):self.live.set('Mode error: '+item['fault'].splitlines()[0])
