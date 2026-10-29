@@ -4,7 +4,7 @@ import ctypes,hashlib,json,os,queue,sys,threading,time
 from ctypes import wintypes
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.9.3'
+VERSION='0.9.4'
 from settings import DEFAULTS, SCHEMA, validate_settings
 
 

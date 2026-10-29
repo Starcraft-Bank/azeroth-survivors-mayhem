@@ -54,6 +54,7 @@ globalThis.makeGuestTransfer127 = function ({base}) {
     if(n>63||heroContext<0||heroContext>n)throw Error('Invalid hero context');
     const saved=run.add(0xc78).readU64(),party=heroContext?run.add(0xa50).readPointer().add((heroContext-1)*2584):null;
     const out=Memory.alloc(32);out.writeByteArray(new Uint8Array(32));
+    if(party&&party.readU64().toString()==='2')throw Error('Player slot is empty');
     if(party)swap(run,party);
     try{
       run.add(0xc78).writeU64(heroContext);
@@ -79,6 +80,7 @@ globalThis.makeGuestTransfer127 = function ({base}) {
     if(n>63||heroContext<0||heroContext>n)throw Error('Invalid hero context');
     const saved=run.add(0xc78).readU64(),party=heroContext?run.add(0xa50).readPointer().add((heroContext-1)*2584):null;
     const out=Memory.alloc(32);out.writeByteArray(new Uint8Array(32));
+    if(party&&party.readU64().toString()==='2')throw Error('Player slot is empty');
     if(party)swap(run,party);
     try{
       run.add(0xc78).writeU64(heroContext);
@@ -90,7 +92,23 @@ globalThis.makeGuestTransfer127 = function ({base}) {
       run.add(0xc78).writeU64(saved);
     }
   }
-  return {connections,sendPacket,heroToGuest,localClients,heroToLocal};
+  function preserveSnapshotIdentity(originalZone) {
+    if(!/^[a-z0-9_]+$/.test(originalZone))throw Error('Expected canonical native zone key');
+    const text=Memory.allocUtf8String(originalZone),len=originalZone.length;
+    // Snapshot enum tag15 owns a SnapshotD0 beginning at+8; its zone is first String.
+    // Temporarily borrow original key only during encoding, restore before native destructor.
+    const listener=Interceptor.attach(base.add(0x5d14a90),{
+      onEnter(args){
+        const msg=args[1];
+        if(msg.readU64().toString(16)!=='800000000000000f')return;
+        this.msg=msg;this.ptr=msg.add(0x10).readPointer();this.len=msg.add(0x18).readU64();
+        msg.add(0x10).writePointer(text);msg.add(0x18).writeU64(len);
+      },
+      onLeave(){if(this.msg){this.msg.add(0x10).writePointer(this.ptr);this.msg.add(0x18).writeU64(this.len);}}
+    });
+    return {detach(){listener.detach();},originalZone};
+  }
+  return {connections,sendPacket,heroToGuest,localClients,heroToLocal,preserveSnapshotIdentity};
 };
 
 /* Analysis-only 0.127.0 helper. Evidence: protocol-5bf56d0.asm (Run drop),
@@ -148,7 +166,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
     if(count>63)throw Error('Invalid party count');
     for(let i=0;i<count;i++){
       const p=party.add(i*2584);
-      if(p.readU32()===2)continue;
+      if(p.readU64().toString()==='2')continue;
       vec(p,0x5e0,88,'guest projectiles');vec(p,0x5b0,144,'guest effects144');vec(p,0x5c8,120,'guest effects120');
     }
     return {vectors,drops};
@@ -222,22 +240,29 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
       if(r.add(0xc78).readU64().toString()!=='0')throw Error('Wait for the host simulation');
       if(requireLive&&r.add(0xd83).readU8()!==1)throw Error('Close choices and resume the match before travelling');
       const count=r.add(0xa58).readU64().toNumber(),members=r.add(0xa50).readPointer();
-      if(!Number.isSafeInteger(count)||count<0||count>32)throw Error('Invalid party');
+      if(!Number.isSafeInteger(count)||count<0||count>32||(count&&members.isNull()))throw Error('Invalid party');
       const clients=transport.localClients(g);
       if(clients.active.length!==1)throw Error('Expected one active local game client');
       const recipients=g.add(0xd98).readU32()===3?transport.connections(g):[];
       if(recipients.some(x=>x.context<1||x.context>count)||new Set(recipients.map(x=>x.context)).size!==recipients.length)throw Error('Party recipients are inconsistent');
-      if(requireLive&&recipients.some(x=>members.add((x.context-1)*0xa18+0xa14).readU8()===2))throw Error('Wait for every player to finish choosing an upgrade');
-      return {count,members,recipients,clients};
+      const participants=recipients.map(x=>({context:x.context,p:members.add((x.context-1)*0xa18)}));
+      if(participants.some(x=>x.p.readU64().toString()==='2'))throw Error('Wait for the party update to finish');
+      if(requireLive&&participants.some(x=>x.p.add(0xa14).readU8()===2))throw Error('Wait for every player to finish choosing an upgrade');
+      return {count,members,recipients,clients,participants,heroes:[0,...participants.map(x=>x.context)]};
     }
-    function keySnapshot(p){const cap=p.add(0x2c8).readU64(),ptr=p.add(0x2d0).readPointer(),len=p.add(0x2d8).readU64();if(cap.toNumber()>1048576||len.toNumber()>32)throw Error('Invalid owned zone string');return {p,cap,ptr,len,xyz:[0,4,8,12].map(o=>p.add(0x520+o).readU32())};}
-    function releaseKey(k){if(k.cap.compare(0)>0)free(k.ptr,k.cap,1);}
+    // Native Run/Party zone is a borrowed &str, not an owned String.
+    // +0x2c8 contains gameplay stats and must never be interpreted or overwritten.
+    // The destination keys live in the executable's static zone catalog.
+    function keySnapshot(p,context){
+      const ptr=p.add(0x2d0).readPointer(),len=p.add(0x2d8).readU64();
+      const n=len.toNumber();
+      if(n<1||n>32||ptr.isNull()||!zones.some(z=>z.key===ptr.readUtf8String(n)))throw Error('Invalid zone reference for player '+context);
+      return {p,ptr,len,xyz:[0,4,8,12].map(o=>p.add(0x520+o).readU32())};
+    }
     function prepare(r,s,z){
-      const result={arc:null,keys:[],old:[],oldArc:r.add(0xc18).readPointer(),committed:false};
+      const result={arc:null,old:[],oldArc:r.add(0xc18).readPointer(),committed:false};
       try{
-        result.old.push(keySnapshot(r));for(let i=0;i<s.count;i++)result.old.push(keySnapshot(s.members.add(i*0xa18)));
-        const owned=new Set();for(const old of result.old)if(old.cap.compare(0)>0){if(owned.has(old.ptr.toString()))throw Error('Unexpected shared owned zone string');owned.add(old.ptr.toString());}
-        for(const old of result.old){const p=alloc(z.key.length,1);if(p.isNull())throw Error('Zone key allocation failed');p.writeByteArray(Array.from(z.key,c=>c.charCodeAt(0)));result.keys.push({ptr:p,cap:uint64(z.key.length)});}
+        result.old.push(keySnapshot(r,0));for(const member of s.participants)result.old.push(keySnapshot(member.p,member.context));
         result.arc=alloc(0xd8,8);if(result.arc.isNull())throw Error('World allocation failed');
         result.arc.writeByteArray(new Uint8Array(0xd8));result.arc.writeU64(1);result.arc.add(8).writeU64(1);
         const name=Memory.allocUtf8String(mapNames[z.map]),xyz=Memory.alloc(12);z.xyz.forEach((v,i)=>xyz.add(i*4).writeFloat(v));
@@ -250,14 +275,13 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
         return result;
       }catch(e){disposePrepared(result);throw e;}
     }
-    function disposePrepared(p){if(p.committed)return;for(const k of p.keys)releaseKey(k);p.keys=[];if(p.arc&&!p.arc.isNull()){if(p.loaded)dropArc(p.arc);else free(p.arc,0xd8,8);p.arc=null;}}
+    function disposePrepared(p){if(p.committed)return;if(p.arc&&!p.arc.isNull()){if(p.loaded)dropArc(p.arc);else free(p.arc,0xd8,8);p.arc=null;}}
     function commit(r,p,z){
       try{
-        for(let i=0;i<p.old.length;i++){const target=p.old[i].p,k=p.keys[i];target.add(0x2c8).writeU64(k.cap);target.add(0x2d0).writePointer(k.ptr);target.add(0x2d8).writeU64(z.key.length);z.xyz.forEach((v,n)=>target.add(0x520+n*4).writeFloat(v));target.add(0x52c).writeFloat(z.facing);}
+        for(let i=0;i<p.old.length;i++){const target=p.old[i].p;target.add(0x2d0).writePointer(z.p.add(8).readPointer());target.add(0x2d8).writeU64(z.p.add(16).readU64());z.xyz.forEach((v,n)=>target.add(0x520+n*4).writeFloat(v));target.add(0x52c).writeFloat(z.facing);}
         r.add(0xc18).writePointer(p.arc);
-      }catch(e){for(const old of p.old){old.p.add(0x2c8).writeU64(old.cap);old.p.add(0x2d0).writePointer(old.ptr);old.p.add(0x2d8).writeU64(old.len);old.xyz.forEach((v,n)=>old.p.add(0x520+n*4).writeU32(v));}r.add(0xc18).writePointer(p.oldArc);disposePrepared(p);throw e;}
+      }catch(e){for(const old of p.old){old.p.add(0x2d0).writePointer(old.ptr);old.p.add(0x2d8).writeU64(old.len);old.xyz.forEach((v,n)=>old.p.add(0x520+n*4).writeU32(v));}r.add(0xc18).writePointer(p.oldArc);disposePrepared(p);throw e;}
       p.committed=true;
-      for(const old of p.old)releaseKey(old);
       dropArc(p.oldArc);
     }
     function loginPacket(z){const out=Memory.alloc(32),body=alloc(20,1);if(body.isNull())throw Error('Transfer packet allocation failed');out.writeByteArray(new Uint8Array(32));body.writeU32(z.map);z.xyz.forEach((v,i)=>body.add(4+i*4).writeFloat(v));body.add(16).writeFloat(z.facing);out.writeU64(20);out.add(8).writePointer(body);out.add(16).writeU64(20);out.add(24).writeU16(0x236);return out;}
@@ -281,7 +305,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
       const clock=r.add(0xcc0).readFloat(),key=String(r)+':'+r.add(0x4b0).readU64().toString();
       if(owner&&(key!==owner||clock<lastClock-1)){reset(true);}owner=key;lastClock=clock;
       try{
-        if(pending){if(Date.now()<pending.at)return;pending.attempts++;const s=state(r,g,false);for(let h=0;h<=s.count;h++)transport.heroToLocal(g,r,h);for(const row of s.recipients)for(let h=0;h<=s.count;h++)transport.heroToGuest(g,r,row.context,h);lastZone=pending.zone.name;pending=null;completed++;nextAt=Date.now()+5000;notice('Arrived in '+lastZone);return;}
+        if(pending){if(Date.now()<pending.at)return;pending.attempts++;const s=state(r,g,false);const stillPresent=s.participants.filter(x=>pending.heroGuids.includes(x.p.add(0x4b0).readU64().toString()));const heroes=[0,...stillPresent.map(x=>x.context)];const recipients=s.recipients.filter(x=>stillPresent.some(p=>p.context===x.context));for(const h of heroes)transport.heroToLocal(g,r,h);for(const row of recipients)for(const h of heroes)transport.heroToGuest(g,r,row.context,h);lastZone=pending.zone.name;pending=null;completed++;nextAt=Date.now()+5000;notice('Arrived in '+lastZone);return;}
         if(queued===null)return;
         const s=state(r,g,true),z=zones[queued];queued=null;
         if(readKey(r)===z.key)throw Error('Already in '+z.name);
@@ -293,7 +317,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,getIdentity}){
         originalZone=origin;identityRun=r;protectUntil=Date.now()+5000;
         try{cleanup.clearTransient(r);}catch(e){lastError='World moved, but old-entity cleanup reported: '+String(e.message||e);}
         if(api.onCommit){try{api.onCommit();}catch(e){lastError='World moved, but mode cleanup reported: '+String(e.message||e);}}
-        pending={at:Date.now()+1200,zone:z,attempts:0};const sendErrors=sendLogin(g,s,packet);if(sendErrors.length)lastError=sendErrors.join('; ');notice('Travelling to '+z.name+(sendErrors.length?' (a guest disconnected during transfer)':''));
+        pending={at:Date.now()+1200,zone:z,attempts:0,heroGuids:s.participants.map(x=>x.p.add(0x4b0).readU64().toString())};const sendErrors=sendLogin(g,s,packet);if(sendErrors.length)lastError=sendErrors.join('; ');notice('Travelling to '+z.name+(sendErrors.length?' (a guest disconnected during transfer)':''));
       }catch(e){queued=null;lastError=String(e.message||e);notice('Map travel: '+lastError);if(pending){if(pending.attempts>=3)pending=null;else pending.at=Date.now()+1200;}}
     }
     function status(){let reason='',currentZone='';const busy=queued!==null||!!pending;try{const r=getRun(),g=getGame();state(r,g,true);currentZone=readKey(r);if(busy)reason='A map transfer is in progress';else if(Date.now()<nextAt)reason='Wait a few seconds between transfers';}catch(e){reason=String(e.message||e);}return {supported:true,busy,canTravel:!reason,reason,currentZone,originZone:originalZone,catalog:catalog(),queued,completed,error:lastError,protectedHits,protectionSeconds:Math.max(0,(protectUntil-Date.now())/1000)};}
