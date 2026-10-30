@@ -61,7 +61,7 @@ class App:
         def worker():
             try:
                 _,profile,report=compatibility_check(path,report_path)
-                message=(f"Compatible: {report['version']} / {report['stamp']}." if profile else report['message'])
+                message=report['message']
                 self.check_events.put(message+' Report: '+str(report_path))
             except Exception as e:self.check_events.put(str(e))
         threading.Thread(target=worker,daemon=True).start()
@@ -109,7 +109,7 @@ class App:
                 while True:
                     item=self.game.events.get_nowait();kind=item.get('kind')
                     if kind=='ready':
-                        self.launching=False;self.stop.configure(state='normal');self.panel_button.configure(state='normal');self.status.set('Mayhem is running. Press INSERT in the game to open settings.')
+                        self.launching=False;self.stop.configure(state='normal');self.panel_button.configure(state='normal');self.status.set(('UNVERIFIED BUILD. ' if self.game.unverified else '')+'Mayhem is running. Press INSERT for settings.')
                     elif kind=='status':
                         self.overlay.update_status(item)
                         if item.get('fault'):self.status.set('Mode error. Relaunch the game: '+item['fault'].splitlines()[0])

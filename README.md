@@ -1,77 +1,48 @@
-# Legendary Mayhem — native edition 0.9.6
+[![Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/pC4n2fvrmD)
 
-A community custom mode for the native Windows Azeroth Survivors game.
-The native edition is now the main development target. The browser launcher is
-legacy; its older releases remain available in the release history.
+# Azeroth Legendary Mayhem — native edition 0.10.0
 
-## Game 0.130.0 update
+A host-run custom mode for Azeroth Survivors. Only the host needs Mayhem; friends use the ordinary game.
 
-Compatibility - Updated native hooks and player layouts for game 0.130.0.
-Map travel - Preserves the new damage-source arguments used by Death Recap.
+## New in 0.10.0
 
-## Map rotation control
+- Version Check - Removed identity-only blocking; matching hooks allow unverified builds to launch.
+- World Controls - Added game speed, mob/boss movement, spawn rate and density settings.
+- Rewards - Added XP and gold starting rates, growth per minute and caps.
+- Stampede - Added timed enemy haste with configurable delay, interval, duration and strength. Default OFF.
+- Affixes - Added native selection and Rift Pulse, Death Echo and Nemesis Hunt challenges with bonus loot.
+- Difficulty - Renamed presets to Easy, Normal, Heroic and Mythic. Existing numeric settings are preserved.
 
-**Insert > Session > Automatic map rotation ON / OFF** applies immediately and
-is saved between launches. Rotation is ON by default. OFF cancels queued travel;
-an already-started transfer finishes safely. ON starts a fresh three-minute
-countdown. Waves, events, rewards and scaling continue with rotation OFF.
+## Configure the run
 
-## Included map-transfer correction
+Press **Insert** and use **Apply settings**. Settings are saved locally and reused next launch.
 
-Corrects the map-zone layout used during transfers. Upgraded characters no longer
-fail the old owned-string check, and unrelated gameplay stats are kept intact.
-Transfers use currently connected players; departed lobby records are excluded.
+| Panel | Options |
+| --- | --- |
+| World | Game speed ON/OFF (default OFF), 50–200%; mob and boss movement 50–300%; spawn rate and density 25–300%. |
+| Rewards | XP/gold ON/OFF, starting rate 25–1,000%, growth 0–100 percentage points per match minute, cap 25–2,000%. |
+| Events | Stampede ON/OFF (default OFF), first delay 10–900s, repeat 30–900s, duration 5–120s, movement boost 100–300%. Duration must be shorter than repeat. |
+| Affixes | Native Game default / Disabled / Custom; choose Bolstering, Sanguine and Explosive. Optional Mayhem affixes default OFF, interval 30–300s, four difficulties and 0–100% bonus rewards. |
 
-## Map rotation
+100% retains the existing rate. Movement changes affect living and newly spawned enemies without stacking each frame. Lowering density never deletes existing enemies; the native living-enemy cap is adjusted, with a 500-enemy ceiling. Spawn rate affects ordinary scheduled mobs, not Mayhem boss intervals or scripted summons.
 
-Mayhem moves the whole party to a randomly selected map every **three minutes
-of match time**. A ten-second game announcement warns players to collect drops.
-Rotation waits for reward choices to close. Only the host needs Mayhem.
+Game speed changes host simulation time, including guests' host-simulated actors, timers, waves and hazards. Transport deadlines and menu animations remain normal. At 200%, a two-minute match timer takes about one real minute.
 
-The boss pool and map rotation are shuffled each match, with no immediate
-repeats. Final bosses enter the Mayhem pool only after confirmed Endless.
-The wave count, elapsed time, growing enemy difficulty and bounty milestones
-continue across map changes. Insert > Session shows the rotation countdown.
+XP starts at 100% with no growth. Gold keeps the existing 125% start, +15 percentage points per minute, capped at 800%. Treasure Rush doubles gold after that setting. Example: XP start 100%, growth 10, cap 300% reaches 2× at ten minutes and 3× at twenty. Existing balances and levels are unchanged; native level caps remain.
 
-Levels, learned skills, carried items and gold are kept. Existing enemies,
-hazards and uncollected ground drops are cleared without kill rewards.
-Players receive five seconds of damage protection while loading.
-Completion rewards retain the original run's map identity; travelling does not
-award extra map clears or increase the lobby size. Map rotation requires the
-reviewed native 0.130.0 build; older supported adapters keep the existing mode.
+**Native affixes:** Game default preserves the original selection; Custom applies the selected native effects; Disabled clears them for this run. Returning to Game default restores the original selection. The game's native Heroic I–V rank, progression eligibility and associated rewards stay tied to the lobby choice. Mayhem's four preset labels do not grant a higher native rank.
 
-## Game compatibility
+**Mayhem affixes:**
+- Rift Pulse - Dodge rings, then collect a gold/XP bounty and power-up.
+- Death Echo - A dead boss leaves telegraphed runes, followed by a bonus chest and bounty.
+- Nemesis Hunt - Defeat the summoned foreign rare to earn a chest and bounty.
 
-Support for native game **0.130.0 / e7d9dd47**, with reviewed player/enemy
-layouts and native reward hooks. Includes the game's new Death Recap build.
-
-## Mode features
-
-- **Permanent Endless rewards:** cross-map Mayhem bosses now qualify for native
-  final-boss rewards during confirmed Endless on game 0.130.0. Class Marks and
-  native gear rewards use each player's normal save and upgrade system. Only
-  the host runs Mayhem. Payouts follow native rules, not a fixed per-kill amount.
-- Boss gold/XP bounties; Mayhem bosses pay twice the base bounty. Every three
-  boss kills gives a chest and powerup and adds 10% to later bounties, capped
-  at +200%. Bounty tiers reset each match.
-- Extra powerups every 25 seconds and chests every 75 seconds near living players.
-- Scatter, broken-ring, cross, lane and spiral rune formations, plus native
-  cone and line attacks during storms, arrival barrages and idle checks.
-  Warnings remain 2.5 seconds; these are damaging attacks, not physical walls.
-- Rerolls cost 100 / 300 / 900, then at most 1,000 gold by default.
-- Luck-stat chest rings/trinkets are filtered by default (Mark of the Chosen).
-  Procedural amulet affixes and existing equipment are unchanged. Reward settings
-  are in the Insert overlay.
-- Native announcement sounds and colored boss-death bursts at the death position.
-
-An in-world shop is **not included**. Permanent progression currently uses the
-game's existing class Marks and gear upgrades between matches. There is no
-new custom currency, guest addon, or public collection-unlock feature.
+Rift Pulse and Nemesis Hunt alternate when both are selected. Death Echo triggers on boss deaths. Custom rune warnings are 2.5 match seconds; native defenses still apply. Affix difficulty increases rune counts, damage and rewards. These optional affix runes are independent of the Arena hazards toggle. Map travel clears pending old-map affix challenges.
 
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.9.6.exe.
+2. Run AzerothSurvivorsMayhemNative-0.10.0.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.
@@ -88,18 +59,14 @@ combat verified saved class Marks for the host and an unmodified guest.
 Actual reroll input verified the 1,000-gold cap and fixed-jewelry Luck filter.
 Long Internet sessions and balance still need playtesting.
 
-Detection scans instruction patterns and independently verifies the reviewed
-loaded code/data image. It accepts compatible timestamp/checksum/certificate
-or preferred-base packaging differences, instead of requiring one exact file
-size/hash. Changed logic/layout still requires a new adapter. This does not
-promise universal compatibility with every past or future version.
+Build/version identity no longer blocks launch. If every required hook matches at its configured location, an unknown build launches automatically as UNVERIFIED BUILD using that adapter. Memory layouts and behavior may have changed; crashes or broken features remain possible. Missing/moved hooks and ambiguous adapters still stop launch. This does not automatically port the trainer to future builds. Unlock All still requires a supported save catalog.
 
 Use Check compatibility in the launcher before playing. It never opens a game.
 The local compatibility-report.json has file hashes, sizes and match results,
 without personal file paths, saves or process access. Share that report when a
 new build needs support. It is saved under %LOCALAPPDATA%/LegendaryMayhemNative.
 The --diagnose --game <EXE> --report <JSON> command performs the same offline
-check without showing a window. Unknown/incompatible builds are not launched. Administrator access and a separate
+check without showing a window. Build identity is advisory; missing required hooks stop launch. Administrator access and a separate
 Python installation are not needed. This community executable is unsigned.
 
 This launches your existing native game. It does not replace game files,
@@ -112,12 +79,12 @@ ordinary game separately between sessions, then check compatibility again.
 ## Insert overlay settings
 
 Boss health and Boss damage are separate dropdowns:
-Easy / Hard / Brutal / Insane.
+Easy / Normal / Heroic / Mythic.
 
 Health uses 25% / 50% / 75% / 100% of the previous Mayhem health curve.
-Insane preserves the previous health setting. Damage: Easy is the gentler
-curve, Hard the previous midpoint, Brutal the harder curve, and Insane adds
-35% to Brutal. Defaults: Insane health, Hard damage.
+Mythic preserves the previous health setting. Damage: Easy is the gentler
+curve, Normal the previous midpoint, Heroic the harder curve, and Mythic adds
+35% to Heroic. Defaults: Mythic health, Normal damage.
 
 First guaranteed Legendary: 0–30 minutes. Add another every: 1–30 minutes.
 Defaults: one from the start, two at 10 minutes, three at 20 minutes.
@@ -227,7 +194,3 @@ https://github.com/Starcraft-Bank/azeroth-survivors-mayhem
 Unofficial community project; not affiliated with Aethus or Blizzard.
 There is no God mode, rapid-skill menu, manual spawner, instant win or
 collection-unlock control in this mode.
-
-## Community
-
-Join the Discord for discussion and feedback: https://discord.gg/pC4n2fvrmD

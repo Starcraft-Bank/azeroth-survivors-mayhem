@@ -252,5 +252,27 @@
     "connectionStride": 1880,
     "partyStride": 2616,
     "playerDamageExtraArgs": 2
+  },
+  "income": {
+    "xpAward": 97218000,
+    "xpOffset": 1332
+  },
+  "population": {
+    "spawnBudgetBefore": 97332498,
+    "spawnBudgetAfter": 97332514,
+    "spawnBudgetOffset": 3356,
+    "mobCapCompare": 97242741,
+    "budgetRunRegister": "rsi"
+  },
+  "nativeAffixes": {
+    "capacity": 2168,
+    "pointer": 2176,
+    "length": 2184,
+    "heroic": 879,
+    "pools": {
+      "capacity": 2192,
+      "pointer": 2200,
+      "length": 2208
+    }
   }
 }

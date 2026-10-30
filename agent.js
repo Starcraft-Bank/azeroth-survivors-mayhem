@@ -47,7 +47,7 @@
   let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true,autoMap:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
   let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
-  let state,rewards=null,effects=null,permanentRewards=null,travel=null;
+  let state,rewards=null,effects=null,permanentRewards=null,travel=null,income=null,population=null,tempo=null,affixes=null;
   // Shuffle bags avoid a fixed sequence and repeats before a pool is exhausted.
   function shuffleBag(random=Math.random){
     let bag=[],last=null;
@@ -72,7 +72,7 @@
   }
   function reset(){
     mapBag.reset();bossBag.reset();finalBag.reset();
-    if(rewards?.reset)rewards.reset();if(effects?.reset)effects.reset();
+    if(rewards?.reset)rewards.reset();if(effects?.reset)effects.reset();income?.reset();population?.reset();tempo?.reset();affixes?.onTravel();
     for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];
     state={clock:0,wave:0,nextMap:180,mapChanges:0,mapWarning:0,mapRetryAt:0,lastBoss:null,lastBossCode:-1,nextWave:settings.bossInterval,finalCursor:0,affix:0,endless:false,nextHazard:settings.hazardInterval,
       shapeNext:0,shapedBursts:0,stormNext:0,barrageUntil:0,barrageNext:0,event:0,eventUntil:0,nextEvent:settings.eventFirst,eventCount:0,
@@ -85,6 +85,7 @@
   const time=r=>r.add(F(0xbf4)).readFloat();
   const phase=r=>r.add(r.equals(run)?F(0xca2):F(0x98c)).readU8();
   const alive=e=>e.add(E(0xb0)).readU32()===0&&e.add(E(0x160)).readFloat()>0;
+  const hazardSource=e=>alive(e)&&Number.isFinite(e.add(E(0x168)).readFloat())&&e.add(E(0x168)).readFloat()>0;
   const isBoss=e=>definitionSet.has(String(e.add(E(0x30)).readPointer()))&&e.add(E(0x18)).readS64().toString()!=='-1';
   const guid=e=>e.add(E(0xf0)).readU64().toString(16);
   function enemies(r){const n=number(r,F(0x590)),p=r.add(F(0x588)).readPointer();if(n>100000)throw Error('Invalid native enemy vector');return {n,p};}
@@ -107,7 +108,7 @@
     if(extra){health*=3;damage*=1.3;speed*=1.05;cooldown*=.8;}
     return {health,damage,speed,cooldown,mobHealth:Math.min(40,1.8+.12*m+.018*m*m),
       mobDamage:Math.min(5,1.15+.04*m+.001*m*m)*(state.event===3?1.35:1),
-      mobSpeed:Math.min(1.3,1+.004*m)*(state.event===3?1.2:1),gold:Math.min(8,1.25+.15*m)*(state.event===1?2:1)};
+      mobSpeed:Math.min(1.3,1+.004*m)*(state.event===3?1.2:1),gold:MAYHEM_INCOME.factor('gold',settings,m)*(state.event===1?2:1),xp:MAYHEM_INCOME.factor('xp',settings,m)};
   }
   // All three native income paths, after bonuses/sharing and before both
   // balance and earned counters. Refunds, prices and old balances stay native.
@@ -165,6 +166,12 @@
     owned.writeByteArray(text.readByteArray(length));let n=number(r,F(0x668));
     if(n>=number(r,F(0x658)))reserveUi(r.add(F(0x658)));
     const item=r.add(F(0x660)).readPointer().add(n*24);item.writeU64(length);item.add(8).writePointer(owned);item.add(16).writeU64(length);r.add(F(0x668)).writeU64(n+1);flush(r);
+  }
+  function enqueueUi(r,value){
+    const text=Memory.allocUtf8String(value),length=Array.from(value).reduce((n,c)=>n+(c.codePointAt(0)<128?1:c.codePointAt(0)<2048?2:c.codePointAt(0)<65536?3:4),0),owned=allocate(length,1);
+    if(owned.isNull())throw Error('Unable to allocate native UI event');owned.writeByteArray(text.readByteArray(length));
+    let n=number(r,F(0x668));if(n>=number(r,F(0x658)))reserveUi(r.add(F(0x658)));
+    const item=r.add(F(0x660)).readPointer().add(n*24);item.writeU64(length);item.add(8).writePointer(owned);item.add(16).writeU64(length);r.add(F(0x668)).writeU64(n+1);
   }
   function continueEndless(r){
     const coop=r.add(F(0xc9d)).readU8()===1;
@@ -250,7 +257,7 @@
   }
   function bossDied(r,id,position,extra){
     if(deadBossIds.has(id))return;deadBossIds.add(id);livingBossIds.delete(id);bossRegistry.delete(id);state.killCount++;
-    if(position){if(rewards)rewards.bossReward(r,position,extra?'mayhem':'boss');if(controls.fireworks&&effects)effects.death(r,'0x'+id,position,2085+(state.killCount-1)%4);}
+    if(position){if(rewards)rewards.bossReward(r,position,extra?'mayhem':'boss');affixes?.bossDied(r,id,position);if(controls.fireworks&&effects)effects.death(r,'0x'+id,position,2085+(state.killCount-1)%4);}
   }
   Interceptor.attach(at('enemyDamage'),{
     onEnter(args){this.r=args[0];this.id=args[1].toString().slice(2);this.wasAlive=livingBossIds.has(this.id)&&!deadBossIds.has(this.id);this.position=null;this.extra=bossRegistry.has(this.id);
@@ -268,7 +275,7 @@
   function extraAttack(r,target){
     if(!settings.extraHazards||state.clock<state.shapeNext||number(r,F(0x5c0))>=128)return;
     const v=enemies(r),centre=[0x4f0,0x4f4,0x4f8].map(o=>target.add(F(o)).readFloat());let nearest=-1,distance=24*24;
-    for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(!alive(e))continue;const pos=enemyPosition(r,e),d=(pos[0]-centre[0])**2+(pos[1]-centre[1])**2;if(d<distance){distance=d;nearest=i;}}
+    for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(!hazardSource(e))continue;const pos=enemyPosition(r,e),d=(pos[0]-centre[0])**2+(pos[1]-centre[1])**2;if(d<distance){distance=d;nearest=i;}}
     if(nearest<0)return;const kind=state.shapedBursts%2?9:8,a=shapedTemplates.get(kind);if(!a)return;
     const e=v.p.add(nearest*profile.enemyStride),hp=target.add(F(0x4a0)).readFloat(),multiplier=[.5,1,1.5,2][settings.hazardPreset]*(1+Math.min(3,time(r)/60*settings.hazardGrowth/100));
     let damage=e.add(E(0x168)).readFloat();if(isBoss(e)&&e.add(E(0x50)).readU8())damage*=1.4;
@@ -294,13 +301,33 @@
     finally{offsets.forEach((off,i)=>r.add(off).writeFloat(xyz[i]));}
     if(intense||stationary)extraAttack(r,target);state.hazardBursts++;return true;
   }
+  function affixBurst(r,options){
+    const v=enemies(r);let index=-1;
+    for(let i=0;i<v.n;i++)if(hazardSource(v.p.add(i*profile.enemyStride))){index=i;break;}
+    const group=players(r);if(index<0||!group.length)return false;
+    const source=v.p.add(index*profile.enemyStride);let damage=source.add(E(0x168)).readFloat();
+    if(source.add(E(0x18)).readS64().toString()!=='-1'&&source.add(E(0x50)).readU8())damage*=1.4;
+    const offsets=[F(0x4f0),F(0x4f4),F(0x4f8)],saved=offsets.map(o=>r.add(o).readFloat());let count=0;
+    try{
+      for(const player of (options.position?[group[0]]:group)){
+        const centre=options.position||offsets.map(o=>player.add(o).readFloat());
+        const raw=Math.min(250,Math.max(25,player.add(F(0x4a0)).readFloat()*.2))*options.damagePercent/100;
+        hazard.add(4).writeU32(1);hazard.add(12).writeFloat(0);hazard.add(20).writeFloat(raw/(r.add(F(0xc90)).readU8()?1:2)/Math.max(.001,damage));
+        const amount=Math.max(0,Math.min(options.count,128-number(r,F(0x5c0))));
+        for(const [x,y] of MAYHEM_PATTERNS.points(options.pattern,amount,state.clock)){
+          r.add(offsets[0]).writeFloat(centre[0]+x);r.add(offsets[1]).writeFloat(centre[1]+y);r.add(offsets[2]).writeFloat(centre[2]);cast(r,index,hazard);count++;
+        }
+      }
+    }finally{offsets.forEach((o,i)=>r.add(o).writeFloat(saved[i]));}
+    return count>0;
+  }
   function hazards(r,v,bosses){
     const t=state.clock,storm=state.event===4&&t<state.eventUntil;
     if(!controls.hazards){camp.clear();state.nextHazard=t+settings.hazardInterval;state.stormNext=0;state.barrageNext=t+settings.barrageIntervalTenths/10;return;}
     if(!bosses.some(e=>bossRegistry.has(guid(e))))state.barrageUntil=0;
     const barrage=t<state.barrageUntil,intense=storm||barrage;
     if(!storm&&state.stormNext){state.stormNext=0;state.nextHazard=t+settings.hazardInterval;}
-    let source=-1;for(let i=0;i<v.n;i++)if(alive(v.p.add(i*profile.enemyStride))){source=i;break;}
+    let source=-1;for(let i=0;i<v.n;i++)if(hazardSource(v.p.add(i*profile.enemyStride))){source=i;break;}
     if(source<0)return;
     const due=storm?t>=state.stormNext:barrage?t>=state.barrageNext:t>=state.nextHazard;
     const group=players(r);let served=0;
@@ -361,10 +388,11 @@
       run=r;const t=time(r),p=r.add(F(0xca2)).readU8(),world=r.add(F(0xca3)).readU8();
       if(t+.5<state.clock||(p===0&&state.clock>0))reset();state.clock=t;
       if((r.add(F(0xc9d)).readU8()?world:p)!==1)return;
+      tempo?.tick(r);
       state.endless=!!r.add(F(0xc90)).readU8()&&!!r.add(F(0xb10)).readU32();
       if(rotateMap(r,t))return;
       const v=enemies(r),bosses=[];for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(isBoss(e)){if(alive(e))bosses.push(e);else if(livingBossIds.has(guid(e)))bossDied(r,guid(e),enemyPosition(r,e),bossRegistry.has(guid(e)));}}
-      events(r,bosses.length);hazards(r,v,bosses);if(rewards)rewards.tick(r);if(effects?.tick)effects.tick(r);
+      population?.tick(r);affixes?.tick(r);events(r,bosses.length);hazards(r,v,bosses);if(rewards)rewards.tick(r);if(effects?.tick)effects.tick(r);
       if(!controls.waves){state.nextWave=t+settings.bossInterval;return;}
       if(t<state.nextWave||bosses.length>=8)return;
       const extra=state.wave%4===3;state.affix=state.wave%4;
@@ -391,27 +419,39 @@
   if(globalThis.MAYHEM_PERMANENT_REWARDS)permanentRewards=globalThis.MAYHEM_PERMANENT_REWARDS.setup({profile,base,F,getState:()=>state,knownBoss:p=>bossDefinitions.get(String(p)),homeFinal:r=>{const z=zones[zoneIndex(r)];return z?z.bosses[4].pointer:null;}});
   if(globalThis.MAYHEM_REWARDS)rewards=globalThis.MAYHEM_REWARDS.setup({profile,base,F,native,guarded,notice,time,players,getSettings:()=>settings});
   if(globalThis.MAYHEM_EFFECTS)effects=globalThis.MAYHEM_EFFECTS.setup({base,profile,F,E,allocate,appendMessage,players,getSettings:()=>settings,guarded});
+  income=MAYHEM_INCOME.setup({base,profile,getRun:()=>run,getSettings:()=>settings,time,guarded});
+  population=MAYHEM_POPULATION.setup({base,profile,F,E,getRun:()=>run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,guarded,notice});
+  tempo=MAYHEM_TEMPO.setup({base,profile,getSettings:()=>settings,guarded,F,players,appendMessage,allocate,getGame:()=>game,canSync:()=>!travel?.status().busy});
+  affixes=MAYHEM_AFFIXES.setup({base,profile,allocate,deallocate,appendMessage,enqueueUi,getSettings:()=>settings,time,enemies,guid,alive,isBoss,enemyPosition,notice,guarded,hunt,
+    burst:affixBurst,bounty(r,position,amount){
+      const group=players(r);if(!group.length||!rewards?.queue)return false;
+      const centre=position||[0x4f0,0x4f4,0x4f8].map(o=>group[0].add(F(o)).readFloat());
+      let sent=false;for(const [kind,n] of [[1,amount.gold],[0,amount.xp],...(amount.chest?[[2,1]]:[]),...(amount.powerup?[[3+Math.floor(Math.random()*4),1]]:[])])sent=rewards.queue(kind,n,centre)||sent;
+      return sent;
+    }});
   travel=AZS_MAP_TRAVEL.setup({profile,base,F,getRun:()=>run.isNull()?null:run,getGame:()=>game.isNull()?null:game,notice,onCommit(){
     state.mapChanges++;state.nextMap=time(run)+180;if(rewards?.onTravel)rewards.onTravel(run);
+    population?.reset();tempo?.reset();affixes?.onTravel();
     for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];announcements=[];camp.clear();leases.clear();bossRegistry.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
   }});
   function status(){
     let match=null;if(!run.isNull())guarded(()=>{match={clock:time(run),phase:run.add(F(0xca2)).readU8(),worldPhase:run.add(F(0xca3)).readU8(),coop:!!run.add(F(0xc9d)).readU8(),zone:zoneIndex(run)};});
-    return {ready:!fault,fault,travel:travel.status(),settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
+    return {ready:!fault,fault,travel:travel.status(),settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,income:income?.status?.()??null,population:population?.status?.()??null,tempo:tempo?.status?.()??null,affixes:affixes?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
   }
   rpc.exports={
     status,travel(zone){if(fault)return false;return travel.request(zone);},
     configure(candidate){
       if(!candidate||Object.keys(candidate).length!==Object.keys(schema).length||
         Object.entries(schema).some(([key,spec])=>!Number.isInteger(candidate[key])||candidate[key]<spec[1]||candidate[key]>spec[2])||
-        candidate.eventGapMin>candidate.eventGapMax)return false;
+        candidate.eventGapMin>candidate.eventGapMax||candidate.hasteDuration>=candidate.hasteInterval||
+        candidate.xpBasePercent>candidate.xpCapPercent||candidate.goldBasePercent>candidate.goldCapPercent)return false;
       const t=state.clock;
       if(candidate.bossInterval!==settings.bossInterval)state.nextWave=t+candidate.bossInterval;
       if(candidate.hazardInterval!==settings.hazardInterval)state.nextHazard=t+candidate.hazardInterval;
       if(candidate.eventFirst!==settings.eventFirst&&state.eventCount===0)state.nextEvent=Math.max(t+1,candidate.eventFirst);
       if((candidate.eventGapMin!==settings.eventGapMin||candidate.eventGapMax!==settings.eventGapMax)&&!state.event&&state.eventCount>0)
         state.nextEvent=t+candidate.eventGapMin;
-      settings={...candidate};return true;},
+      settings={...candidate};population?.configure();return true;},
     control(name,enabled){
       if(!Object.hasOwn(controls,name))return false;
       enabled=!!enabled;

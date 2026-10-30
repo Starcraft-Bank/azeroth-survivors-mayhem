@@ -1,11 +1,11 @@
 """Offline native compatibility discovery. Never executes or attaches to a game.
 
-Instruction patterns locate hooks. A reviewed adapter's normalized loaded-image
-identity must ALSO match before its ABI, field offsets or data tables are used.
-Changed logic with familiar function prologues is discovery, not compatibility.
+Instruction patterns check hook locations. Loaded-image identity labels reviewed
+builds, but no longer blocks launch by itself. Pattern-only launches reuse an
+adapter's unverified ABI/data offsets and are explicitly reported as unverified.
 """
 from pathlib import Path
-import hashlib,json,re,struct
+import copy,hashlib,json,re,struct
 import pefile
 
 MAX_IMAGE=256*1024*1024
@@ -93,7 +93,7 @@ def analyze_game(path,manifest_path):
     if manifest.get('schema')!=1 or not manifest.get('adapters'):raise ValueError('Missing compatibility manifest.')
     digest=hashlib.sha256(data).hexdigest();runtime=normalized_identity(data,pe)
     sections=[(s.VirtualAddress,s.get_data()) for s in pe.sections if s.Characteristics&0x20000000]
-    reports=[];selected=None
+    reports=[];selected=None;fallbacks=[]
     for adapter in manifest['adapters']:
         rows={}
         for name,signature in adapter['signatures'].items():
@@ -105,25 +105,37 @@ def analyze_game(path,manifest_path):
         accepted=identity and expected and bool(rows)
         reports.append({'version':adapter['profile']['version'],'runtimeEquivalent':identity,
                         'matched':sum(bool(v['candidates']) for v in rows.values()),
-                        'total':len(rows),'hooks':rows,'accepted':accepted})
+                        'total':len(rows),'hooks':rows,'accepted':accepted,
+                        'hookLocationsMatch':expected and bool(rows)})
+        if expected and rows:fallbacks.append(adapter['profile'])
         if accepted:
             if selected is not None:raise ValueError('Ambiguous compatibility adapters.')
             selected=adapter['profile']
+    verified=selected is not None
+    if not verified and len(fallbacks)==1:
+        selected=copy.deepcopy(fallbacks[0])
+        selected.update(compatibilityUnverified=True,runtimeTested=False,validation='unverified-hook-match')
     report={'schema':1,'fileBytes':len(data),'fileSha256':digest,'runtimeSha256':runtime,
-            'compatible':selected is not None,'adapters':reports,
-            'method':'instruction patterns plus reviewed code/data/layout identity',
+            'compatible':verified,'verified':verified,'launchAllowed':selected is not None,'adapters':reports,
+            'method':'hook-location checks; build identity is advisory',
             'processAccessed':False}
-    if selected:
+    if selected and verified:
         report['decision']='reviewed' if digest==selected['sha256'] else 'runtime-equivalent'
         report['version']=selected['version'];report['stamp']=selected['stamp']
         report['validation']=selected.get('validation','native-tested')
         report['message']='Compatible adapter detected automatically.'
         if report['validation']=='static-review-only':report['message']+=' Preview: native gameplay testing is pending.'
+    elif selected:
+        report.update(decision='unverified-hook-match',version='unverified',stamp='unknown',
+                      adapterVersion=selected['version'],validation='unverified-hook-match')
+        report['message']=('Launch allowed: unverified game build. Hook locations match adapter '+
+                           selected['version']+'. Features and memory layouts have not been tested on this build.')
     else:
         best=max(reports,key=lambda r:r['matched'])
         report['decision']='adapter-required'
-        report['message']=(f"Found {best['matched']}/{best['total']} hook patterns, but this build's code or data layout "
-                           'is not verified. No game process was opened. Share the compatibility report to add support.')
+        report['message']=('Multiple hook adapters match; cannot choose a memory layout.' if len(fallbacks)>1 else
+                           f"Required hook locations changed or are missing ({best['matched']}/{best['total']} patterns found).")
+        report['message']+=' No game process was opened. Share the compatibility report to repair these hooks.'
     return selected,report
 
 def write_report(path,report):

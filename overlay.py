@@ -7,6 +7,8 @@ from tkinter import ttk
 from settings import DEFAULTS, SCHEMA, PRESETS, CONTROLS, validate_settings
 
 CHOICES={'hazardPattern':('Mixed','Scatter','Broken ring','Cross','Lanes','Spiral'),'banLuck':('Off','On'),'soundEnabled':('Off','On'),'extraHazards':('Off','On')}
+CHOICES.update({k:('Off','On') for k in ['gameSpeedEnabled','hasteEnabled','xpScalingEnabled','goldScalingEnabled','affixesEnabled']})
+CHOICES['nativeAffixMode']=('Game default','Disabled','Custom')
 BG='#101722'; CARD='#182334'; TEXT='#e6edf7'; MUTED='#99abc2'; GOLD='#ffd183'
 
 class InsertHotkey:
@@ -109,11 +111,12 @@ class Overlay:
         self.summary=tk.StringVar(value='HOST CONTROL PANEL  ·  Ready')
         tk.Label(body,textvariable=self.summary,bg=BG,fg=MUTED,font=('Segoe UI',10),anchor='w').pack(fill='x',padx=24,pady=(0,14))
         self.tabs=ttk.Notebook(body);self.tabs.pack(fill='both',expand=True,padx=18)
-        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key!='eventMask'}
+        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key not in ('eventMask','affixMask','nativeAffixMask')}
         self.flags={key:tk.BooleanVar(value=value) for key,value in controls.items()}
         self.events=[tk.BooleanVar(value=bool(settings['eventMask']&(1<<i))) for i in range(4)]
+        self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(3)] for key in ['affixMask','nativeAffixMask']}
         self.pages={}
-        for title in ['Combat','Events','Hazards','Rewards','Session']:
+        for title in ['Combat','World','Events','Hazards','Rewards','Affixes','Session']:
             outer=ttk.Frame(self.tabs);self.tabs.add(outer,text='  '+title+'  ')
             canvas=tk.Canvas(outer,bg=BG,highlightthickness=0)
             bar=ttk.Scrollbar(outer,orient='vertical',command=canvas.yview)
@@ -134,6 +137,16 @@ class Overlay:
         self.field(p,'Add a Legendary every · minutes','legendaryInterval')
         self.note(p,'Up to three guaranteed choices. Normal enemies still grow stronger over time. Existing bosses keep their current stats.')
         self.check(p,'Extra cross-map boss waves','waves')
+        p=self.pages['World']
+        self.heading(p,'Set the pace','100% is the existing Mayhem rate. Apply changes during a match or before starting.')
+        self.setting_toggle(p,'Game speed ON / OFF · default OFF','gameSpeedEnabled')
+        self.field(p,'Game speed · %','gameSpeedPercent')
+        self.note(p,'Changes shared simulation, player movement, cooldowns and match timers for everyone. Network deadlines and menu animations keep their normal pacing. OFF restores current natural movement speeds.')
+        self.field(p,'Normal mob movement · %','mobSpeedPercent')
+        self.field(p,'Boss movement · %','bossSpeedPercent')
+        self.field(p,'Mob spawn rate · %','spawnRatePercent')
+        self.field(p,'Mob density · %','mobDensityPercent')
+        self.note(p,'Movement adjusts existing and new enemies. Spawn rate controls how quickly new mobs arrive; density controls the living-mob limit. Native performance limits still apply.')
         p=self.pages['Events']
         self.heading(p,'Keep the run unpredictable','Choose the event pool, timing and duration.')
         self.check(p,'Random events enabled','events')
@@ -143,6 +156,10 @@ class Overlay:
         self.field(p,'First event · seconds','eventFirst')
         self.field(p,'Minimum break · seconds','eventGapMin');self.field(p,'Maximum break · seconds','eventGapMax')
         self.note(p,'The break starts after an event ends. Busy boss moments can delay events. Rune Storm is first when enabled. Hunt spawns one rare; its duration controls the event window.')
+        self.heading(p,'Stampede','Timed bursts of faster mobs and bosses. Default OFF.')
+        self.setting_toggle(p,'Stampede ON / OFF','hasteEnabled')
+        for label,key in [('First Stampede · seconds','hasteFirst'),('Repeat every · seconds','hasteInterval'),('Duration · seconds','hasteDuration'),('Movement during Stampede · %','hasteSpeedPercent')]:self.field(p,label,key)
+        self.note(p,'Duration must be shorter than the repeat interval. Turning OFF restores the configured movement speed. Timers follow match time.')
         p=self.pages['Hazards']
         self.heading(p,'Make the whole party move','2.5-second warnings · maximum 128 active circles shared across players.')
         self.check(p,'Arena hazards enabled','hazards')
@@ -150,11 +167,27 @@ class Overlay:
         self.field(p,'Native cone and line attacks','extraHazards')
         self.note(p,'Mixed rotates rings, crosses, lanes, spirals and scatter. Formations leave escape routes; these are damaging runes, not solid walls.')
         for label,key in [('Obstacle damage','hazardPreset'),('Damage growth · % per minute','hazardGrowth'),('Normal circles · per player','hazardCount'),('Normal interval · seconds','hazardInterval'),('Rune Storm circles · per player','stormCount'),('Rune Storm interval · tenths of a second','stormIntervalTenths'),('Boss barrage circles · per player','barrageCount'),('Boss barrage interval · tenths of a second','barrageIntervalTenths'),('Boss barrage duration · seconds','barrageDuration'),('Camping trigger · seconds still','campSeconds')]:self.field(p,label,key)
-        self.note(p,'Easy 0.5× · Hard 1× · Brutal 1.5× · Insane 2×. Base damage: 20% max HP (25–250), or 25% (35–350) during storms/barrages, before defenses. Growth adds up to 4× over time. Example: 25 tenths = 2.5 seconds.')
+        self.note(p,'Easy 0.5× · Normal 1× · Heroic 1.5× · Mythic 2×. Base damage: 20% max HP (25–250), or 25% (35–350) during storms/barrages, before defenses. Growth adds up to 4× over time. Example: 25 tenths = 2.5 seconds.')
         p=self.pages['Rewards']
         self.heading(p,'Give every boss a purpose','Boss bounties and recurring chest milestones use native collectible drops.')
+        for kind,title in [('xp','Experience'),('gold','Gold')]:
+            self.heading(p,title+' scaling','Applies to new income. Existing levels and balances are unchanged.')
+            self.setting_toggle(p,title+' scaling ON / OFF',kind+'ScalingEnabled')
+            self.field(p,'Starting rate · %',kind+'BasePercent');self.field(p,'Added percentage points / minute',kind+'GrowthPercent');self.field(p,'Maximum rate · %',kind+'CapPercent')
+        self.note(p,'100% = normal income. Example: start 100%, add 10 per minute, cap 300% reaches 2× at ten minutes and 3× at twenty. Treasure Rush doubles gold after this setting.')
         for label,key in [('Exclude Luck rings / trinkets','banLuck'),('Maximum reroll price · gold','rerollCap'),('Extra powerup interval · seconds','pickupInterval'),('Extra chest interval · seconds','chestInterval'),('Boss kills per chest milestone','rewardEvery')]:self.field(p,label,key)
         self.note(p,'A bounty drops at each defeated boss. Milestones increase bounty rewards during this run; loot and collection progress follow the game’s normal rules. Luck filtering covers future ring/trinket choices; amulet affixes and equipped items are unchanged.')
+        p=self.pages['Affixes']
+        self.heading(p,'Native run affixes','Keep the game selection, disable native affixes, or choose your own combination.')
+        self.field(p,'Native affix selection','nativeAffixMode')
+        for var,name in zip(self.affix_flags['nativeAffixMask'],['Bolstering · deaths strengthen nearby enemies','Sanguine · slain elites leave healing pools','Explosive · native explosive orbs']):ttk.Checkbutton(p,text=name,variable=var).pack(anchor='w',pady=5)
+        self.note(p,'Choose Custom to apply these boxes. Game default restores the run’s original affixes. The native Heroic rank and its rewards remain your game-lobby selection.')
+        self.heading(p,'Mayhem affixes','Optional challenges with extra rewards. Default OFF.')
+        self.setting_toggle(p,'Mayhem affixes ON / OFF','affixesEnabled')
+        self.field(p,'Affix difficulty','affixPreset')
+        for var,name in zip(self.affix_flags['affixMask'],['Rift Pulse · dodge rings for a bounty','Death Echo · corpse runes, then a chest','Nemesis Hunt · kill the rare for a chest']):ttk.Checkbutton(p,text=name,variable=var).pack(anchor='w',pady=5)
+        self.field(p,'Affix interval · seconds','affixInterval');self.field(p,'Bonus rewards · %','affixBonusPercent')
+        self.note(p,'Rift Pulse and Nemesis Hunt alternate when both are selected. Death Echo follows boss kills. Native circles give 2.5 seconds to dodge. Difficulty increases rune counts, damage and bounty rewards. These circles are independent of the Arena hazards toggle.')
         p=self.pages['Session']
         self.heading(p,'Session controls','These controls affect the match you host.')
         self.field(p,'Announcement sounds','soundEnabled')
@@ -184,6 +217,7 @@ class Overlay:
         self.note(p,subtitle)
     def note(self,p,text):ttk.Label(p,text=text,wraplength=470,foreground=MUTED,justify='left').pack(anchor='w',fill='x',pady=(2,10))
     def check(self,p,label,key):ttk.Checkbutton(p,text=label,variable=self.flags[key]).pack(anchor='w',pady=7)
+    def setting_toggle(self,p,label,key):ttk.Checkbutton(p,text=label,variable=self.vars[key],onvalue='On',offvalue='Off').pack(anchor='w',pady=7)
     def field(self,p,label,key):
         row=ttk.Frame(p);row.pack(fill='x',pady=6)
         ttk.Label(row,text=label).pack(side='left')
@@ -195,16 +229,19 @@ class Overlay:
     def values(self):
         values={k:PRESETS.index(v.get()) if k.endswith('Preset') else CHOICES[k].index(v.get()) if k in CHOICES else int(v.get()) for k,v in self.vars.items()}
         values['eventMask']=sum(1<<i for i,v in enumerate(self.events) if v.get())
-        if not validate_settings(values):raise ValueError('Check the values and ensure minimum event break is no greater than maximum.')
+        values.update({key:sum(1<<i for i,v in enumerate(flags) if v.get()) for key,flags in self.affix_flags.items()})
+        if not validate_settings(values):raise ValueError('Check ranges: minimum break ≤ maximum; Stampede duration < repeat interval; income starting rates ≤ caps.')
         return values,{k:v.get() for k,v in self.flags.items()}
     def apply(self):
         try:
             settings,controls=self.values();self.app.apply_settings(settings,controls)
-            self.feedback.set('Applied. New spawns and future events use these settings.')
+            self.feedback.set('Applied. Movement and pacing update live; income changes affect future awards.')
         except Exception as e:self.feedback.set(str(e))
     def restore(self):
         for k,v in self.vars.items():v.set(PRESETS[DEFAULTS[k]] if k.endswith('Preset') else CHOICES[k][DEFAULTS[k]] if k in CHOICES else str(DEFAULTS[k]))
         for v in self.events:v.set(True)
+        for key,flags in self.affix_flags.items():
+            for i,v in enumerate(flags):v.set(bool(DEFAULTS[key]&(1<<i)))
         for k,v in self.flags.items():v.set(CONTROLS[k])
         self.feedback.set('Defaults selected. Press Apply to use them.')
     def toggle_rotation(self):
@@ -241,6 +278,15 @@ class Overlay:
             self.live.set(f'Next boss: {max(0,int(state.get("nextWave",0)-clock))}s\nEvent: {event}\nBosses defeated: {state.get("killCount",0)}\nHazard bursts: {state.get("hazardBursts",0)}\nGold drops: ×{item["scaling"]["gold"]:.2f}')
             reward=item.get('rewards') or {}
             if reward.get('supported'):self.live.set(self.live.get()+f'\nBounty tier: {reward.get("tier",0)} · next chest in {max(1,item.get("settings",{}).get("rewardEvery",3))-reward.get("kills",0)%max(1,item.get("settings",{}).get("rewardEvery",3))} boss kills\nBonus drops: {reward.get("pickups",0)} powerups · {reward.get("chests",0)} chests')
+            population=item.get('population') or {};tempo=item.get('tempo') or {};affixes=item.get('affixes') or {}
+            self.live.set(self.live.get()+f'\nXP: ×{(item.get("scaling") or {}).get("xp",1):.2f} · Game speed: ×{tempo.get("factor",1):.2f}\nStampede: {"ACTIVE" if population.get("hasteActive") else "Waiting" if population.get("hasteEnabled") else "OFF"}\nNative affixes: {", ".join(affixes.get("nativeAffixes",[])) or "None"}\nMayhem affixes: {"ON" if affixes.get("enabled") else "OFF"} · Bonus bounties: {affixes.get("rewards",0)}')
+            unavailable=[]
+            if not (item.get('income') or {}).get('supported'):unavailable.append('XP scaling')
+            if population.get('supported') is False:unavailable.append('population controls')
+            if not affixes.get('supported'):unavailable.append('native affix selection')
+            if tempo.get('movementSupported') is False:unavailable.append('player movement synchronization')
+            if unavailable:self.live.set(self.live.get()+'\nUnavailable on this adapter: '+', '.join(unavailable))
+            if affixes.get('nativeError'):self.live.set(self.live.get()+'\nNative affixes: '+affixes['nativeError'])
         else:self.live.set('Ready. Start a solo match or host a lobby normally.')
     def show(self):
         if not self.app.game or not self.app.game.ready:return
@@ -252,7 +298,7 @@ class Overlay:
     def place(self):
         rect=self.bridge.rect()
         if not rect:return
-        x,y,width,height=rect;pw=min(600,width-24);ph=min(760,height-24)
+        x,y,width,height=rect;pw=min(720,width-24);ph=min(760,height-24)
         geometry=f'{max(420,pw)}x{max(360,ph)}+{max(0,x+width-pw-12)}+{max(0,y+12)}'
         if geometry!=self.last_geometry:self.window.geometry(geometry);self.last_geometry=geometry
     def poll(self):

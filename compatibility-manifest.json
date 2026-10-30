@@ -1186,6 +1186,17 @@
           "flushPendingCoop": 96017456,
           "buildSnapshot": 97608304,
           "playerDamage": 96543536
+        },
+        "income": {
+          "xpAward": 96646240,
+          "xpOffset": 1332
+        },
+        "population": {
+          "spawnBudgetBefore": 96761403,
+          "spawnBudgetAfter": 96761423,
+          "spawnBudgetOffset": 3324,
+          "mobCapCompare": 96670757,
+          "budgetRunRegister": "r12"
         }
       },
       "runtimeSha256": "59e50d244f992e10dd40934656241e2caa9061da3f6592561bfbfeb6a830b3ff",
@@ -1459,6 +1470,30 @@
           "pattern": "5541574156415541545657534881ec98000000488dac2480000000440f294d00440f2945f00f297de00f2975d048c745c8feffffff4889d34889ce488b89d0020000488b96d8020000e8e25fedff4869c8f0000000488d0584b24001488b9401880000004839da74384c8d42684939d874334c8d82d00000004939d8742e4c8d82380100004939d874294881c2a00100004839da0f8532040000bf04000000eb1731ffeb13bf01000000eb0cbf02000000eb05bf030000004801c8488b4808488b5010",
           "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffff00ffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffffff00000000ffffffffffff00ffffff00ffffffffffff00ffffffffffff00ffffffffffffffffffffffffffffffff",
           "referenceCandidateCount": 1
+        },
+        "income_xpAward": {
+          "rva": 96646240,
+          "pattern": "5541574156415541545657534881ecd8010000488dac2480000000440f29bd40010000440f29b530010000440f29ad20010000440f29a510010000440f299d00010000440f2995f0000000440f298de0000000440f2985d00000000f29bdc00000000f29b5b000000048c785a8000000feffffff89d74889ce03b93405000089b9340500004c8db9580c0000f30f103d34476200f3440f100533146200f3440f100d9a156200450f57d2f3440f101de11662004989ee4c8d6d20f3440f1025d57b6000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffff00000000ffffffffffffffffff00000000ffffffffffffffffffffffff00000000",
+          "referenceCandidateCount": 1
+        },
+        "population_spawnBudgetBefore": {
+          "rva": 96761403,
+          "pattern": "f3410f58b424fc0c0000f3410f11b424fc0c0000488b85d80000004c8b7878488b808000000048898538010000488d048048c1e0044c01f84c89bde000000048898530010000488985e800000048c785f000000000000000488d4578488985f8000000488d4d204c8db5e00000004c89f2e8df2b0b00f3410f108424fc0c0000488b7d284c8b6d3031f6410f2ec00f82b60000009083fe080f83ac000000f30f105d784c89e14889fa4d89e8e8d479feff90483b85380100000f8309280000488d0c80",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00000000ffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffff",
+          "referenceCandidateCount": 1
+        },
+        "population_spawnBudgetAfter": {
+          "rva": 96761423,
+          "pattern": "488b85d80000004c8b7878488b808000000048898538010000488d048048c1e0044c01f84c89bde000000048898530010000488985e800000048c785f000000000000000488d4578488985f8000000488d4d204c8db5e00000004c89f2e8df2b0b00f3410f108424fc0c0000488b7d284c8b6d3031f6410f2ec00f82b60000009083fe080f83ac000000f30f105d784c89e14889fa4d89e8e8d479feff90483b85380100000f8309280000488d0c8048c1e104f3410f10740f444c8ba548010000",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffff00000000ffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "population_mobCapCompare": {
+          "rva": 96670757,
+          "pattern": "4939c6737c488b8ed0020000488b96d8020000e8c33eedff4869c0f00000004c8d35659140014a8b943080000000488d4aff4839d9480f42d94839d30f83d10800004901c64c8d3c9b49c1e7044d037e78803f0074328b470c898500020000488b4704488985f8010000f3440f1086c00c00000f57ff83bed00b0000017445eb6731c0e926080000c74424200000003f488d8df8010000f30f1015dc9a6400f30f101d84e761004889f2e8bcf4fffff3440f1086c00c00000f57ff83bed00b000001",
+          "mask": "ffffffff00ffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff00ffffff00000000ffffffffffffffffffffffffffffffffffffff00000000ffffffff00000000ffffffff00000000ffffffffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
         }
       }
     },
@@ -1717,6 +1752,28 @@
           "connectionStride": 1880,
           "partyStride": 2616,
           "playerDamageExtraArgs": 2
+        },
+        "income": {
+          "xpAward": 97218000,
+          "xpOffset": 1332
+        },
+        "population": {
+          "spawnBudgetBefore": 97332498,
+          "spawnBudgetAfter": 97332514,
+          "spawnBudgetOffset": 3356,
+          "mobCapCompare": 97242741,
+          "budgetRunRegister": "rsi"
+        },
+        "nativeAffixes": {
+          "capacity": 2168,
+          "pointer": 2176,
+          "length": 2184,
+          "heroic": 879,
+          "pools": {
+            "capacity": 2192,
+            "pointer": 2200,
+            "length": 2208
+          }
         }
       },
       "runtimeSha256": "f5dc87b9c982650fc69f662d74edc658d834a4ab12f73f2c32aecebd899a90a1",
@@ -1941,6 +1998,30 @@
           "rva": 97234240,
           "pattern": "5541574156415541545657534881ec98000000488dac2480000000440f294d00440f2945f00f297de00f2975d048c745c8feffffff4889d34889ce488b89d0020000488b96d8020000e882aae9ff4869c8f0000000488d054cca3d01488b9401880000004839da74384c8d42684939d874334c8d82d00000004939d8742e4c8d82380100004939d874294881c2a00100004839da0f8532040000bf04000000eb1731ffeb13bf01000000eb0cbf02000000eb05bf030000004801c8488b4808488b5010",
           "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffff00ffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffff00ffffffffffffffffffffffff00000000ffffffffffff00ffffff00ffffffffffff00ffffffffffff00ffffffffffffffffffffffffffffffff",
+          "referenceCandidateCount": 1
+        },
+        "income_xpAward": {
+          "rva": 97218000,
+          "pattern": "5541574156415541545657534881ecd8010000488dac2480000000440f29bd40010000440f29b530010000440f29ad20010000440f29a510010000440f299d00010000440f2995f0000000440f298de0000000440f2985d00000000f29bdc00000000f29b5b000000048c785a8000000feffffff89d74889ce03b93405000089b9340500004c8db9780c0000f30f103d34675d00f3440f100553195e00f3440f100d2e675d00450f57d2f3440f101d35675d004989ee4c8d6d20f3440f1025f5655d00",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffff00000000ffffffffff00000000ffffffffffffffffff00000000ffffffffffffffffffffffff00000000",
+          "referenceCandidateCount": 1
+        },
+        "population_spawnBudgetBefore": {
+          "rva": 97332498,
+          "pattern": "f30f58be1c0d0000f30f11be1c0d0000488b85c80000004c8b7878488b808000000048898520010000488d048048c1e0044c01f84c89bdd000000048898518010000488985d800000048c785e000000000000000488d4560488985e8000000488d4d104c8db5d00000004c89f2e87ced0600f30f10861c0d0000488b4518488985280100004c8b6d204531e4410f2ec00f82b40000000f1f8400000000004183fc080f83a2000000f30f105d604889f1488b95280100004d89e8e85f7dfeff90",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00000000ff",
+          "referenceCandidateCount": 1
+        },
+        "population_spawnBudgetAfter": {
+          "rva": 97332514,
+          "pattern": "488b85c80000004c8b7878488b808000000048898520010000488d048048c1e0044c01f84c89bdd000000048898518010000488985d800000048c785e000000000000000488d4560488985e8000000488d4d104c8db5d00000004c89f2e87ced0600f30f10861c0d0000488b4518488985280100004c8b6d204531e4410f2ec00f82b40000000f1f8400000000004183fc080f83a2000000f30f105d604889f1488b95280100004d89e8e85f7dfeff90483b85200100000f8398260000488d0c80",
+          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffff",
+          "referenceCandidateCount": 1
+        },
+        "population_mobCapCompare": {
+          "rva": 97242741,
+          "pattern": "4939c6737c488b8ed0020000488b96d8020000e88389e9ff4869c0f00000004c8d354da93d014a8b943080000000488d4aff4839d9480f42d94839d30f83d10800004901c64c8d3c9b49c1e7044d037e78803f0074328b470c898500020000488b4704488985f8010000f3440f1086e00c00000f57ff83bef00b0000017445eb6731c0e926080000c74424200000003f488d8df8010000f30f1015ac7e6100f30f101d18085d004889f2e8bcf4fffff3440f1086e00c00000f57ff83bef00b000001",
+          "mask": "ffffffff00ffffffffffffffffffffffffffffff00000000ffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff00ffffff00000000ffffffffffffffffffffffffffffffffffffff00000000ffffffff00000000ffffffff00000000ffffffffffffffffffffffffffffffffffffff",
           "referenceCandidateCount": 1
         }
       }
