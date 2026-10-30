@@ -1,10 +1,15 @@
-# Legendary Mayhem — native edition 0.9.5
+# Legendary Mayhem — native edition 0.9.6
 
 A community custom mode for the native Windows Azeroth Survivors game.
 The native edition is now the main development target. The browser launcher is
 legacy; its older releases remain available in the release history.
 
-## New in 0.9.5
+## Game 0.130.0 update
+
+Compatibility - Updated native hooks and player layouts for game 0.130.0.
+Map travel - Preserves the new damage-source arguments used by Death Recap.
+
+## Map rotation control
 
 **Insert > Session > Automatic map rotation ON / OFF** applies immediately and
 is saved between launches. Rotation is ON by default. OFF cancels queued travel;
@@ -33,17 +38,17 @@ hazards and uncollected ground drops are cleared without kill rewards.
 Players receive five seconds of damage protection while loading.
 Completion rewards retain the original run's map identity; travelling does not
 award extra map clears or increase the lobby size. Map rotation requires the
-reviewed native 0.127.0 build; older supported adapters keep the existing mode.
+reviewed native 0.130.0 build; older supported adapters keep the existing mode.
 
 ## Game compatibility
 
-Support for native game **0.127.0 / d1c85453**, with reviewed player/enemy
-layouts and native reward hooks. The game itself raises the level cap to 120.
+Support for native game **0.130.0 / e7d9dd47**, with reviewed player/enemy
+layouts and native reward hooks. Includes the game's new Death Recap build.
 
 ## Mode features
 
 - **Permanent Endless rewards:** cross-map Mayhem bosses now qualify for native
-  final-boss rewards during confirmed Endless on game 0.127.0. Class Marks and
+  final-boss rewards during confirmed Endless on game 0.130.0. Class Marks and
   native gear rewards use each player's normal save and upgrade system. Only
   the host runs Mayhem. Payouts follow native rules, not a fixed per-kill amount.
 - Boss gold/XP bounties; Mayhem bosses pay twice the base bounty. Every three
@@ -66,7 +71,7 @@ new custom currency, guest addon, or public collection-unlock feature.
 ## Start playing
 
 1. Keep your downloaded game and its Data folder together.
-2. Run AzerothSurvivorsMayhemNative-0.9.5.exe.
+2. Run AzerothSurvivorsMayhemNative-0.9.6.exe.
 3. Browse to your game's AzerothSurvivors.exe.
 4. Click Launch Mayhem. In the game, press INSERT to open the overlay.
    Use windowed or borderless mode; exclusive fullscreen is unsupported.
@@ -75,9 +80,9 @@ new custom currency, guest addon, or public collection-unlock feature.
 6. Keep the launcher open while playing. Closing it closes its game too.
 
 Requires Windows 10/11 x64. Automatic compatibility detection reads the selected
-EXE without starting or attaching to a game. Use **0.127.0 / d1c85453**
+EXE without starting or attaching to a game. Use **0.130.0 / e7d9dd47**
 on both host and guests for the current tested mode. Reviewed adapters for
-0.120.5, 0.122.0 and 0.123.0 remain included; current validation targets 0.127.0.
+0.120.5, 0.122.0 and 0.123.0 remain included; current validation targets 0.130.0.
 Native two-client LAN tests verified shared hazards and Endless; ordinary
 combat verified saved class Marks for the host and an unmodified guest.
 Actual reroll input verified the 1,000-gold cap and fixed-jewelry Luck filter.
