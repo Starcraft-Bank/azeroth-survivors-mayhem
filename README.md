@@ -1,6 +1,12 @@
 [![Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/pC4n2fvrmD)
 
-# Azeroth Legendary Mayhem 0.11.0
+## Update notices
+
+The launcher checks its project's public GitHub release metadata in the background when opened. Select Check for updates to check again; if a newer release is available, Download update opens its GitHub page. Updating is optional: notices never block launching or playing, and nothing is downloaded or installed automatically. A failed or offline check leaves the launcher usable.
+
+The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
+
+# Azeroth Legendary Mayhem 0.11.1
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 

@@ -6,6 +6,7 @@ from tkinter import filedialog,messagebox,ttk
 from native_runtime import ROOT,VERSION,NativeGame,self_test,compatibility_check
 from settings import CONTROLS,migrate_settings
 from overlay import Overlay,BG,TEXT,GOLD
+from updates import UpdateFooter
 PREFS=Path(os.environ.get('LOCALAPPDATA',Path.home()))/'LegendaryMayhemNative'/'settings.json'
 
 class App:
@@ -15,7 +16,7 @@ class App:
         except (OSError,ValueError):pass
         self.current_settings=migrate_settings(self.saved.get('settings',{}))
         self.current_controls={k:self.saved.get('controls',{}).get(k,v) is True for k,v in CONTROLS.items()}
-        window.title('Legendary Mayhem · Native '+VERSION);window.geometry('600x400');window.minsize(560,400)
+        window.title('Legendary Mayhem · Native '+VERSION);window.geometry('600x520');window.minsize(560,520)
         try:window.iconbitmap(str(ROOT/'assets/wow.ico'))
         except tk.TclError:pass
         window.configure(bg=BG);style=ttk.Style(window);style.theme_use('clam')
@@ -50,6 +51,7 @@ class App:
         guide_row=ttk.Frame(frame);guide_row.pack(fill='x')
         ttk.Button(guide_row,text='Open guide',command=lambda:os.startfile(str(ROOT/'README.txt'))).pack(side='left')
         self.check_button=ttk.Button(guide_row,text='Optional diagnostics',command=self.check_compatibility);self.check_button.pack(side='right')
+        self.updates=UpdateFooter(frame,VERSION,'Starcraft-Bank/azeroth-survivors-mayhem')
         self.checking=False;self.check_events=queue.Queue()
         self.overlay=Overlay(self,self.current_settings,self.current_controls)
         window.protocol('WM_DELETE_WINDOW',self.quit);window.after(200,self.poll)
@@ -128,7 +130,7 @@ class App:
     def quit(self):
         if self.game and not messagebox.askyesno('Close Mayhem?','Closing Mayhem also closes its game. Finish or leave your match first.'):return
         if self.game:self.game.close()
-        self.overlay.hotkey.stop();self.window.destroy()
+        self.updates.close();self.overlay.hotkey.stop();self.window.destroy()
 
 def main(app_class=App):
     parser=argparse.ArgumentParser();parser.add_argument('--self-test',action='store_true');parser.add_argument('--diagnose',action='store_true');parser.add_argument('--game');parser.add_argument('--report');parser.add_argument('--seconds',type=int,default=15);args=parser.parse_args()

@@ -19,3 +19,7 @@ checksums accompany downloads. No launcher can control a game's own privacy
 behavior; see the original game's information for that.
 
 Compatibility reports remain local and include hashes and sizes; optional diagnostics also include pattern matches. They exclude the selected path and save contents. Optional diagnostics do not access running processes or upload reports.
+
+## Optional release updates
+
+At startup and when you select Check for updates, the launcher requests public release metadata from its project's GitHub API. This sends no game saves, settings, local paths or credentials. GitHub receives ordinary connection metadata, such as the network address and application user agent. No account or token is used. The check runs in the background and never blocks launch; it does not download or install software. Download update opens the project's GitHub release page in your browser.
