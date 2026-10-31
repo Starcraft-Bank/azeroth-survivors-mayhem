@@ -1,14 +1,22 @@
 /* Persistent encounter modifiers. All native ownership remains with the game. */
 (() => {
  'use strict';
- const TIERS=[.75,1,1.25,1.5],NAMES=['Pack Tactics','Blood Frenzy','Revenant Legion','Nemesis Bond','Soul Debt'];
+ const TIERS=[.75,1,1.25,1.5],NAMES=['Pack Tactics','Blood Frenzy','Revenant Legion','Nemesis Bond','Soul Debt','Fission'];
+ const LINEAGE_LIMIT=8192;
+ function createBirthQueue(limit=512){
+  const items=[];let dropped=0,remaining=0;
+  return {push(item){if(items.length>=limit){dropped++;return false;}items.push({...item,remaining:2});remaining+=2;return true;},clear(){items.length=0;remaining=0;},reset(){items.length=0;remaining=0;dropped=0;},reservation(enabled){return enabled?Math.min(2,remaining):0;},
+   drain(spawn,budget=2){while(items.length&&budget-->0){const item=items[0],made=spawn(item);if(made===-1){remaining-=item.remaining;items.shift();dropped++;continue;}if(made===0)break;if(made!==1)throw Error('Invalid Fission native birth count');remaining--;if(--item.remaining===0)items.shift();}},
+   status:()=>({fissionQueued:items.length,fissionWaiting:remaining,fissionDropped:dropped})};
+ }
  function createModel(getSettings,random=Math.random){
-  let rows=new Map(),neighbours=new Map(),pairs=new Map(),enraged=new Set(),revenants=new Set(),processed=new Set(),debt=0,epoch=0;
-  let counts={prevented:0,frenzied:0,revived:0,bonds:0,enrages:0,payouts:0};
+  let rows=new Map(),neighbours=new Map(),pairs=new Map(),enraged=new Set(),revenants=new Set(),lineage=new Set(),processed=new Set(),debt=0,epoch=0;
+  let counts={prevented:0,frenzied:0,revived:0,bonds:0,enrages:0,payouts:0,fissionParents:0,fissionChildren:0};
   const on=bit=>getSettings().runAffixesEnabled===1&&!!(getSettings().runAffixMask&(1<<bit));
   const tier=bit=>TIERS[getSettings()[['packPreset','frenzyPreset','revenantPreset','bondPreset','debtPreset'][bit]]??getSettings().runAffixPreset??1];
-  function reset(){rows.clear();neighbours.clear();pairs.clear();enraged.clear();revenants.clear();processed.clear();debt=0;epoch++;counts={prevented:0,frenzied:0,revived:0,bonds:0,enrages:0,payouts:0};}
-  function update(input){
+  function reset(){rows.clear();neighbours.clear();pairs.clear();enraged.clear();revenants.clear();lineage.clear();processed.clear();debt=0;epoch++;counts={prevented:0,frenzied:0,revived:0,bonds:0,enrages:0,payouts:0,fissionParents:0,fissionChildren:0};}
+  function update(input,present=null){
+   const presentIds=present?new Set(present):new Set(input.map(x=>x.id));for(const id of lineage)if(!presentIds.has(id))lineage.delete(id);
    input=input.filter(x=>x.combatant!==false||x.boss);rows=new Map(input.map(x=>[x.id,x]));neighbours.clear();
    if(!getSettings().runAffixesEnabled){debt=0;pairs.clear();enraged.clear();return;}
    if(!on(3)){pairs.clear();enraged.clear();}if(!on(4))debt=0;
@@ -43,16 +51,20 @@
    if(row.boss){if(on(4)&&debt>0){actions.push({type:'bounty',position:row.position,gold:Math.ceil(debt*20),xp:Math.ceil(debt*10),chest:debt>=25,epoch});counts.payouts++;debt=0;}}
    else if(!wasRevenant&&row.combatant!==false){
     if(on(4))debt=Math.min(getSettings().debtCap,debt+getSettings().debtPerKill*tier(4));
-    if(on(2)&&random()*100<Math.min(75,getSettings().revenantChance*tier(2)))actions.push({type:'revive',position:row.position,health:getSettings().revenantHealth/100,epoch});
+    if(!lineage.has(row.id)&&on(5)&&row.fission&&Number.isFinite(row.max)&&row.max>0&&Number.isFinite(row.naturalDamage)&&row.naturalDamage>0){
+     const preset=getSettings().fissionPreset??1;counts.fissionParents++;actions.push({type:'fission',position:row.position,definition:row.fission,health:Math.min(1e30,row.max*([.5,1,1.25,1.5][preset])*(getSettings().fissionHealth??100)/100),damage:Math.min(1e24,row.naturalDamage*([.75,1,1.25,1.5][preset])*(getSettings().fissionDamage??100)/100),epoch});
+    }
+    if(!lineage.has(row.id)&&on(2)&&random()*100<Math.min(75,getSettings().revenantChance*tier(2)))actions.push({type:'revive',position:row.position,health:getSettings().revenantHealth/100,epoch});
    }else if(wasRevenant){actions.push({type:'bounty',position:row.position,gold:15,xp:10,chest:false,epoch});}
    return actions;
   }
-  function revived(ids){for(const id of ids){revenants.add(id);counts.revived++;}}
-  return {update,incoming,damage,speed,pair,kill,revived,reset,on,epoch:()=>epoch,status:()=>({enabled:getSettings().runAffixesEnabled===1,active:NAMES.filter((_,i)=>on(i)),debt,paired:pairs.size/2,revenants:revenants.size,...counts})};
+  function revived(ids){for(const id of ids){revenants.add(id);lineage.add(id);counts.revived++;}}
+  function fissionBorn(ids){for(const id of ids){lineage.add(id);counts.fissionChildren++;}}
+  return {update,incoming,damage,speed,pair,kill,revived,fissionBorn,canBirth:()=>lineage.size<LINEAGE_LIMIT,reset,on,epoch:()=>epoch,status:()=>({enabled:getSettings().runAffixesEnabled===1,active:NAMES.filter((_,i)=>on(i)),debt,paired:pairs.size/2,revenants:revenants.size,lineageTracked:lineage.size,lineageFull:lineage.size>=LINEAGE_LIMIT,...counts})};
  }
- globalThis.MAYHEM_RUN_AFFIXES={createModel,setup(api){
+ globalThis.MAYHEM_RUN_AFFIXES={createModel,createBirthQueue,setup(api){
   const {profile,base,F,E,getRun,getSettings,time,enemies,isBoss,guid,alive,enemyPosition,guarded,notice}=api;
-  const model=createModel(getSettings,api.random||Math.random),damageState=new Map(),queue=[];
+  const model=createModel(getSettings,api.random||Math.random),damageState=new Map(),queue=[],births=createBirthQueue();
   let owner='',last=-1,next=0,pointers=new Map(),vector='',length=-1,nextRevive=0;
   const address=base.add(profile.functions.enemyDamage),types=['pointer','uint64','float','uint32','uint32','uint32','uint32'];
   const original=new NativeFunction(address,'void',types,{traps:'all'});
@@ -60,37 +72,39 @@
    if(force||String(v.p)!==vector||v.n!==length){pointers.clear();for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);pointers.set(guid(e),e);}vector=String(v.p);length=v.n;}return v;
   }
   function find(r,id){index(r);let e=pointers.get(id);if(e&&guid(e)===id)return e;index(r,true);return pointers.get(id)||null;}
-  function record(r,e){const damage=e.add(E(0x168)).readFloat();return {id:guid(e),hp:e.add(E(0x160)).readFloat(),max:e.add(E(0x164)).readFloat(),boss:isBoss(e),combatant:Number.isFinite(damage)&&damage>0,position:enemyPosition(r,e)};}
-  function enqueue(actions){for(const action of actions){if(action.type==='rage'){notice('Nemesis Bond — the surviving boss is enraged!',3);continue;}if(queue.length<32)queue.push(action);}}
+  function record(r,e,death=false){const id=guid(e),damage=e.add(E(0x168)).readFloat(),old=damageState.get(id),naturalDamage=old?(damage===old.applied?old.natural:damage/old.factor):damage;return {id,naturalDamage,fission:death&&model.on(5)&&!isBoss(e)&&damage>0?api.fissionInfo(r,e):null,hp:e.add(E(0x160)).readFloat(),max:e.add(E(0x164)).readFloat(),boss:isBoss(e),combatant:Number.isFinite(damage)&&damage>0,position:enemyPosition(r,e)};}
+  function enqueue(actions){for(const action of actions){if(action.type==='rage'){notice('Nemesis Bond — the surviving boss is enraged!',3);continue;}if(action.type==='fission'){births.push(action);continue;}if(queue.length<32)queue.push(action);}}
   function killed(r,row){enqueue(model.kill(row));damageState.delete(row.id);}
   const replacement=new NativeCallback((r,id,amount,a,b,c,d)=>{
    let before=null,adjusted=amount;
    guarded(()=>{const current=getRun();if(!current||current.isNull()||!current.equals(r)||!getSettings().runAffixesEnabled)return;
-    const e=find(r,id.toString(16));if(e&&alive(e)){before=record(r,e);adjusted=model.incoming(before.id,amount);}});
+    const e=find(r,id.toString(16));if(e&&alive(e)){before=record(r,e,true);adjusted=model.incoming(before.id,amount);}});
    original(r,id,adjusted,a,b,c,d);
    if(before)guarded(()=>{const e=find(r,before.id);if(!e||!alive(e))killed(r,before);});
   },'void',types);
   AZS_HOOKS.replace(address,replacement);
-  function reset(){owner='';last=-1;next=0;nextRevive=0;vector='';length=-1;pointers.clear();damageState.clear();queue.length=0;model.reset();}
+  function reset(){owner='';last=-1;next=0;nextRevive=0;vector='';length=-1;pointers.clear();damageState.clear();queue.length=0;births.reset();model.reset();}
   function restore(r){const v=index(r,true);for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride),old=damageState.get(guid(e));if(old&&e.add(E(0x168)).readFloat()===old.applied)e.add(E(0x168)).writeFloat(old.natural);}damageState.clear();}
   function tick(r){const t=time(r);if(owner!==String(r)||t+.5<last){reset();owner=String(r);}last=t;if(t<next)return;next=t+.2;
-   const v=index(r,true),input=[],seen=new Set();for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(alive(e))input.push(record(r,e));}
-   model.update(input);
+   const v=index(r,true),input=[],seen=new Set(),present=[];for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);present.push(guid(e));if(alive(e))input.push(record(r,e));}
+   model.update(input,present);
    for(const row of input){const e=pointers.get(row.id),address=e.add(E(0x168)),value=address.readFloat(),old=damageState.get(row.id);seen.add(row.id);
     if(!Number.isFinite(value)||value<0)continue;const natural=old?(value===old.applied?old.natural:value/old.factor):value,factor=model.damage(row.id),applied=Math.fround(Math.min(1e24,natural*factor));
     if(value!==applied)address.writeFloat(applied);damageState.set(row.id,{natural,applied,factor});}
    for(const id of damageState.keys())if(!seen.has(id))damageState.delete(id);
-   if(!getSettings().runAffixesEnabled){queue.length=0;return;}
+   if(!getSettings().runAffixesEnabled){queue.length=0;births.clear();return;}
+   if(!model.on(5))births.clear();
+   births.drain(item=>{if(item.epoch!==model.epoch()||!model.canBirth())return -1;return api.fissionBirth(r,item,ids=>model.fissionBorn(ids));});
    let budget=4;
    while(queue.length&&budget--){const item=queue[0];if(item.epoch!==model.epoch()){queue.shift();continue;}
     if(item.type==='revive'){
      if(!model.on(2)){queue.shift();continue;}if(t<nextRevive)break;nextRevive=t+.35;queue.shift();
-     if(input.length>=500)continue;const ids=api.revive(r,item.position,item.health)||[];model.revived(ids);
+     if(input.length>=500||!model.canBirth())continue;const ids=api.revive(r,item.position,item.health)||[];model.revived(ids);
     }else{queue.shift();if(api.bounty(r,item.position,item)!==false&&item.chest)notice('Soul Debt paid — claim your chest and bounty!',2);}
    }
   }
-  return {tick,reset,configure(){next=0;},speed:e=>model.speed(guid(e)),wantsPair:()=>model.on(3),pair:ids=>model.pair(ids),
-   bossDied(r,id,position){killed(r,{id,boss:true,position});},onTravel(){reset();},status:()=>({supported:true,...model.status(),pending:queue.length}),
+  return {tick,reset,reservation:()=>births.reservation(model.on(5)),configure(){next=0;if(!model.on(5))births.clear();if(!getSettings().runAffixesEnabled)queue.length=0;},speed:e=>model.speed(guid(e)),wantsPair:()=>model.on(3),pair:ids=>model.pair(ids),
+   bossDied(r,id,position){killed(r,{id,boss:true,position});},onTravel(){reset();},status:()=>({supported:true,...model.status(),...births.status(),fissionReserved:births.reservation(model.on(5)),pending:queue.length}),
    // Retain the native replacement, original and model for the script lifetime.
    retained:{original,replacement},restore};
  }};

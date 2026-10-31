@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.11.1
+# Azeroth Legendary Mayhem 0.12.0
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
@@ -32,7 +32,7 @@ Windows 10/11 x64; no Python or browser extension installation is required. Sett
 
 Each Mayhem affix shows its name, description and toggle. Its own difficulty and settings appear only while enabled; hiding them preserves your choices. Group master switches also hide their disabled settings. Combat hazard groups expand separately. Restore defaults selects defaults; Apply commits them. Existing preferences are preserved, including settings migrated from the former Events tab.
 
-## Five persistent Mayhem affixes
+## Six persistent Mayhem affixes
 
 These affect ordinary combat throughout a run. The master switch defaults OFF. Each affix has its own Easy / Normal / Heroic / Mythic difficulty and individual settings.
 
@@ -42,7 +42,13 @@ These affect ordinary combat throughout a run. The master switch defaults OFF. E
 - **Nemesis Bond:** Mayhem waves summon linked boss pairs when the living-boss limit permits. Killing one enrages its surviving partner. Set damage enrage (10–200%); the movement increase is half that amount.
 - **Soul Debt:** Ordinary kills increase enemy damage and bank a bounty. A boss kill pays out gold/XP and clears the debt; debt of at least 25 also gives a chest. Set debt per kill (1–5 percentage points) and cap (10–200%).
 
-Each affix's difficulty scales its own configured effects. Turning modifiers off removes their live stat multipliers. New runs and map travel clear pending affix state; rewards already collected remain.
+- **Fission:** Eligible normal-mob deaths queue two enemies of the same native creature type at the corpse. Bosses never split. Children drop ordinary native rewards and cannot trigger Fission or Revenant Legion. Fission defaults OFF, even when an older persistent-affix selection is loaded. Set its own difficulty, child health (10–200%) and child damage (25–200%); both sliders default to 100%.
+
+Fission difficulty multiplies the child sliders: Easy uses 50% health / 75% damage; Normal uses 100% / 100%; Heroic uses 125% / 125%; Mythic uses 150% / 150%. At Normal with both sliders at 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Difficulty never changes the two-child count. Spawns respect native population limits and can wait in a bounded queue for slots. Queued children receive priority over ordinary new spawns; the population limit is not increased.
+
+Fission and Revenant Legion remain independent: an original enemy can produce two Fission children plus one weaker revenant if the Revenant roll succeeds. All affix-created offspring are excluded from both birth mechanics, preventing multiplication chains.
+
+Each affix's difficulty scales its own configured effects. Turning combat buffs off removes their live temporary multipliers. Turning Fission off cancels queued births; existing offspring keep their birth stats and cannot multiply. New runs and map travel clear pending affix state; rewards already collected remain.
 
 ## Native and reward affixes
 

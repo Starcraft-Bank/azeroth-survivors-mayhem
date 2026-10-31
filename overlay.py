@@ -114,7 +114,7 @@ class Overlay:
         self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key not in ('eventMask','affixMask','nativeAffixMask','runAffixMask')}
         self.flags={key:tk.BooleanVar(value=value) for key,value in controls.items()}
         self.events=[tk.BooleanVar(value=bool(settings['eventMask']&(1<<i))) for i in range(4)]
-        self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(5 if key=='runAffixMask' else 3)] for key in ['affixMask','nativeAffixMask','runAffixMask']}
+        self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(6 if key=='runAffixMask' else 3)] for key in ['affixMask','nativeAffixMask','runAffixMask']}
         self.pages={};self.sections={};self.affix_settings_panels={}
         for title in ['Combat','Population','Rewards','Affixes','Session']:
             outer=ttk.Frame(self.tabs);self.tabs.add(outer,text='  '+title+'  ')
@@ -182,6 +182,7 @@ class Overlay:
             ('Revenant Legion','Some defeated normal mobs return as weaker revenants with bonus gold and XP. Revenants cannot revive again.','revenantPreset',[('Revenant chance · %','revenantChance'),('Revenant health · %','revenantHealth')]),
             ('Nemesis Bond','Mayhem bosses arrive as linked pairs. Defeating one enrages its surviving partner.','bondPreset',[('Partner enrage bonus · %','bondRage')]),
             ('Soul Debt','Normal kills build enemy strength and bank a bounty. Defeat a boss to receive the bounty and reset the debt.','debtPreset',[('Strength added per kill · %','debtPerKill'),('Maximum added strength · %','debtCap')]),
+            ('Fission','Normal mobs split into two of the same type at their corpse. Bosses never split; children cannot split again. Difficulty changes child stats, never the count.','fissionPreset',[('Child health · % of normal','fissionHealth'),('Child damage · % of normal','fissionDamage')]),
         ]
         for var,(title,detail,preset,fields) in zip(self.affix_flags['runAffixMask'],entries):
             ttk.Checkbutton(p,text=title,variable=var).pack(anchor='w',pady=(12,3));self.note(p,detail)
@@ -190,6 +191,7 @@ class Overlay:
             if title=='Pack Tactics':self.note(settings_page,'Protection is capped at 60% damage reduction.')
             elif title=='Nemesis Bond':self.note(settings_page,'The surviving partner gains damage; its movement bonus is half as large. Difficulty scales the bonus.')
             elif title=='Soul Debt':self.note(settings_page,'The boss bounty pays gold and XP, plus a chest at 25% debt or more. Revenant kills do not add debt.')
+            elif title=='Fission':self.note(settings_page,'Always two children. Difficulty multiplies the percentages above: Easy 0.5× health / 0.75× damage; Normal 1×; Heroic 1.25×; Mythic 1.5×. At Normal and 100%, children use normal same-type health and damage.')
         p=ttk.Frame(affix_page);p.pack(fill='x',pady=(16,0));self.affix_groups['Timed']=p
         self.heading(p,'Timed affixes','Select the rotation pool. Stampede runs independently on its own schedule.')
         self.check(p,'Timed affix rotation ON / OFF','events')

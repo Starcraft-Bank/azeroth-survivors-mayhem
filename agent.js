@@ -47,7 +47,7 @@
   let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true,autoMap:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
   let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
-  let state,rewards=null,effects=null,permanentRewards=null,travel=null,income=null,population=null,tempo=null,affixes=null,runAffixes=null;
+  let state,rewards=null,effects=null,permanentRewards=null,travel=null,income=null,population=null,tempo=null,affixes=null,runAffixes=null,fissionSpawning=0;
   // Shuffle bags avoid a fixed sequence and repeats before a pool is exhausted.
   function shuffleBag(random=Math.random){
     let bag=[],last=null;
@@ -422,7 +422,7 @@
   if(globalThis.MAYHEM_REWARDS)rewards=globalThis.MAYHEM_REWARDS.setup({profile,base,F,native,guarded,notice,time,players,getSettings:()=>settings});
   if(globalThis.MAYHEM_EFFECTS)effects=globalThis.MAYHEM_EFFECTS.setup({base,profile,F,E,allocate,appendMessage,players,getSettings:()=>settings,guarded});
   income=MAYHEM_INCOME.setup({base,profile,getRun:()=>run,getSettings:()=>settings,time,guarded});
-  population=MAYHEM_POPULATION.setup({base,profile,F,E,getRun:()=>run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,guarded,notice,extraSpeed:e=>runAffixes?.speed(e)??1});
+  population=MAYHEM_POPULATION.setup({base,profile,F,E,getRun:()=>run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,guarded,notice,extraSpeed:e=>runAffixes?.speed(e)??1,reservedSlots:()=>fissionSpawning?0:(runAffixes?.reservation?.()||0)});
   tempo=MAYHEM_TEMPO.setup({base,profile,getSettings:()=>settings,guarded,F,players,appendMessage,allocate,getGame:()=>game,canSync:()=>!travel?.status().busy});
   affixes=MAYHEM_AFFIXES.setup({base,profile,allocate,deallocate,appendMessage,enqueueUi,getSettings:()=>settings,time,enemies,guid,alive,isBoss,enemyPosition,notice,guarded,hunt,
     burst:affixBurst,bounty(r,position,amount){
@@ -432,6 +432,25 @@
       return sent;
     }});
   runAffixes=MAYHEM_RUN_AFFIXES.setup({profile,base,F,E,getRun:()=>run.isNull()?null:run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,enemyPosition,guarded,notice,
+    fissionInfo(r,e){
+      const zone=zoneIndex(r);if(zone<0||zone>=profile.zoneCount||isBoss(e))return null;
+      const entry=base.add(profile.zoneTable+zone*profile.zoneStride),defs=entry.add(0x78).readPointer(),count=number(entry,0x80),definition=e.add(E(0x100)).readPointer();
+      if(defs.isNull()||count<=0||count>4096||definition.compare(defs)<0||definition.compare(defs.add(count*80))>=0)return null;
+      const offset=definition.sub(defs).toUInt32();if(offset%80)return null;
+      return {zone,index:offset/80,pointer:String(definition)};
+    },
+    fissionBirth(r,item,mark){
+      const source=item.definition,zone=zoneIndex(r);if(zone!==source.zone||zone<0||zone>=profile.zoneCount)return -1;
+      const entry=base.add(profile.zoneTable+zone*profile.zoneStride),defs=entry.add(0x78).readPointer(),count=number(entry,0x80);
+      if(!Number.isInteger(source.index)||source.index<0||source.index>=count||String(defs.add(source.index*80))!==source.pointer)return -1;
+      if(!item.position?.every(Number.isFinite)||!Number.isFinite(item.health)||!Number.isFinite(item.damage))return -1;
+      const before=enemies(r),seen=new Set();for(let i=0;i<before.n;i++)seen.add(guid(before.p.add(i*profile.enemyStride)));
+      const where=Memory.alloc(16);where.writeU32(1);item.position.forEach((v,i)=>where.add(4+i*4).writeFloat(v));
+      fissionSpawning++;scope.push({r,boss:false,extra:false});try{spawnMob(r,source.index,where);}finally{scope.pop();fissionSpawning--;}
+      const after=enemies(r);let created=0;for(let i=0;i<after.n;i++){const e=after.p.add(i*profile.enemyStride),id=guid(e);if(seen.has(id)||isBoss(e))continue;
+        mark([id]);created++;freshStats(r,e,false,false);const hp=Math.max(1,item.health);e.add(E(0x160)).writeFloat(hp);e.add(E(0x164)).writeFloat(hp);e.add(E(0x168)).writeFloat(Math.max(0,item.damage));syncHealth(r,e);}
+      return created;
+    },
     revive(r,position,health){
       const before=enemies(r),seen=new Set();for(let i=0;i<before.n;i++)seen.add(guid(before.p.add(i*profile.enemyStride)));
       const where=Memory.alloc(16);where.writeU32(1);position.forEach((v,i)=>where.add(4+i*4).writeFloat(v));

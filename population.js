@@ -1,12 +1,16 @@
 /* Native population budget, living-enemy cap and reversible movement tuning. */
 (() => {
  'use strict';
- globalThis.MAYHEM_POPULATION={setup(api){
+ function capFor(native,density,reserved=0){
+  const configured=Math.min(500,Math.max(1,Math.floor(native*density))),slots=Math.min(configured,2,Math.max(0,Math.floor(Number.isFinite(reserved)?reserved:0)));
+  return {configured,reserved:slots,cap:configured-slots};
+ }
+ globalThis.MAYHEM_POPULATION={capFor,setup(api){
   const {base,profile,F,E,getRun,getSettings,time,enemies,isBoss,guid,alive,guarded,notice}=api,p=profile.population;
   if(!p)return {tick(){},reset(){},configure(){},status:()=>({supported:false})};
   const movement=new Map(),budgets=new Map(),listeners=[];
   let owner='',lastClock=-1,nextSpeed=0,hasteWasEnabled=false,hasteActive=false,nextHaste=0,hasteUntil=0;
-  let budgetTicks=0,densityChecks=0,lastNativeCap=0,lastAdjustedCap=0,lastBudgetGain=0,lastAdjustedGain=0,hasteStarts=0;
+  let budgetTicks=0,densityChecks=0,lastNativeCap=0,lastAdjustedCap=0,lastEffectiveCap=0,lastReservedSlots=0,lastBudgetGain=0,lastAdjustedGain=0,hasteStarts=0;
   const percent=(key,lo,hi,fallback=100)=>Math.min(hi,Math.max(lo,Number(getSettings()[key]??fallback)))/100;
   function active(r){const current=getRun();return current&&!current.isNull()&&current.equals(r)&&r.add(r.add(F(0xc9d)).readU8()?F(0xca3):F(0xca2)).readU8()===1;}
   function reset(){movement.clear();budgets.clear();owner='';lastClock=-1;nextSpeed=0;hasteWasEnabled=false;hasteActive=false;nextHaste=0;hasteUntil=0;hasteStarts=0;}
@@ -29,8 +33,10 @@
   listeners.push(AZS_HOOKS.attach(base.add(p.mobCapCompare),function(){guarded(()=>{
    const r=this.context.rsi;if(!active(r))return;
    const native=this.context.rax.toUInt32();if(native<1||native>10000)return;
-   const adjusted=Math.min(500,Math.max(1,Math.floor(native*percent('mobDensityPercent',25,300))));
-   this.context.rax=ptr(adjusted);densityChecks++;lastNativeCap=native;lastAdjustedCap=adjusted;
+   // Pending Fission children claim existing capacity before ordinary refill.
+   // Their scoped constructor bypasses this reservation, never the actual cap.
+   const cap=capFor(native,percent('mobDensityPercent',25,300),api.reservedSlots?.()||0);
+   this.context.rax=ptr(cap.cap);densityChecks++;lastNativeCap=native;lastAdjustedCap=cap.configured;lastEffectiveCap=cap.cap;lastReservedSlots=cap.reserved;
   });}));
   function updateHaste(t){
    const s=getSettings(),enabled=s.hasteEnabled===1;
@@ -64,7 +70,7 @@
   function status(){return {supported:true,hasteEnabled:getSettings().hasteEnabled===1,hasteActive,hasteUntil,nextHaste,hasteStarts,
    mobSpeedPercent:getSettings().mobSpeedPercent,bossSpeedPercent:getSettings().bossSpeedPercent,
    spawnRatePercent:getSettings().spawnRatePercent,mobDensityPercent:getSettings().mobDensityPercent,
-   budgetTicks,densityChecks,lastNativeCap,lastAdjustedCap,lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
+   budgetTicks,densityChecks,lastNativeCap,lastAdjustedCap,lastEffectiveCap,lastReservedSlots,lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
   return {tick,reset,configure,status};
  }};
 })();
