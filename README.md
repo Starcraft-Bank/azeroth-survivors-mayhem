@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.12.1
+# Azeroth Legendary Mayhem 0.12.2
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
@@ -115,6 +115,6 @@ Automatic map rotation is an ON/OFF control under Session. When enabled, it choo
 
 Launching does not require a matching version or a successful hook-pattern scan. Hook installation failures are reported separately while other hooks remain active. If the shared extension runtime cannot initialize, partial hooks are unloaded before gameplay and the normal game opens instead.
 
-Unknown builds use a best-effort bundled layout, so changed game code or memory layouts may still require fixes. Native gameplay was tested on 0.130.0 and the 0.130.1 hotfix. The new adapter follows relocated code addresses; earlier adapters remain available. Optional diagnostics do not block launch. Collection/save-format checks remain separate from launching.
+Unknown builds use a best-effort bundled layout, so changed game code or memory layouts may still require fixes. This release targets game 0.131.0. See the release notes for the checks completed on that build; earlier adapters remain available. Optional diagnostics do not block launch. Collection/save-format checks remain separate from launching.
 
 The launcher does not patch the game EXE or distribute game assets. It uses your ordinary native save. Game self-updating is disabled for its launched session; update the ordinary game separately between sessions. Source, licenses, checksums and a privacy audit accompany the public release.
