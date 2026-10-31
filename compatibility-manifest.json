@@ -1171,6 +1171,12 @@
             "reroll": "0e5b5139ab69f9b3c259adaea84871748f864feaa7219928fa81ef23e7fc72ae",
             "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
             "jewelryLoop": "15655840732b7caf41e6597da8e48cfed2119d2313b0d682ea7d773a0b4ec238"
+          },
+          "chest": {
+            "purchase": 96786000,
+            "hud": 96440178,
+            "json": 96586654,
+            "priceOffset": 3360
           }
         },
         "permanentRewards": {
@@ -1689,6 +1695,12 @@
             "reroll": "4cd19bb5c276f34a4eaecadb48ce3edec9f4317c53c05c05bd784b9334fe3def",
             "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
             "jewelryLoop": "d4da71c25efe93cdff34cc50c3888bd2ddff7a38b490147e944f542e30eb050f"
+          },
+          "chest": {
+            "purchase": 97356688,
+            "hud": 97010562,
+            "json": 97158670,
+            "priceOffset": 3392
           }
         },
         "goldAwards": [
@@ -2218,6 +2230,12 @@
             "reroll": "4cd19bb5c276f34a4eaecadb48ce3edec9f4317c53c05c05bd784b9334fe3def",
             "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
             "jewelryLoop": "f54f9d1481dee062bdd881cc10c75dd9a53298feac92f17a5ec9c4b392f86c47"
+          },
+          "chest": {
+            "purchase": 97357568,
+            "hud": 97011442,
+            "json": 97159550,
+            "priceOffset": 3392
           }
         },
         "goldAwards": [

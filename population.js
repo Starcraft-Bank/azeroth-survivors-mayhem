@@ -1,19 +1,19 @@
 /* Native population budget, living-enemy cap and reversible movement tuning. */
 (() => {
  'use strict';
- function capFor(native,density,reserved=0){
-  const configured=Math.min(500,Math.max(1,Math.floor(native*density))),slots=Math.min(configured,2,Math.max(0,Math.floor(Number.isFinite(reserved)?reserved:0)));
-  return {configured,reserved:slots,cap:configured-slots};
+ function capFor(native,density,fissionEnabled=false){
+  const configured=Math.min(500,Math.max(1,Math.floor(native*density)));
+  return {configured,cap:fissionEnabled===true?null:configured,bypass:fissionEnabled===true};
  }
  globalThis.MAYHEM_POPULATION={capFor,setup(api){
   const {base,profile,F,E,getRun,getSettings,time,enemies,isBoss,guid,alive,guarded,notice}=api,p=profile.population;
   if(!p)return {tick(){},reset(){},configure(){},status:()=>({supported:false})};
   const movement=new Map(),budgets=new Map(),listeners=[];
   let owner='',lastClock=-1,nextSpeed=0,hasteWasEnabled=false,hasteActive=false,nextHaste=0,hasteUntil=0;
-  let budgetTicks=0,densityChecks=0,lastNativeCap=0,lastAdjustedCap=0,lastEffectiveCap=0,lastReservedSlots=0,lastBudgetGain=0,lastAdjustedGain=0,hasteStarts=0;
+  let budgetTicks=0,lastBudgetGain=0,lastAdjustedGain=0,hasteStarts=0;
   const percent=(key,lo,hi,fallback=100)=>Math.min(hi,Math.max(lo,Number(getSettings()[key]??fallback)))/100;
   function active(r){const current=getRun();return current&&!current.isNull()&&current.equals(r)&&r.add(r.add(F(0xc9d)).readU8()?F(0xca3):F(0xca2)).readU8()===1;}
-  function reset(){movement.clear();budgets.clear();owner='';lastClock=-1;nextSpeed=0;hasteWasEnabled=false;hasteActive=false;nextHaste=0;hasteUntil=0;hasteStarts=0;}
+  function reset(){capState.writeByteArray(new Uint8Array(24));movement.clear();budgets.clear();owner='';lastClock=-1;nextSpeed=0;hasteWasEnabled=false;hasteActive=false;nextHaste=0;hasteUntil=0;hasteStarts=0;}
   function prepare(r){const t=time(r);if(owner!==String(r)||t<lastClock-1){reset();owner=String(r);}lastClock=t;return t;}
   // Scale the budget increment, not the accumulated balance, so repeated frames
   // never compound stored spawn credit. The scheduler still chooses native mobs.
@@ -30,14 +30,37 @@
    const scaled=gain*percent('spawnRatePercent',25,300);address.writeFloat(Math.min(1000000,previous.value+scaled));
    budgetTicks++;lastBudgetGain=gain;lastAdjustedGain=scaled;
   });}));
-  listeners.push(AZS_HOOKS.attach(base.add(p.mobCapCompare),function(){guarded(()=>{
-   const r=this.context.rsi;if(!active(r))return;
-   const native=this.context.rax.toUInt32();if(native<1||native>10000)return;
-   // Pending Fission children claim existing capacity before ordinary refill.
-   // Their scoped constructor bypasses this reservation, never the actual cap.
-   const cap=capFor(native,percent('mobDensityPercent',25,300),api.reservedSlots?.()||0);
-   this.context.rax=ptr(cap.cap);densityChecks++;lastNativeCap=native;lastAdjustedCap=cap.configured;lastEffectiveCap=cap.cap;lastReservedSlots=cap.reserved;
-  });}));
+  // Native detour: nested runTick listeners are suppressed by Frida. Override
+  // Fission enables uncapped ordinary arrivals and offspring for this Run and
+  // game thread. Disabled mode retains configured density. Preserve registers and
+  // flags except RAX, then execute the original relocated cap comparison.
+  const capState=Memory.alloc(72),capCode=Memory.alloc(Process.pageSize);capState.writeByteArray(new Uint8Array(72));
+  const originalCap=AZS_HOOKS.replaceFast(base.add(p.mobCapCompare),capCode);
+  Memory.patchCode(capCode,1024,code=>{
+   const w=new X86Writer(code,{pc:capCode}),branch=(condition,label)=>w.putJccNearLabel(condition,label,'no-hint');
+   w.putPushfx();for(const reg of ['rcx','rdx','r11'])w.putPushReg(reg);
+   w.putMovRegAddress('r11',capState);w.putCmpRegOffsetPtrReg('r11',0,'rsi');branch('jne','tail');
+   w.putMovRegOffsetPtrReg('r11',48,'rax');
+   w.putCmpRegOffsetPtrReg('r11',8,'rsi');branch('jne','limited');
+   w.putMovRegGsU32Ptr('rcx',0x48); // Windows x64 TEB.ClientId.UniqueThread
+   w.putCmpRegOffsetPtrReg('r11',16,'rcx');branch('je','unlimited');w.putLabel('limited');
+   w.putCmpRegI32('rax',1);branch('jb','tail');w.putCmpRegI32('rax',10000);branch('ja','tail');
+   w.putMovRegOffsetPtrReg('r11',48,'rax');
+   w.putMovRegRegOffsetPtr('rcx','r11',24);w.putBytes([0x48,0xf7,0xe1]); // mul rcx
+   w.putMovRegU32('ecx',100);w.putBytes([0x48,0xf7,0xf1]); // div rcx
+   w.putCmpRegI32('rax',1);branch('jae','minimum');w.putMovRegU32('eax',1);w.putLabel('minimum');
+   w.putCmpRegI32('rax',500);branch('jbe','maximum');w.putMovRegU32('eax',500);w.putLabel('maximum');
+   w.putMovRegOffsetPtrReg('r11',56,'rax');
+   w.putJmpNearLabel('record');w.putLabel('unlimited');
+   w.putMovRegU64('rax',uint64('0xffffffffffffffff'));
+   w.putMovRegRegOffsetPtr('rcx','r11',40);w.putIncReg('rcx');w.putMovRegOffsetPtrReg('r11',40,'rcx');
+   w.putLabel('record');w.putMovRegOffsetPtrReg('r11',64,'rax');
+   w.putMovRegRegOffsetPtr('rcx','r11',32);w.putIncReg('rcx');w.putMovRegOffsetPtrReg('r11',32,'rcx');
+   w.putLabel('tail');for(const reg of ['r11','rdx','rcx'])w.putPopReg(reg);w.putPopfx();w.putJmpAddress(originalCap);w.flush();
+  });
+  function uncapped(){const s=getSettings();return s.runAffixesEnabled===1&&!!(s.runAffixMask&32);}
+  function updateCap(){const r=getRun(),current=r&&active(r)?r:ptr(0);capState.add(24).writeU64(Math.round(percent('mobDensityPercent',25,300)*100));capState.writePointer(current);capState.add(8).writePointer(uncapped()?current:ptr(0));}
+  function withFission(r,fn){if(!active(r)||!uncapped())return false;updateCap();return fn();}
   function updateHaste(t){
    const s=getSettings(),enabled=s.hasteEnabled===1;
    if(enabled&&!hasteWasEnabled){nextHaste=t+Math.max(1,s.hasteFirst);hasteActive=false;hasteUntil=0;}
@@ -65,12 +88,12 @@
    }
    for(const id of movement.keys())if(!seen.has(id))movement.delete(id);
   }
-  function tick(r){if(!active(r))return;const t=prepare(r);updateHaste(t);if(t>=nextSpeed){nextSpeed=t+.1;applyMovement(r);}}
-  function configure(){nextSpeed=0;}
+  function tick(r){if(!active(r)){updateCap();return;}const t=prepare(r);capState.add(16).writeU64(Process.getCurrentThreadId());updateCap();updateHaste(t);if(t>=nextSpeed){nextSpeed=t+.1;applyMovement(r);}}
+  function configure(){nextSpeed=0;updateCap();}
   function status(){return {supported:true,hasteEnabled:getSettings().hasteEnabled===1,hasteActive,hasteUntil,nextHaste,hasteStarts,
    mobSpeedPercent:getSettings().mobSpeedPercent,bossSpeedPercent:getSettings().bossSpeedPercent,
    spawnRatePercent:getSettings().spawnRatePercent,mobDensityPercent:getSettings().mobDensityPercent,
-   budgetTicks,densityChecks,lastNativeCap,lastAdjustedCap,lastEffectiveCap,lastReservedSlots,lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
-  return {tick,reset,configure,status};
+   budgetTicks,densityChecks:capState.add(32).readU64().toNumber(),lastNativeCap:capState.add(48).readU64().toNumber(),lastAdjustedCap:capState.add(56).readU64().toNumber(),lastEffectiveCap:capState.add(64).readU64().equals(uint64('0xffffffffffffffff'))?null:capState.add(64).readU64().toNumber(),populationCapRemoved:uncapped(),fissionBypasses:capState.add(40).readU64().toNumber(),lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
+  return {tick,reset,configure,status,withFission,_nativeResources:[capCode,capState,originalCap]};
  }};
 })();

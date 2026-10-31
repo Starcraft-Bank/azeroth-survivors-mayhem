@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.12.0
+# Azeroth Legendary Mayhem 0.12.1
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
@@ -44,7 +44,7 @@ These affect ordinary combat throughout a run. The master switch defaults OFF. E
 
 - **Fission:** Eligible normal-mob deaths queue two enemies of the same native creature type at the corpse. Bosses never split. Children drop ordinary native rewards and cannot trigger Fission or Revenant Legion. Fission defaults OFF, even when an older persistent-affix selection is loaded. Set its own difficulty, child health (10–200%) and child damage (25–200%); both sliders default to 100%.
 
-Fission difficulty multiplies the child sliders: Easy uses 50% health / 75% damage; Normal uses 100% / 100%; Heroic uses 125% / 125%; Mythic uses 150% / 150%. At Normal with both sliders at 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Difficulty never changes the two-child count. Spawns respect native population limits and can wait in a bounded queue for slots. Queued children receive priority over ordinary new spawns; the population limit is not increased.
+Fission difficulty multiplies the child sliders: Easy uses 50% health / 75% damage; Normal uses 100% / 100%; Heroic uses 125% / 125%; Mythic uses 150% / 150%. At Normal with both sliders at 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Difficulty never changes the two-child count. While Fission is enabled, the normal-mob population cap is removed for both ordinary arrivals and Fission children. Normal spawning continues alongside the copies, using the configured spawn rate. Large birth queues drain over successive updates; valid births are not discarded because of a queue-size limit. Turning Fission off restores the configured population limit without deleting existing enemies.
 
 Fission and Revenant Legion remain independent: an original enemy can produce two Fission children plus one weaker revenant if the Revenant roll succeeds. All affix-created offspring are excluded from both birth mechanics, preventing multiplication chains.
 
@@ -72,13 +72,13 @@ Each has its own difficulty and reward bonus. Rift Pulse and Nemesis Hunt have i
 
 Shared game speed is adjustable from 50–200% and defaults OFF. It changes player movement, combat timers, waves and hazards for the whole party. Network deadlines and menu animations keep normal timing. At 200%, two match minutes take about one real minute.
 
-Mob and boss movement are separately adjustable from 50–300%. Spawn rate and density range from 25–300%, with a 500-enemy living cap. Lowering density never deletes existing enemies. Ordinary spawn rate does not change the Mayhem boss interval or scripted summons.
+Mob and boss movement are separately adjustable from 50–300%. Spawn rate and density range from 25–300%. With Fission OFF, ordinary population is capped at 500 living enemies; with Fission ON, the normal-mob population cap is removed. Lowering density never deletes existing enemies. Ordinary spawn rate does not change the Mayhem boss interval or scripted summons.
 
 XP and gold each have an ON/OFF switch, starting rate (25–1,000%), growth per match minute (0–100 percentage points) and cap (25–2,000%). XP defaults to 100% without growth. Gold defaults to 125%, +15 points per minute, capped at 800%. Treasure Rush applies an additional 1.5 / 2 / 2.5 / 3× gold multiplier according to its own difficulty. Existing balances/levels are unchanged and native level caps remain.
 
 Guaranteed Legendary choices default to one from the start, two after ten minutes and three after twenty. Configure first Legendary time and the interval; the quota caps at three eligible choices.
 
-Boss kills drop native bounties. Recurring milestones increase rewards and add chests; extra supplies spawn around the map. Configure supply intervals, milestone frequency, the reroll-price cap (up to 1,000 gold) and filtering of future fixed-Luck ring/trinket rewards. Equipped items and amulet affixes are unchanged.
+Boss kills drop native bounties. Recurring milestones increase rewards and add chests; extra supplies spawn around the map. Configure supply intervals, milestone frequency, the reroll-price cap (up to 1,000 gold) and filtering of future fixed-Luck ring/trinket rewards. Equipped items and amulet affixes are unchanged. Chests have a fixed 1,000-gold price ceiling for purchases and their displayed prices; cheaper and free chests keep their native prices. This ceiling is separate from the reroll setting and needs no extra slider.
 
 ## Bosses, timed affixes and hazards
 
@@ -109,7 +109,7 @@ Only the host runs Mayhem. Host and guests must use game builds that can join on
 
 Automatic Endless continues after native victory. Eligible cross-map Endless bosses grant the game's own permanent class Marks and gear rewards to host and guests under native rules. Spend Marks through the game's ordinary permanent progression menus. Public Mayhem has no cheat or Unlock All menu.
 
-Automatic map rotation is an ON/OFF control under Session. When enabled, it chooses a shuffled destination every three match minutes and keeps player levels/items, wave count and scaling. Turning it on starts a fresh countdown. Transfers pause during reward choices; a transfer already underway finishes. Completion rewards remain tied to the original run.
+Automatic map rotation is an ON/OFF control under Session. When enabled, it chooses a shuffled destination every three match minutes and keeps player levels/items, wave count and scaling. Turning it on starts a fresh countdown. Transfers pause during reward choices; a transfer already underway finishes. Completion rewards remain tied to the original run. Map travel now uses the available adapter fields instead of the stale build allowlist that prevented rotation on game 0.130.1. Delayed or unavailable transfers report their reason; temporary request errors retry after five match seconds without stopping the other Mayhem features.
 
 ## Startup and diagnostics
 

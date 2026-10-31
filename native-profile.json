@@ -189,6 +189,12 @@
       "reroll": "4cd19bb5c276f34a4eaecadb48ce3edec9f4317c53c05c05bd784b9334fe3def",
       "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
       "jewelryLoop": "d4da71c25efe93cdff34cc50c3888bd2ddff7a38b490147e944f542e30eb050f"
+    },
+    "chest": {
+      "purchase": 97356688,
+      "hud": 97010562,
+      "json": 97158670,
+      "priceOffset": 3392
     }
   },
   "goldAwards": [

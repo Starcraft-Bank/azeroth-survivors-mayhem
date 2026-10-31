@@ -8,6 +8,27 @@
     const xyz=Memory.alloc(12),maxQueue=80;
     let owner='',last=-1,nextPickup=0,nextChest=0,kills=0,tier=0,queued=[],spawned=0,pickups=0,chests=0,filtered=0,capped=0;
     const setting=(name,fallback)=>getSettings()[name]??fallback;
+    // Limit the actual native purchase price as well as both UI paths. Lower
+    // prices (including free chests) keep their native value; gold is not refunded.
+    const chest=p.chest,priceLimit=1000,pricePointer=Memory.alloc(4);pricePointer.writeU32(priceLimit);
+    let chestPricesCapped=0;
+    function capChest(r){
+      if(!chest||!r||r.isNull())return;
+      const price=r.add(chest.priceOffset);
+      if(price.readU32()>priceLimit){price.writeU32(priceLimit);chestPricesCapped++;}
+    }
+    if(chest){
+      AZS_HOOKS.attach(base.add(chest.purchase),{
+        onEnter(args){this.buyer=args[0];guarded(()=>capChest(this.buyer));},
+        onLeave(){guarded(()=>capChest(this.buyer));}
+      });
+      AZS_HOOKS.attach(base.add(chest.hud),function(){guarded(()=>{
+        if(this.context.rax.readU32()>priceLimit)this.context.rax=pricePointer;
+      });});
+      AZS_HOOKS.attach(base.add(chest.json),function(){guarded(()=>{
+        if(this.context.rax.toUInt32()>priceLimit)this.context.rax=ptr(priceLimit);
+      });});
+    }
     function reset(r,t){owner=String(r);last=t;nextPickup=t+setting('pickupInterval',25);nextChest=t+setting('chestInterval',75);kills=0;tier=0;queued=[];spawned=0;pickups=0;chests=0;}
     for(const site of p.costSites)AZS_HOOKS.attach(base.add(site.rva),function(){guarded(()=>{
       const c=this.context,cap=Math.min(1000,Math.max(100,setting('rerollCap',1000)));
@@ -40,6 +61,9 @@
     }
     function tick(r){
       const t=time(r);if(owner!==String(r)||t<last-1)reset(r,t);last=t;
+      // Chest pricing belongs to the shared Run, beyond the party-member layout.
+      // Guest purchases use this same price; never access it through a member pointer.
+      capChest(r);
       if(t>=nextPickup){ring(r,3+Math.floor(Math.random()*4),1);nextPickup=t+setting('pickupInterval',25);}
       if(t>=nextChest){ring(r,2,1,12);nextChest=t+setting('chestInterval',75);}
       let budget=4;
@@ -48,6 +72,6 @@
         const item=queued.shift();item.position.forEach((n,i)=>xyz.add(i*4).writeFloat(n));loot(r,item.kind,item.amount,xyz);spawned++;if(item.kind===2)chests++;else if(item.kind>=3)pickups++;
       }
     }
-    return {tick,queue,bossReward,milestone,onTravel(r){const v=pos(r);queued.forEach((item,i)=>{const a=i*2.4;item.position=[v[0]+Math.cos(a)*3,v[1]+Math.sin(a)*3,v[2]];});},reset(){owner='';last=-1;queued=[];kills=0;tier=0;spawned=0;pickups=0;chests=0;},status:()=>({supported:true,kills,tier,queued:queued.length,spawned,pickups,chests,filtered,capped,nextPickup,nextChest})};
+    return {tick,queue,bossReward,milestone,onTravel(r){const v=pos(r);queued.forEach((item,i)=>{const a=i*2.4;item.position=[v[0]+Math.cos(a)*3,v[1]+Math.sin(a)*3,v[2]];});},reset(){owner='';last=-1;queued=[];kills=0;tier=0;spawned=0;pickups=0;chests=0;},status:()=>({supported:true,kills,tier,queued:queued.length,spawned,pickups,chests,filtered,capped,nextPickup,nextChest,chestPriceCap:chest?priceLimit:null,chestPricesCapped})};
   }};
 })();

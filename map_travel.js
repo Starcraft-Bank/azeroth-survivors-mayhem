@@ -197,8 +197,10 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
   'use strict';
   globalThis.AZS_MAP_TRAVEL = {setup(api) {
     const {profile,base,getRun,getGame}=api, notice=api.notice||(()=>{});
-    if(!['3ef9d74c30bb6b435d739b3d960c8535486836c540e0d8c20f98549a6f1dcbbb','8829953418a4d996cc5287f0e9fad25407ca30ceb64d105a4f57833caef78016'].includes(profile.sha256)) {
-      const reason='Map travel requires the reviewed native game adapter';
+    const required=['loadWorld','worldDropSlow','createHero','sendLocalPacket','encodeCoop','flushPendingCoop','buildSnapshot','playerDamage'];
+    const missing=required.filter(name=>!Number.isSafeInteger(profile.mapTravelFunctions?.[name])||profile.mapTravelFunctions[name]<=0);
+    if(!profile.mapTravel||missing.length) {
+      const reason='Map travel adapter is incomplete'+(missing.length?': '+missing.join(', '):': missing layout');
       return {request(){throw Error(reason);},tick(){},reset(){},catalog(){return [];},status(){return {supported:false,busy:false,canTravel:false,reason,currentZone:'',originZone:'',catalog:[]};}};
     }
     const T=o=>profile.mapTravel?.runOffsets?.['0x'+o.toString(16)]??o,G=o=>profile.mapTravel?.gameOffsets?.['0x'+o.toString(16)]??o,ps=profile.mapTravel?.partyStride??0xa18;

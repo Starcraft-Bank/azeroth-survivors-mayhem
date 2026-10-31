@@ -154,7 +154,7 @@ class Overlay:
         self.field(p,'Normal mob movement · %','mobSpeedPercent')
         self.field(p,'Mob spawn rate · %','spawnRatePercent')
         self.field(p,'Mob density · %','mobDensityPercent')
-        self.note(p,'100% keeps the existing Mayhem rate. Spawn rate changes ordinary scheduled arrivals; boss waves and scripted summons keep their own schedules. Density changes the living-mob limit, capped at 500. Lowering it does not delete enemies.')
+        self.note(p,'100% keeps the existing Mayhem rate. Spawn rate changes ordinary arrivals; boss waves keep their own schedules. While Fission is ON, normal-mob population has no cap: ordinary arrivals continue alongside the copies. Fission OFF restores the configured density limit, up to 500 living mobs, without deleting existing enemies.')
         p=self.pages['Rewards']
         self.heading(p,'Legendary choices','Up to three guaranteed Legendary choices at each level-up.')
         self.field(p,'First Legendary · minutes','legendaryStart')
@@ -166,7 +166,7 @@ class Overlay:
         self.note(p,'100% = normal income. Start 100%, add 10 per minute and cap at 300% to reach 2× at ten minutes and 3× at twenty. Treasure Rush doubles gold after this setting.')
         self.heading(p,'Loot and rerolls','Native collectibles, boss bounties and recurring chest milestones.')
         for label,key in [('Exclude Luck rings / trinkets','banLuck'),('Maximum reroll price · gold','rerollCap'),('Extra powerup interval · seconds','pickupInterval'),('Extra chest interval · seconds','chestInterval'),('Boss kills per chest milestone','rewardEvery')]:self.field(p,label,key)
-        self.note(p,'Boss bounties and milestones reward longer runs. Luck filtering affects future ring/trinket choices; equipped items and amulet affixes remain unchanged.')
+        self.note(p,'Chest opening prices never exceed 1,000 gold; cheaper chests keep their normal price. Boss bounties and milestones reward longer runs. Luck filtering affects future ring/trinket choices; equipped items and amulet affixes remain unchanged.')
         affix_page=self.pages['Affixes']
         self.heading(affix_page,'Affixes','Every enabled Mayhem affix has its own difficulty and settings. Turn an affix on to show its controls.')
         self.affix_groups={}
@@ -182,7 +182,7 @@ class Overlay:
             ('Revenant Legion','Some defeated normal mobs return as weaker revenants with bonus gold and XP. Revenants cannot revive again.','revenantPreset',[('Revenant chance · %','revenantChance'),('Revenant health · %','revenantHealth')]),
             ('Nemesis Bond','Mayhem bosses arrive as linked pairs. Defeating one enrages its surviving partner.','bondPreset',[('Partner enrage bonus · %','bondRage')]),
             ('Soul Debt','Normal kills build enemy strength and bank a bounty. Defeat a boss to receive the bounty and reset the debt.','debtPreset',[('Strength added per kill · %','debtPerKill'),('Maximum added strength · %','debtCap')]),
-            ('Fission','Normal mobs split into two of the same type at their corpse. Bosses never split; children cannot split again. Difficulty changes child stats, never the count.','fissionPreset',[('Child health · % of normal','fissionHealth'),('Child damage · % of normal','fissionDamage')]),
+            ('Fission','Normal mobs split into two same-type children at their corpse. While enabled, normal spawning has no population cap. Bosses and affix offspring never split. Difficulty changes child stats, never the count.','fissionPreset',[('Child health · % of normal','fissionHealth'),('Child damage · % of normal','fissionDamage')]),
         ]
         for var,(title,detail,preset,fields) in zip(self.affix_flags['runAffixMask'],entries):
             ttk.Checkbutton(p,text=title,variable=var).pack(anchor='w',pady=(12,3));self.note(p,detail)
@@ -191,7 +191,7 @@ class Overlay:
             if title=='Pack Tactics':self.note(settings_page,'Protection is capped at 60% damage reduction.')
             elif title=='Nemesis Bond':self.note(settings_page,'The surviving partner gains damage; its movement bonus is half as large. Difficulty scales the bonus.')
             elif title=='Soul Debt':self.note(settings_page,'The boss bounty pays gold and XP, plus a chest at 25% debt or more. Revenant kills do not add debt.')
-            elif title=='Fission':self.note(settings_page,'Always two children. Difficulty multiplies the percentages above: Easy 0.5× health / 0.75× damage; Normal 1×; Heroic 1.25×; Mythic 1.5×. At Normal and 100%, children use normal same-type health and damage.')
+            elif title=='Fission':self.note(settings_page,'Always two children. Difficulty multiplies the percentages above: Easy 0.5× health / 0.75× damage; Normal 1×; Heroic 1.25×; Mythic 1.5×. At Normal and 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Large birth queues drain over successive updates.')
         p=ttk.Frame(affix_page);p.pack(fill='x',pady=(16,0));self.affix_groups['Timed']=p
         self.heading(p,'Timed affixes','Select the rotation pool. Stampede runs independently on its own schedule.')
         self.check(p,'Timed affix rotation ON / OFF','events')
@@ -349,6 +349,8 @@ class Overlay:
         elif not enabled:reason='Automatic map rotation is OFF. Waves and difficulty continue on this map.'
         elif match.get('phase')==2:reason='Paused during reward choices.'
         elif not state.get('canTravel'):reason=state.get('reason') or 'Waiting for play to resume.'
+        elif rotation.get('mapBlockedReason'):reason='Map rotation waiting: '+rotation['mapBlockedReason']
+        elif state.get('error'):reason='Last map transfer: '+state['error']
         else:reason='The next destination is chosen automatically.'
         countdown=f'{remaining//60:02}:{remaining%60:02}' if enabled else 'OFF'
         self.travel_info.set(f'Current: {names(state.get("currentZone"))} · Original: {names(state.get("originZone"))}\nNext change: {countdown} · Map changes: {changes}\n{reason}')

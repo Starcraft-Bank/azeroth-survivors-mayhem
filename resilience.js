@@ -11,7 +11,12 @@
  globalThis.AZS_HOOKS={
   attach(address,...args){try{executable(address);const listener=attach(address,...args);current?.undo.push(()=>listener.detach());return listener;}
    catch(error){report(current?.name||'Hook '+address,error);return {detach(){}};}},
-  replace(address,...args){try{executable(address);const key=String(address),previous=replacements.get(key),result=replace(address,...args);replacements.set(key,args);
+  replaceFast(address,replacement){
+   try{executable(address);const key=String(address);if(replacements.has(key))throw Error('A replacement already owns this instruction.');
+    const original=Interceptor.replaceFast(address,replacement);replacements.set(key,{fast:true});current?.undo.push(()=>{Interceptor.revert(address);replacements.delete(key);});return original;
+   }catch(error){report(current?.name||'Hook '+address,error);throw error;}
+  },
+  replace(address,...args){try{executable(address);const key=String(address),previous=replacements.get(key);if(previous?.fast)throw Error('A native detour already owns this instruction.');const result=replace(address,...args);replacements.set(key,args);
     current?.undo.push(()=>{Interceptor.revert(address);if(previous){replace(address,...previous);replacements.set(key,previous);}else replacements.delete(key);});return result;}
    catch(error){report(current?.name||'Hook '+address,error);}}
  };
