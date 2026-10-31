@@ -99,7 +99,7 @@ globalThis.makeGuestTransfer127 = function ({base,profile}) {
     const text=Memory.allocUtf8String(originalZone),len=originalZone.length;
     // Snapshot enum tag15 owns a SnapshotD0 beginning at+8; its zone is first String.
     // Temporarily borrow original key only during encoding, restore before native destructor.
-    const listener=Interceptor.attach(base.add(profile.mapTravelFunctions.encodeCoop),{
+    const listener=AZS_HOOKS.attach(base.add(profile.mapTravelFunctions.encodeCoop),{
       onEnter(args){
         const msg=args[1];
         if(msg.readU64().toString(16)!=='800000000000000f')return;
@@ -122,7 +122,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
   const T=o=>profile.mapTravel?.runOffsets?.['0x'+o.toString(16)]??o,ps=profile.mapTravel?.partyStride??2584;
   const alloc=new NativeFunction(base.add(0x21c0),'pointer',['uint64','uint64']);
   const free=new NativeFunction(base.add(0x21d0),'void',['pointer','uint64','uint64']);
-  const snapshotHook=Interceptor.attach(base.add(profile.mapTravelFunctions.buildSnapshot),{
+  const snapshotHook=AZS_HOOKS.attach(base.add(profile.mapTravelFunctions.buildSnapshot),{
     onEnter(args){
       const identity=getIdentity(args[1]);
       if(identity&&identity.originalZone){this.out=args[0];this.zone=identity.originalZone;}
@@ -232,7 +232,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
       const address=base.add(profile.mapTravelFunctions.playerDamage),types=['pointer','float','uint64','uint32',...(profile.mapTravel?.playerDamageExtraArgs===2?['uint32','uint32']:[])];
       const original=new NativeFunction(address,'void',types);
       const callback=new NativeCallback((r,damage,attacker,flags,...source)=>{if(damage>0&&protectedRun(r)){protectedHits++;return;}original(r,damage,attacker,flags,...source);},'void',types);
-      damageCallbacks.push(original,callback);Interceptor.replace(address,callback);
+      damageCallbacks.push(original,callback);AZS_HOOKS.replace(address,callback);
     }
     const cleanup=makeTravelRewardsCleanup127({base,profile,getIdentity:r=>identityRun&&r.equals(identityRun)?{originalZone}:null});
     const readKey=r=>r.add(0x2d0).readPointer().readUtf8String(r.add(0x2d8).readU64().toNumber());

@@ -8,7 +8,7 @@
  }
  globalThis.MAYHEM_INCOME={factor,setup({profile,base,getRun,getSettings,time,guarded}){
   const p=profile.income;let awards=0,calls=0,skipped=0,last=null;
-  if(p)Interceptor.attach(base.add(p.xpAward),{onEnter(a){guarded(()=>{
+  if(p)AZS_HOOKS.attach(base.add(p.xpAward),{onEnter(a){guarded(()=>{
    calls++;const r=getRun();if(!r||r.isNull()||!r.equals(a[0])){skipped++;return;}
    const s=getSettings(),amount=a[1].toUInt32(),multiplier=factor('xp',s,time(r)/60);
    const current=r.add(p.xpOffset).readU32();

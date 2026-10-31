@@ -142,3 +142,23 @@ def write_report(path,report):
     target=Path(path);target.parent.mkdir(parents=True,exist_ok=True)
     temporary=target.with_suffix(target.suffix+'.tmp')
     temporary.write_text(json.dumps(report,indent=2),encoding='utf-8');temporary.replace(target)
+
+
+def select_launch_profile(path, manifest_path):
+    """Select a best-effort layout without scanning or requiring hook patterns."""
+    data=Path(path).read_bytes();pe=parse_image(data)
+    manifest=json.loads(Path(manifest_path).read_text(encoding='utf-8'))
+    adapters=manifest.get('adapters') or []
+    if not adapters:raise ValueError('Missing bundled game layouts. Reinstall the launcher.')
+    digest=hashlib.sha256(data).hexdigest();runtime=normalized_identity(data,pe)
+    exact=[a for a in adapters if a['profile']['sha256']==digest or a.get('runtimeSha256')==runtime]
+    version_key=lambda a:tuple(int(x) for x in a['profile']['version'].split('.'))
+    stamps=[a for a in adapters if a['profile'].get('stamp','!').encode() in data]
+    selected=max(exact or stamps or adapters,key=version_key)
+    profile=copy.deepcopy(selected['profile']);verified=bool(exact)
+    if not verified:profile.update(compatibilityUnverified=True,runtimeTested=False,validation='best-effort-no-hook-gate')
+    report={'schema':1,'fileSha256':digest,'runtimeSha256':runtime,'compatible':verified,'verified':verified,
+            'launchAllowed':True,'hookScanPerformed':False,'processAccessed':False,'adapterVersion':profile['version'],
+            'version':profile['version'] if verified else 'unverified','decision':'reviewed' if verified else 'best-effort',
+            'message':'Launch allowed. No version or required-hook gate. Feature failures are reported separately.'}
+    return profile,report

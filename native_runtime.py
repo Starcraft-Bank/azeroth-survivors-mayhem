@@ -4,7 +4,7 @@ import ctypes,hashlib,json,os,queue,sys,threading,time
 from ctypes import wintypes
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.10.0'
+VERSION='0.11.0'
 from settings import DEFAULTS, SCHEMA, validate_settings
 
 
@@ -37,24 +37,31 @@ class OwnedProcess:
 
 
 def compatibility_check(path, report_path=None):
-    from compatibility import analyze_game,write_report
+    from compatibility import analyze_game,select_launch_profile,write_report
     exe=Path(path).resolve(strict=True)
     if not exe.is_file():raise ValueError('Select AzerothSurvivors.exe.')
     profile,report=analyze_game(exe,ROOT/'compatibility-manifest.json')
+    launch_profile,_=select_launch_profile(exe,ROOT/'compatibility-manifest.json')
+    report['diagnosticHooksMatch']=bool(profile);report['diagnosticOnly']=True;report['launchAllowed']=True
+    if not profile:
+        report['message']='Diagnostic: some hook locations differ. Launch remains allowed; individual features may be unavailable.'
+    profile=launch_profile
     if report_path:write_report(report_path,report)
     return exe,profile,report
 
 def check_game(path):
     report_path=Path(os.environ.get('LOCALAPPDATA',Path.home()))/'LegendaryMayhemNative'/'compatibility-report.json'
-    exe,profile,report=compatibility_check(path,report_path)
-    if not profile:raise ValueError(report['message']+' Report: '+str(report_path))
+    from compatibility import select_launch_profile,write_report
+    exe=Path(path).resolve(strict=True)
+    profile,report=select_launch_profile(exe,ROOT/'compatibility-manifest.json')
+    write_report(report_path,report)
     if not (exe.parent/'Data').is_dir():raise ValueError('The game needs its Data folder beside AzerothSurvivors.exe.')
     return exe,profile
 
 class NativeGame:
     def __init__(self):
         self.events=queue.Queue();self.device=None;self.session=None;self.agent=None;self.pid=None;self.owned_process=None
-        self.unverified=False;self.ready=False;self.closed=threading.Event();self.lock=threading.RLock();self.latest=None
+        self.unverified=False;self.ready=False;self.running=False;self.feature_errors=[];self.closed=threading.Event();self.lock=threading.RLock();self.latest=None
 
     def start(self,path,settings,environment=None):
         if not validate_settings(settings):raise ValueError('Invalid pre-match settings.')
@@ -75,11 +82,18 @@ class NativeGame:
                 self.session=self.device.attach(self.pid)
                 self.session.on('detached',self._detached)
                 self.events.put({'kind':'compatible','version':profile['version'],'stamp':profile['stamp'],'verified':not self.unverified})
-                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['income.js','tempo.js','population.js','affixes.js','patterns.js','rewards.js','effects.js','permanent-rewards.js','map_travel.js','agent.js'])
-                self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
-                self.agent.on('message',self._message);self.agent.load()
-                if not self.ready:raise RuntimeError('The native mode did not initialize; the game was not resumed.')
-                self.device.resume(self.pid)
+                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['income.js','tempo.js','population.js','affixes.js','patterns.js','rewards.js','effects.js','permanent-rewards.js','map_travel.js','run-affixes.js','resilience.js','agent.js'])
+                try:
+                    self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
+                    self.agent.on('message',self._message);self.agent.load()
+                    if not self.ready:raise RuntimeError('Feature initialization did not complete.')
+                except Exception as error:
+                    # The child is still suspended: remove partial hooks before any
+                    # gameplay can borrow agent-owned data, then start the normal game.
+                    if self.agent:self.agent.unload()
+                    self.agent=None;self.ready=False
+                    self.events.put({'kind':'degraded','error':str(error),'text':'Game running without extensions; feature initialization failed.'})
+                self.device.resume(self.pid);self.running=True
             except BaseException:
                 self.close();raise
 
@@ -87,13 +101,15 @@ class NativeGame:
         if message.get('type')=='send':
             value=message['payload']
             if value.get('kind')=='ready':self.ready=True
-            if value.get('kind')=='status':self.latest=value
+            if value.get('kind')=='feature-unavailable':self.feature_errors.append(value)
+            if value.get('kind')=='status':
+                value['unavailableFeatures']=list(self.feature_errors);self.latest=value
             self.events.put(value)
         elif message.get('type')=='error':
             self.events.put(dict(kind='fault',error=message.get('description','Native runtime error')))
 
     def _detached(self,reason,crash=None):
-        self.closed.set();self.ready=False
+        self.closed.set();self.ready=False;self.running=False
         if self.owned_process:self.owned_process.close(terminate=reason!='process-terminated')
         self.pid=None
         self.events.put(dict(kind='closed',reason=reason,crashed=crash is not None))
@@ -116,7 +132,7 @@ class NativeGame:
                 try:self.device.kill(self.pid)
                 except Exception as error:
                     if type(error).__name__!='ProcessNotFoundError':raise
-            self.pid=None;self.ready=False;self.closed.set()
+            self.pid=None;self.ready=False;self.running=False;self.closed.set()
 
 def self_test(game,report,seconds=15):
     """Packaged launch check: isolated save, no combat/test memory writes."""

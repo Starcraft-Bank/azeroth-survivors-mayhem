@@ -49,7 +49,7 @@ class App:
         ttk.Label(frame,text='All settings are in the Insert overlay. Use windowed or borderless mode.\nKeep Mayhem open while playing.',wraplength=530).pack(anchor='w',pady=14)
         guide_row=ttk.Frame(frame);guide_row.pack(fill='x')
         ttk.Button(guide_row,text='Open guide',command=lambda:os.startfile(str(ROOT/'README.txt'))).pack(side='left')
-        self.check_button=ttk.Button(guide_row,text='Check compatibility',command=self.check_compatibility);self.check_button.pack(side='right')
+        self.check_button=ttk.Button(guide_row,text='Optional diagnostics',command=self.check_compatibility);self.check_button.pack(side='right')
         self.checking=False;self.check_events=queue.Queue()
         self.overlay=Overlay(self,self.current_settings,self.current_controls)
         window.protocol('WM_DELETE_WINDOW',self.quit);window.after(200,self.poll)
@@ -90,12 +90,13 @@ class App:
     def open_game(self):
         if self.launching or self.game:return
         self.launching=True;self.launch.configure(state='disabled');self.browse.configure(state='disabled');self.path_entry.configure(state='disabled')
-        self.status.set('Checking the game and starting Mayhem…');self.save();self.game=NativeGame()
+        self.status.set('Starting the game and initializing Mayhem…');self.save();self.game=NativeGame()
         path,settings,controls=self.path.get(),dict(self.current_settings),dict(self.current_controls);current=self.game
         def worker():
             try:
                 current.start(path,settings)
-                for key,value in controls.items():current.control(key,value)
+                if current.ready:
+                    for key,value in controls.items():current.control(key,value)
             except Exception as error:current.events.put({'kind':'launch-error','error':str(error)})
         threading.Thread(target=worker,daemon=True).start()
     def poll(self):
@@ -110,6 +111,9 @@ class App:
                     item=self.game.events.get_nowait();kind=item.get('kind')
                     if kind=='ready':
                         self.launching=False;self.stop.configure(state='normal');self.panel_button.configure(state='normal');self.status.set(('UNVERIFIED BUILD. ' if self.game.unverified else '')+'Mayhem is running. Press INSERT for settings.')
+                    elif kind=='degraded':
+                        self.launching=False;self.stop.configure(state='normal');self.panel_button.configure(state='disabled');self.status.set(item['text'])
+                    elif kind=='feature-unavailable':self.status.set(item['feature']+' unavailable; game continues.')
                     elif kind=='status':
                         self.overlay.update_status(item)
                         if item.get('fault'):self.status.set('Mode error. Relaunch the game: '+item['fault'].splitlines()[0])

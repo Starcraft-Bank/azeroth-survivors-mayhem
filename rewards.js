@@ -9,14 +9,14 @@
     let owner='',last=-1,nextPickup=0,nextChest=0,kills=0,tier=0,queued=[],spawned=0,pickups=0,chests=0,filtered=0,capped=0;
     const setting=(name,fallback)=>getSettings()[name]??fallback;
     function reset(r,t){owner=String(r);last=t;nextPickup=t+setting('pickupInterval',25);nextChest=t+setting('chestInterval',75);kills=0;tier=0;queued=[];spawned=0;pickups=0;chests=0;}
-    for(const site of p.costSites)Interceptor.attach(base.add(site.rva),function(){guarded(()=>{
+    for(const site of p.costSites)AZS_HOOKS.attach(base.add(site.rva),function(){guarded(()=>{
       const c=this.context,cap=Math.min(1000,Math.max(100,setting('rerollCap',1000)));
       const overflow=(c[site.overflowRegister].toUInt32()&1)!==0,value=c[site.costRegister].toUInt32();
       if(overflow||value>cap){c[site.costRegister]=ptr(cap);c[site.overflowRegister]=c[site.overflowRegister].and(ptr('0xfffffffffffffffe'));capped++;}
     });});
     // Skip a banned definition at the native candidate-loop boundary. The
     // game's own weighting, equipment limits, uniqueness and RNG remain intact.
-    Interceptor.attach(base.add(p.jewelryLoop),function(){guarded(()=>{
+    AZS_HOOKS.attach(base.add(p.jewelryLoop),function(){guarded(()=>{
       if(!setting('banLuck',1))return;
       let offset=this.context.r14.toUInt32();
       if(offset%p.jewelryStride||offset>p.jewelryCount*p.jewelryStride)throw Error('Invalid jewelry iterator');

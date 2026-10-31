@@ -5,9 +5,11 @@
  globalThis.MAYHEM_AFFIXES={setup(api){
   const {profile,base,allocate,deallocate,getSettings,time,enemies,guid,alive,isBoss,enemyPosition,notice,guarded}=api;
   const layout=profile.nativeAffixes,tracked=new Map(),pending=[];
-  let owner='',last=-1,original=null,managed=false,active=[],nativeRank=0,nativeError='',next=0,lastKind=0,lastMask=0,wasEnabled=false;
+  let owner='',last=-1,original=null,managed=false,active=[],nativeRank=0,nativeError='',next=0,nextPulse=0,nextHunt=0,lastKind=0,lastMask=0,wasEnabled=false;
   let pulses=0,echoes=0,hunts=0,rewards=0,changes=0,sequence=0;
   const tiers=[.75,1,1.35,1.7];
+  const preset=kind=>getSettings()[({1:'riftPreset',2:'echoPreset',3:'nemesisPreset'})[kind]]??getSettings().affixPreset??1;
+  const bonus=kind=>getSettings()[({1:'riftBonusPercent',2:'echoBonusPercent',3:'nemesisBonusPercent'})[kind]]??getSettings().affixBonusPercent??25;
   function enabled(){return getSettings().affixesEnabled===1;}
   function readNative(r){
    const n=r.add(layout.length).readU64().toNumber(),cap=r.add(layout.capacity).readU64().toNumber(),p=r.add(layout.pointer).readPointer();
@@ -56,31 +58,31 @@
    writeNative(r,wanted);active=wanted;
   }
   function reset(r,t){owner=String(r);last=t;original=null;managed=false;active=[];nativeError='';tracked.clear();pending.length=0;next=t+getSettings().affixInterval;lastKind=0;wasEnabled=false;lastMask=0;sequence=0;pulses=0;echoes=0;hunts=0;rewards=0;changes=0;}
-  function bounty(r,position,chest=false){
-   const s=getSettings(),factor=tiers[s.affixPreset??1]*(1+(s.affixBonusPercent??25)/100);
+  function bounty(r,position,chest=false,kind=1){
+   const s=getSettings(),factor=tiers[preset(kind)]*(1+bonus(kind)/100);
    const amount={gold:Math.min(100000,Math.ceil((60+time(r)*.12)*factor)),xp:Math.min(100000,Math.ceil((30+time(r)*.06)*factor)),chest,powerup:!chest};
    if(api.bounty(r,position,amount)!==false){rewards++;return true;}return false;
   }
   function getTracked(r,id){const v=enemies(r);for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(guid(e)===id)return e;}return null;}
-  const listener=Interceptor.attach(base.add(profile.functions.enemyDamage),{
+  const listener=AZS_HOOKS.attach(base.add(profile.functions.enemyDamage),{
    onEnter(a){this.id=a[1].toString().replace(/^0x/,'');this.r=a[0];this.hunt=enabled()&&owner===String(this.r)&&tracked.get(this.id);},
    onLeave(){if(!this.hunt)return;guarded(()=>{
     if(!enabled()||owner!==String(this.r)||!tracked.has(this.id))return;
     const e=getTracked(this.r,this.id);if(e&&alive(e))return;
-    tracked.delete(this.id);bounty(this.r,this.hunt.position,true);notice('Nemesis defeated — bonus chest and bounty!',2);
+    tracked.delete(this.id);bounty(this.r,this.hunt.position,true,3);notice('Nemesis defeated — bonus chest and bounty!',2);
    });}
   });
   function challenge(r,t,kind){
-   const tier=getSettings().affixPreset??1;
+   const tier=preset(kind);
    if(kind===1){
     if(!api.burst(r,{count:3+tier,damagePercent:[75,100,125,150][tier],pattern:2,position:null}))return false;
     pulses++;notice('Rift Pulse — dodge the rings, then collect your bounty!',2);
-    if(pending.length<16)pending.push({at:t+3,type:'reward',position:null,owner});return true;
+    if(pending.length<16)pending.push({at:t+3,type:'reward',position:null,kind:1,owner});return true;
    }
    if(kind===3){
     if(tracked.size>=2)return false;
     const before=enemies(r),seen=new Set();for(let i=0;i<before.n;i++)seen.add(guid(before.p.add(i*profile.enemyStride)));
-    if(!api.hunt(r))return false;
+    if(!api.hunt(r,preset(3)))return false;
     const after=enemies(r);let added=false;
     for(let i=0;i<after.n&&tracked.size<2;i++){const e=after.p.add(i*profile.enemyStride),id=guid(e);if(!seen.has(id)&&alive(e)&&!isBoss(e)){tracked.set(id,{position:enemyPosition(r,e),owner});added=true;}}
     if(added){hunts++;notice('Nemesis Hunt — defeat the foreign rare for a bonus chest!',2);}return added;
@@ -95,19 +97,18 @@
      if(message!==nativeError&&(managed||s.nativeAffixMode))notice('Native affix controls unavailable — other Mayhem features remain active.',2);
      nativeError=message;
     }
-    if(!enabled()){pending.length=0;tracked.clear();next=t+s.affixInterval;wasEnabled=false;return;}
+    if(!enabled()){pending.length=0;tracked.clear();nextPulse=t+(s.riftInterval??s.affixInterval);nextHunt=t+(s.nemesisInterval??s.affixInterval);next=Math.min(nextPulse,nextHunt);wasEnabled=false;return;}
     const mask=s.affixMask??7;
-    if(!wasEnabled||mask!==lastMask){next=t+s.affixInterval;wasEnabled=true;lastMask=mask;}
+    if(!wasEnabled||mask!==lastMask){nextPulse=t+(s.riftInterval??s.affixInterval);nextHunt=t+(s.nemesisInterval??s.affixInterval);next=Math.min(nextPulse,nextHunt);wasEnabled=true;lastMask=mask;}
     for(let i=pending.length-1;i>=0;i--){const item=pending[i];if(item.owner!==owner){pending.splice(i,1);continue;}if(t<item.at)continue;
-     pending.splice(i,1);if(item.type==='reward'){bounty(r,item.position,item.chest);continue;}
-     if((mask&2)&&api.burst(r,{count:4+(s.affixPreset??1)*2,damagePercent:[75,100,125,150][s.affixPreset??1],pattern:2,position:item.position})){
-      echoes++;if(pending.length<16)pending.push({at:t+3,type:'reward',position:item.position,chest:true,owner});
+     pending.splice(i,1);if(item.type==='reward'){bounty(r,item.position,item.chest,item.kind||1);continue;}
+     if((mask&2)&&api.burst(r,{count:4+preset(2)*2,damagePercent:[75,100,125,150][preset(2)],pattern:2,position:item.position})){
+      echoes++;if(pending.length<16)pending.push({at:t+3,type:'reward',position:item.position,chest:true,kind:2,owner});
      }
     }
-    if(t<next)return;
-    const pool=[1,3].filter(k=>mask&(1<<(k-1)));if(pool.length>1&&pool.includes(lastKind))pool.splice(pool.indexOf(lastKind),1);
-    const kind=pool[sequence++%Math.max(1,pool.length)];next=t+s.affixInterval;
-    if(kind&&challenge(r,t,kind))lastKind=kind;
+    if((mask&1)&&t>=nextPulse){nextPulse=t+(s.riftInterval??s.affixInterval);challenge(r,t,1);}
+    if((mask&4)&&t>=nextHunt){nextHunt=t+(s.nemesisInterval??s.affixInterval);challenge(r,t,3);}
+    next=Math.min(mask&1?nextPulse:Infinity,mask&4?nextHunt:Infinity);if(!Number.isFinite(next))next=0;
    },
    bossDied(r,id,position){
     if(!enabled()||!(getSettings().affixMask&2)||!position||pending.length>=16||owner!==String(r))return;
@@ -117,7 +118,7 @@
    },
    onTravel(){tracked.clear();pending.length=0;},
    status(){return {supported:!!layout&&!nativeError,nativeRank,nativeError,nativeAffixes:active.map(i=>names[i]),nativeMode:getSettings().nativeAffixMode||0,
-    nativeChanges:changes,enabled:enabled(),next,pulses,echoes,hunts,trackedHunts:tracked.size,rewards,pending:pending.length,
+    nativeChanges:changes,enabled:enabled(),next,nextPulse,nextHunt,pulses,echoes,hunts,trackedHunts:tracked.size,rewards,pending:pending.length,
     nativeNote:nativeError|| (layout?'Native Heroic rank and its progression rewards are preserved.':'Native affix controls are unavailable for this adapter.')};}
   };
  }};

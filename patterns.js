@@ -11,3 +11,9 @@ globalThis.MAYHEM_PATTERNS={points(kind,count,rotation=0){
   }
   return result;
 }};
+
+// Every Rune Storm burst mixes all five formations while preserving its total count.
+globalThis.MAYHEM_PATTERNS.mixed=(count,rotation=0)=>{
+ const pools=Array.from({length:5},(_,i)=>MAYHEM_PATTERNS.points(i+1,Math.ceil(count/5),rotation+i*.23));
+ return Array.from({length:count},(_,i)=>pools[i%5][Math.floor(i/5)]);
+};

@@ -62,7 +62,7 @@
    depth++;
    try{original(run,dt*scale);}finally{depth--;}
   },'void',['pointer','float']);
-  Interceptor.replace(address,replacement);
+  AZS_HOOKS.replace(address,replacement);
   return {tick,reset(){speeds.clear();},status(){return {enabled:getSettings().gameSpeedEnabled===1,factor:lastFactor,calls,scaledCalls,movementPackets,movementSupported:!!transport};},
           // Keep callback and original alive for the entire owned game session.
           retained:[original,replacement]};

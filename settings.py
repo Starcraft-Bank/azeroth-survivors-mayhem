@@ -15,7 +15,7 @@ SCHEMA = {
     'hazardPattern': (0, 0, 5), 'extraHazards': (1, 0, 1),
     'hazardPreset': (1, 0, 3), 'hazardGrowth': (0, 0, 10),
     'hazardCount': (6, 1, 16), 'hazardInterval': (10, 3, 60),
-    'stormCount': (8, 1, 16), 'stormIntervalTenths': (25, 10, 100),
+    'stormCount': (13, 1, 19), 'stormIntervalTenths': (25, 10, 100),
     'barrageCount': (8, 1, 16), 'barrageIntervalTenths': (30, 10, 100),
     'barrageDuration': (30, 10, 120), 'campSeconds': (6, 3, 30),
     'gameSpeedEnabled': (0, 0, 1), 'gameSpeedPercent': (100, 50, 200),
@@ -32,6 +32,20 @@ SCHEMA = {
     'affixesEnabled': (0, 0, 1), 'affixPreset': (1, 0, 3),
     'affixInterval': (90, 30, 300), 'affixMask': (7, 0, 7),
     'affixBonusPercent': (25, 0, 100),
+    'runAffixesEnabled': (0, 0, 1), 'runAffixMask': (31, 0, 31),
+    'runAffixPreset': (1, 0, 3), 'packRadius': (12, 4, 30),
+    'packReduction': (10, 1, 20), 'frenzyThreshold': (30, 10, 60),
+    'frenzyBoost': (40, 10, 150), 'revenantChance': (20, 0, 60),
+    'revenantHealth': (40, 10, 75), 'bondRage': (50, 10, 200),
+    'debtPerKill': (1, 1, 5), 'debtCap': (50, 10, 200),
+    'packPreset': (1, 0, 3), 'frenzyPreset': (1, 0, 3),
+    'revenantPreset': (1, 0, 3), 'bondPreset': (1, 0, 3), 'debtPreset': (1, 0, 3),
+    'treasurePreset': (1, 0, 3), 'huntPreset': (1, 0, 3),
+    'berserkerPreset': (1, 0, 3), 'stormPreset': (1, 0, 3), 'hastePreset': (1, 0, 3),
+    'riftPreset': (1, 0, 3), 'echoPreset': (1, 0, 3), 'nemesisPreset': (1, 0, 3),
+    'riftInterval': (90, 30, 300), 'nemesisInterval': (90, 30, 300),
+    'riftBonusPercent': (25, 0, 100), 'echoBonusPercent': (25, 0, 100), 'nemesisBonusPercent': (25, 0, 100),
+    'idleEnabled': (1, 0, 1),
 }
 DEFAULTS = {key: spec[0] for key, spec in SCHEMA.items()}
 CONTROLS = dict(waves=True, events=True, hazards=True, fireworks=True, autoEndless=True, autoMap=True)
@@ -51,4 +65,12 @@ def migrate_settings(value):
         for key, (_, lo, hi) in SCHEMA.items():
             if type(value.get(key)) is int and lo <= value[key] <= hi:
                 result[key] = value[key]
+        for key in ['packPreset','frenzyPreset','revenantPreset','bondPreset','debtPreset']:
+            if key not in value and type(value.get('runAffixPreset')) is int and 0 <= value['runAffixPreset'] <= 3:result[key]=value['runAffixPreset']
+        for prefix in ['rift','echo','nemesis']:
+            if prefix+'Preset' not in value and type(value.get('affixPreset')) is int and 0 <= value['affixPreset'] <= 3:result[prefix+'Preset']=value['affixPreset']
+            if prefix+'BonusPercent' not in value and type(value.get('affixBonusPercent')) is int and 0 <= value['affixBonusPercent'] <= 100:result[prefix+'BonusPercent']=value['affixBonusPercent']
+        for key in ['riftInterval','nemesisInterval']:
+            if key not in value and type(value.get('affixInterval')) is int and 30 <= value['affixInterval'] <= 300:result[key]=value['affixInterval']
+    result['stormCount']=[10,13,16,19][result['stormPreset']]
     return result if validate_settings(result) else dict(DEFAULTS)

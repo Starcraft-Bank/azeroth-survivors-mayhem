@@ -13,12 +13,12 @@
   function prepare(r){const t=time(r);if(owner!==String(r)||t<lastClock-1){reset();owner=String(r);}lastClock=t;return t;}
   // Scale the budget increment, not the accumulated balance, so repeated frames
   // never compound stored spawn credit. The scheduler still chooses native mobs.
-  listeners.push(Interceptor.attach(base.add(p.spawnBudgetBefore),function(){guarded(()=>{
+  listeners.push(AZS_HOOKS.attach(base.add(p.spawnBudgetBefore),function(){guarded(()=>{
    const r=this.context[p.budgetRunRegister];if(!active(r))return;
    const value=r.add(p.spawnBudgetOffset).readFloat();if(!Number.isFinite(value)||value<0)return;
    budgets.set(this.threadId,{r,value});
   });}));
-  listeners.push(Interceptor.attach(base.add(p.spawnBudgetAfter),function(){guarded(()=>{
+  listeners.push(AZS_HOOKS.attach(base.add(p.spawnBudgetAfter),function(){guarded(()=>{
    const previous=budgets.get(this.threadId);budgets.delete(this.threadId);
    if(!previous||!previous.r.equals(this.context[p.budgetRunRegister])||!active(previous.r))return;
    const address=previous.r.add(p.spawnBudgetOffset),value=address.readFloat(),gain=value-previous.value;
@@ -26,7 +26,7 @@
    const scaled=gain*percent('spawnRatePercent',25,300);address.writeFloat(Math.min(1000000,previous.value+scaled));
    budgetTicks++;lastBudgetGain=gain;lastAdjustedGain=scaled;
   });}));
-  listeners.push(Interceptor.attach(base.add(p.mobCapCompare),function(){guarded(()=>{
+  listeners.push(AZS_HOOKS.attach(base.add(p.mobCapCompare),function(){guarded(()=>{
    const r=this.context.rsi;if(!active(r))return;
    const native=this.context.rax.toUInt32();if(native<1||native>10000)return;
    const adjusted=Math.min(500,Math.max(1,Math.floor(native*percent('mobDensityPercent',25,300))));
@@ -45,16 +45,17 @@
    hasteWasEnabled=enabled;
   }
   function applyMovement(r){
-   const v=enemies(r),seen=new Set(),boost=hasteActive?percent('hasteSpeedPercent',100,300):1;
+   const v=enemies(r),seen=new Set(),boost=hasteActive?Math.min(3,1+(percent('hasteSpeedPercent',100,300)-1)*[.75,1,1.25,1.5][getSettings().hastePreset??1]):1;
    for(let i=0;i<v.n;i++){
     const e=v.p.add(i*profile.enemyStride);if(!alive(e))continue;
     const id=guid(e);seen.add(id);const address=e.add(E(0x16c)),value=address.readFloat();
     if(!Number.isFinite(value)||value<=0||value>1000)continue;
-    const previous=movement.get(id),natural=previous&&previous.applied===value?previous.natural:value;
-    const multiplier=percent(isBoss(e)?'bossSpeedPercent':'mobSpeedPercent',50,300)*boost;
+    const previous=movement.get(id),natural=previous?(previous.applied===value?previous.natural:value/(previous.multiplier||1)):value;
+    const modifier=api.extraSpeed?api.extraSpeed(e):1;
+    const multiplier=percent(isBoss(e)?'bossSpeedPercent':'mobSpeedPercent',50,300)*boost*(typeof modifier==='number'&&Number.isFinite(modifier)&&modifier>0?modifier:1);
     const applied=Math.fround(Math.min(60,Math.max(.05,natural*multiplier)));
     if(value!==applied)address.writeFloat(applied);
-    movement.set(id,{natural,applied});
+    movement.set(id,{natural,applied,multiplier});
    }
    for(const id of movement.keys())if(!seen.has(id))movement.delete(id);
   }
