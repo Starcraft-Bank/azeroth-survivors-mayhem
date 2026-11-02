@@ -1,9 +1,9 @@
 /* Native population budget, living-enemy cap and reversible movement tuning. */
 (() => {
  'use strict';
- function capFor(native,density,fissionEnabled=false){
+ function capFor(native,density){
   const configured=Math.min(500,Math.max(1,Math.floor(native*density)));
-  return {configured,cap:fissionEnabled===true?null:configured,bypass:fissionEnabled===true};
+  return {configured,cap:configured};
  }
  globalThis.MAYHEM_POPULATION={capFor,setup(api){
   const {base,profile,F,E,getRun,getSettings,time,enemies,isBoss,guid,alive,guarded,notice}=api,p=profile.population;
@@ -30,20 +30,15 @@
    const scaled=gain*percent('spawnRatePercent',25,300);address.writeFloat(Math.min(1000000,previous.value+scaled));
    budgetTicks++;lastBudgetGain=gain;lastAdjustedGain=scaled;
   });}));
-  // Native detour: nested runTick listeners are suppressed by Frida. Override
-  // Fission enables uncapped ordinary arrivals and offspring for this Run and
-  // game thread. Disabled mode retains configured density. Preserve registers and
-  // flags except RAX, then execute the original relocated cap comparison.
+  // Native detour: nested runTick listeners are suppressed by Frida. Apply
+  // configured density while preserving registers and flags except RAX, then
+  // execute the original relocated cap comparison.
   const capState=Memory.alloc(72),capCode=Memory.alloc(Process.pageSize);capState.writeByteArray(new Uint8Array(72));
   const originalCap=AZS_HOOKS.replaceFast(base.add(p.mobCapCompare),capCode);
   Memory.patchCode(capCode,1024,code=>{
    const w=new X86Writer(code,{pc:capCode}),branch=(condition,label)=>w.putJccNearLabel(condition,label,'no-hint');
    w.putPushfx();for(const reg of ['rcx','rdx','r11'])w.putPushReg(reg);
    w.putMovRegAddress('r11',capState);w.putCmpRegOffsetPtrReg('r11',0,'rsi');branch('jne','tail');
-   w.putMovRegOffsetPtrReg('r11',48,'rax');
-   w.putCmpRegOffsetPtrReg('r11',8,'rsi');branch('jne','limited');
-   w.putMovRegGsU32Ptr('rcx',0x48); // Windows x64 TEB.ClientId.UniqueThread
-   w.putCmpRegOffsetPtrReg('r11',16,'rcx');branch('je','unlimited');w.putLabel('limited');
    w.putCmpRegI32('rax',1);branch('jb','tail');w.putCmpRegI32('rax',10000);branch('ja','tail');
    w.putMovRegOffsetPtrReg('r11',48,'rax');
    w.putMovRegRegOffsetPtr('rcx','r11',24);w.putBytes([0x48,0xf7,0xe1]); // mul rcx
@@ -51,16 +46,11 @@
    w.putCmpRegI32('rax',1);branch('jae','minimum');w.putMovRegU32('eax',1);w.putLabel('minimum');
    w.putCmpRegI32('rax',500);branch('jbe','maximum');w.putMovRegU32('eax',500);w.putLabel('maximum');
    w.putMovRegOffsetPtrReg('r11',56,'rax');
-   w.putJmpNearLabel('record');w.putLabel('unlimited');
-   w.putMovRegU64('rax',uint64('0xffffffffffffffff'));
-   w.putMovRegRegOffsetPtr('rcx','r11',40);w.putIncReg('rcx');w.putMovRegOffsetPtrReg('r11',40,'rcx');
-   w.putLabel('record');w.putMovRegOffsetPtrReg('r11',64,'rax');
+   w.putMovRegOffsetPtrReg('r11',64,'rax');
    w.putMovRegRegOffsetPtr('rcx','r11',32);w.putIncReg('rcx');w.putMovRegOffsetPtrReg('r11',32,'rcx');
    w.putLabel('tail');for(const reg of ['r11','rdx','rcx'])w.putPopReg(reg);w.putPopfx();w.putJmpAddress(originalCap);w.flush();
   });
-  function uncapped(){const s=getSettings();return s.runAffixesEnabled===1&&!!(s.runAffixMask&32);}
-  function updateCap(){const r=getRun(),current=r&&active(r)?r:ptr(0);capState.add(24).writeU64(Math.round(percent('mobDensityPercent',25,300)*100));capState.writePointer(current);capState.add(8).writePointer(uncapped()?current:ptr(0));}
-  function withFission(r,fn){if(!active(r)||!uncapped())return false;updateCap();return fn();}
+  function updateCap(){const r=getRun(),current=r&&active(r)?r:ptr(0);capState.add(24).writeU64(Math.round(percent('mobDensityPercent',25,300)*100));capState.writePointer(current);}
   function updateHaste(t){
    const s=getSettings(),enabled=s.hasteEnabled===1;
    if(enabled&&!hasteWasEnabled){nextHaste=t+Math.max(1,s.hasteFirst);hasteActive=false;hasteUntil=0;}
@@ -88,12 +78,12 @@
    }
    for(const id of movement.keys())if(!seen.has(id))movement.delete(id);
   }
-  function tick(r){if(!active(r)){updateCap();return;}const t=prepare(r);capState.add(16).writeU64(Process.getCurrentThreadId());updateCap();updateHaste(t);if(t>=nextSpeed){nextSpeed=t+.1;applyMovement(r);}}
+  function tick(r){if(!active(r)){updateCap();return;}const t=prepare(r);updateCap();updateHaste(t);if(t>=nextSpeed){nextSpeed=t+.1;applyMovement(r);}}
   function configure(){nextSpeed=0;updateCap();}
   function status(){return {supported:true,hasteEnabled:getSettings().hasteEnabled===1,hasteActive,hasteUntil,nextHaste,hasteStarts,
    mobSpeedPercent:getSettings().mobSpeedPercent,bossSpeedPercent:getSettings().bossSpeedPercent,
    spawnRatePercent:getSettings().spawnRatePercent,mobDensityPercent:getSettings().mobDensityPercent,
-   budgetTicks,densityChecks:capState.add(32).readU64().toNumber(),lastNativeCap:capState.add(48).readU64().toNumber(),lastAdjustedCap:capState.add(56).readU64().toNumber(),lastEffectiveCap:capState.add(64).readU64().equals(uint64('0xffffffffffffffff'))?null:capState.add(64).readU64().toNumber(),populationCapRemoved:uncapped(),fissionBypasses:capState.add(40).readU64().toNumber(),lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
-  return {tick,reset,configure,status,withFission,_nativeResources:[capCode,capState,originalCap]};
+   budgetTicks,densityChecks:capState.add(32).readU64().toNumber(),lastNativeCap:capState.add(48).readU64().toNumber(),lastAdjustedCap:capState.add(56).readU64().toNumber(),lastEffectiveCap:capState.add(64).readU64().toNumber(),lastBudgetGain,lastAdjustedGain,trackedEnemies:movement.size};}
+  return {tick,reset,configure,status,_nativeResources:[capCode,capState,originalCap]};
  }};
 })();

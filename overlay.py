@@ -7,7 +7,7 @@ from tkinter import ttk
 from settings import DEFAULTS, SCHEMA, PRESETS, CONTROLS, validate_settings
 
 CHOICES={'hazardPattern':('Mixed','Scatter','Broken ring','Cross','Lanes','Spiral'),'banLuck':('Off','On'),'soundEnabled':('Off','On'),'extraHazards':('Off','On')}
-CHOICES.update({k:('Off','On') for k in ['gameSpeedEnabled','hasteEnabled','xpScalingEnabled','goldScalingEnabled','affixesEnabled','runAffixesEnabled','idleEnabled']})
+CHOICES.update({k:('Off','On') for k in ['gameSpeedEnabled','hasteEnabled','xpScalingEnabled','goldScalingEnabled','affixesEnabled','idleEnabled']})
 CHOICES['nativeAffixMode']=('Game default','Disabled','Custom')
 BG='#101722'; CARD='#182334'; TEXT='#e6edf7'; MUTED='#99abc2'; GOLD='#ffd183'
 
@@ -111,10 +111,10 @@ class Overlay:
         self.summary=tk.StringVar(value='HOST CONTROL PANEL  ·  Ready')
         tk.Label(body,textvariable=self.summary,bg=BG,fg=MUTED,font=('Segoe UI',10),anchor='w').pack(fill='x',padx=24,pady=(0,14))
         self.tabs=ttk.Notebook(body);self.tabs.pack(fill='both',expand=True,padx=18)
-        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key not in ('eventMask','affixMask','nativeAffixMask','runAffixMask')}
+        self.vars={key:tk.StringVar(value=PRESETS[value] if key.endswith('Preset') else CHOICES[key][value] if key in CHOICES else str(value)) for key,value in settings.items() if key not in ('eventMask','affixMask','nativeAffixMask')}
         self.flags={key:tk.BooleanVar(value=value) for key,value in controls.items()}
         self.events=[tk.BooleanVar(value=bool(settings['eventMask']&(1<<i))) for i in range(4)]
-        self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(6 if key=='runAffixMask' else 3)] for key in ['affixMask','nativeAffixMask','runAffixMask']}
+        self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(3)] for key in ['affixMask','nativeAffixMask']}
         self.pages={};self.sections={};self.affix_settings_panels={}
         for title in ['Combat','Population','Rewards','Affixes','Session']:
             outer=ttk.Frame(self.tabs);self.tabs.add(outer,text='  '+title+'  ')
@@ -154,7 +154,7 @@ class Overlay:
         self.field(p,'Normal mob movement · %','mobSpeedPercent')
         self.field(p,'Mob spawn rate · %','spawnRatePercent')
         self.field(p,'Mob density · %','mobDensityPercent')
-        self.note(p,'100% keeps the existing Mayhem rate. Spawn rate changes ordinary arrivals; boss waves keep their own schedules. While Fission is ON, normal-mob population has no cap: ordinary arrivals continue alongside the copies. Fission OFF restores the configured density limit, up to 500 living mobs, without deleting existing enemies.')
+        self.note(p,'100% keeps the existing Mayhem rate. Spawn rate changes ordinary arrivals; boss waves keep their own schedules. Density is capped at 500 living mobs. Lowering the cap does not delete existing enemies.')
         p=self.pages['Rewards']
         self.heading(p,'Legendary choices','Up to three guaranteed Legendary choices at each level-up.')
         self.field(p,'First Legendary · minutes','legendaryStart')
@@ -171,27 +171,8 @@ class Overlay:
         self.heading(affix_page,'Affixes','Every enabled Mayhem affix has its own difficulty and settings. Turn an affix on to show its controls.')
         self.affix_groups={}
         nav=ttk.Frame(affix_page);nav.pack(fill='x',pady=(0,10))
-        for name in ['Persistent','Timed','Rewards','Native']:
+        for name in ['Timed','Rewards','Native']:
             ttk.Button(nav,text=name,command=lambda n=name:self.jump_affix_group(n)).pack(side='left',padx=(0,5))
-        p=ttk.Frame(affix_page);p.pack(fill='x');self.affix_groups['Persistent']=p
-        self.heading(p,'Persistent combat affixes','Continuous modifiers. The master switch starts OFF.')
-        self.setting_toggle(p,'Persistent affixes ON / OFF','runAffixesEnabled')
-        entries=[
-            ('Pack Tactics','Nearby enemies protect each other. Split packs to remove their protection.','packPreset',[('Protection radius · yards','packRadius'),('Damage reduction per ally · %','packReduction')]),
-            ('Blood Frenzy','Wounded enemies gain damage and movement speed.','frenzyPreset',[('Trigger below health · %','frenzyThreshold'),('Speed and damage bonus · %','frenzyBoost')]),
-            ('Revenant Legion','Some defeated normal mobs return as weaker revenants with bonus gold and XP. Revenants cannot revive again.','revenantPreset',[('Revenant chance · %','revenantChance'),('Revenant health · %','revenantHealth')]),
-            ('Nemesis Bond','Mayhem bosses arrive as linked pairs. Defeating one enrages its surviving partner.','bondPreset',[('Partner enrage bonus · %','bondRage')]),
-            ('Soul Debt','Normal kills build enemy strength and bank a bounty. Defeat a boss to receive the bounty and reset the debt.','debtPreset',[('Strength added per kill · %','debtPerKill'),('Maximum added strength · %','debtCap')]),
-            ('Fission','Normal mobs split into two same-type children at their corpse. While enabled, normal spawning has no population cap. Bosses and affix offspring never split. Difficulty changes child stats, never the count.','fissionPreset',[('Child health · % of normal','fissionHealth'),('Child damage · % of normal','fissionDamage')]),
-        ]
-        for var,(title,detail,preset,fields) in zip(self.affix_flags['runAffixMask'],entries):
-            ttk.Checkbutton(p,text=title,variable=var).pack(anchor='w',pady=(12,3));self.note(p,detail)
-            settings_page=self.affix_settings(p,title,[self.vars['runAffixesEnabled'],var],lambda v=var:self.vars['runAffixesEnabled'].get()=='On' and v.get());self.field(settings_page,'Difficulty',preset)
-            for label,key in fields:self.field(settings_page,label,key)
-            if title=='Pack Tactics':self.note(settings_page,'Protection is capped at 60% damage reduction.')
-            elif title=='Nemesis Bond':self.note(settings_page,'The surviving partner gains damage; its movement bonus is half as large. Difficulty scales the bonus.')
-            elif title=='Soul Debt':self.note(settings_page,'The boss bounty pays gold and XP, plus a chest at 25% debt or more. Revenant kills do not add debt.')
-            elif title=='Fission':self.note(settings_page,'Always two children. Difficulty multiplies the percentages above: Easy 0.5× health / 0.75× damage; Normal 1×; Heroic 1.25×; Mythic 1.5×. At Normal and 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Large birth queues drain over successive updates.')
         p=ttk.Frame(affix_page);p.pack(fill='x',pady=(16,0));self.affix_groups['Timed']=p
         self.heading(p,'Timed affixes','Select the rotation pool. Stampede runs independently on its own schedule.')
         self.check(p,'Timed affix rotation ON / OFF','events')
@@ -245,13 +226,16 @@ class Overlay:
         self.note(p,'Network deadlines and menu animations keep normal pacing. OFF restores current natural movement speeds.')
         self.heading(p,'Run flow and presentation','Session-wide options for the match you host.')
         self.check(p,'Automatically continue into Endless','autoEndless')
-        self.field(p,'Announcement sounds','soundEnabled');self.check(p,'Boss-kill fireworks','fireworks')
-        self.heading(p,'Automatic map rotation','A random map every three minutes of match time.')
-        ttk.Checkbutton(p,text='Automatic map rotation ON / OFF',variable=self.flags['autoMap'],command=self.toggle_rotation).pack(anchor='w',pady=7)
-        self.note(p,'Applies immediately and saves. ON starts a fresh three-minute countdown; an active transfer finishes safely. Rotation pauses during reward choices.')
-        self.travel_info=tk.StringVar(value='Start a solo match or host a match to begin map rotation.')
+        self.field(p,'Reward effect sounds','soundEnabled');self.check(p,'Boss-kill fireworks','fireworks')
+        self.note(p,'Custom Mayhem banners and their sound cues are disabled for game 0.139.2 while native event ownership is reviewed. Game announcements are unchanged.')
+        self.heading(p,'Manual map travel','Choose one destination per match. Your wave count and scaling continue.')
+        self.travel_choice=tk.StringVar();self.travel_catalog=[]
+        self.travel_picker=ttk.Combobox(p,textvariable=self.travel_choice,state='readonly');self.travel_picker.pack(fill='x',pady=(4,6))
+        self.travel_button=ttk.Button(p,text='Travel with party',command=self.manual_travel);self.travel_button.pack(anchor='w',pady=(0,7))
+        self.travel_button.configure(state='disabled')
+        self.travel_info=tk.StringVar(value='Start a solo match or host a match to choose a map.')
         ttk.Label(p,textvariable=self.travel_info,wraplength=470,foreground=MUTED,justify='left').pack(fill='x',pady=(0,8))
-        self.note(p,'The whole party keeps levels, items and match time. Waves and scaling continue; completion rewards stay tied to the original run.')
+        self.note(p,'Automatic rotation is disabled for game 0.139.2. A second transfer in the same match is unavailable while its native ownership is reviewed.')
         self.note(p,'Insert opens/closes this panel. Use windowed or borderless mode. Online matches continue while the panel is open.')
         self.live=tk.StringVar(value='Waiting for game…')
         ttk.Label(p,textvariable=self.live,wraplength=475,justify='left').pack(fill='x',pady=14)
@@ -330,34 +314,26 @@ class Overlay:
             for i,v in enumerate(flags):v.set(bool(DEFAULTS[key]&(1<<i)))
         for k,v in self.flags.items():v.set(CONTROLS[k])
         self.feedback.set('Defaults selected. Press Apply to use them.')
-    def toggle_rotation(self):
-        enabled=self.flags['autoMap'].get()
-        try:
-            self.app.set_control('autoMap',enabled)
-            self.feedback.set('Map rotation ON. New three-minute countdown.' if enabled else 'Map rotation OFF. Staying on this map after any active transfer finishes.')
-        except Exception as error:
-            self.flags['autoMap'].set(self.app.current_controls.get('autoMap',True));self.feedback.set(str(error))
-    def update_travel(self,state,rotation=None,match=None,enabled=True):
-        state=state or {};rotation=rotation or {};catalog=state.get('catalog') or []
-        if not match:
-            self.travel_info.set('Start a solo match or host a match to begin map rotation.');return
-        names=lambda value:next((z['name'] for z in catalog if value in (z['key'],z['id'])),str(value if value is not None else '—'))
-        remaining=max(0,math.ceil(rotation.get('nextMap',180)-rotation.get('clock',0)))
-        changes=max(0,int(rotation.get('mapChanges',0)))
-        if state.get('busy'):reason='Moving the party…'
-        elif not state.get('supported'):reason=state.get('reason') or 'Map rotation is unavailable for this game version.'
-        elif not enabled:reason='Automatic map rotation is OFF. Waves and difficulty continue on this map.'
-        elif match.get('phase')==2:reason='Paused during reward choices.'
-        elif not state.get('canTravel'):reason=state.get('reason') or 'Waiting for play to resume.'
-        elif rotation.get('mapBlockedReason'):reason='Map rotation waiting: '+rotation['mapBlockedReason']
-        elif state.get('error'):reason='Last map transfer: '+state['error']
-        else:reason='The next destination is chosen automatically.'
-        countdown=f'{remaining//60:02}:{remaining%60:02}' if enabled else 'OFF'
-        self.travel_info.set(f'Current: {names(state.get("currentZone"))} · Original: {names(state.get("originZone"))}\nNext change: {countdown} · Map changes: {changes}\n{reason}')
+    def manual_travel(self):
+        zone=next((z for z in self.travel_catalog if z['name']==self.travel_choice.get()),None)
+        if not zone:self.feedback.set('Choose a destination first.');return
+        try:self.app.travel(zone['key']);self.feedback.set('Travelling to '+zone['name']+'…')
+        except Exception as error:self.feedback.set(str(error))
+    def update_travel(self,state,rotation=None,match=None):
+        state=state or {};catalog=state.get('catalog') or []
+        self.travel_catalog=[z for z in catalog if z['key']!=state.get('currentZone')]
+        names=[z['name'] for z in self.travel_catalog];self.travel_picker['values']=names
+        if self.travel_choice.get() not in names:self.travel_choice.set(names[0] if names else '')
+        ready=bool(match and state.get('canTravel') and self.travel_choice.get())
+        self.travel_button.configure(state='normal' if ready else 'disabled')
+        if not match:self.travel_info.set('Start a solo match or host a match to choose a map.');return
+        current=next((z['name'] for z in catalog if z['key']==state.get('currentZone')),state.get('currentZone') or 'Unknown')
+        reason=state.get('reason') or state.get('error') or 'Choose a destination for the whole party.'
+        self.travel_info.set(f'Current: {current} · Transfers used: {state.get("completed",0)} / 1\n{reason}')
     def update_status(self,item):
         travel=dict(item.get('travel') or {})
         if item.get('fault'):travel.update(canTravel=False,reason='Resolve the mode error before transferring maps.')
-        self.update_travel(travel,item.get('state'),item.get('match'),item.get('controls',{}).get('autoMap',True))
+        self.update_travel(travel,item.get('state'),item.get('match'))
         state=item.get('state',{});match=item.get('match');clock=int(state.get('clock',0))
         self.summary.set(('ENDLESS' if state.get('endless') else 'HOST CONTROL PANEL')+f'  ·  {clock//60:02}:{clock%60:02}  ·  Wave {state.get("wave",0)}')
         if item.get('fault'):self.live.set('Mode error: '+item['fault'].splitlines()[0])
@@ -368,9 +344,6 @@ class Overlay:
             if reward.get('supported'):self.live.set(self.live.get()+f'\nBounty tier: {reward.get("tier",0)} · next chest in {max(1,item.get("settings",{}).get("rewardEvery",3))-reward.get("kills",0)%max(1,item.get("settings",{}).get("rewardEvery",3))} boss kills\nBonus drops: {reward.get("pickups",0)} powerups · {reward.get("chests",0)} chests')
             population=item.get('population') or {};tempo=item.get('tempo') or {};affixes=item.get('affixes') or {}
             self.live.set(self.live.get()+f'\nXP: ×{(item.get("scaling") or {}).get("xp",1):.2f} · Game speed: ×{tempo.get("factor",1):.2f}\nStampede: {"ACTIVE" if population.get("hasteActive") else "Waiting" if population.get("hasteEnabled") else "OFF"}\nNative affixes: {", ".join(affixes.get("nativeAffixes",[])) or "None"}\nReward affixes: {"ON" if affixes.get("enabled") else "OFF"} · Bonus bounties: {affixes.get("rewards",0)}')
-            modifiers=item.get('runAffixes') or {}
-            self.live.set(self.live.get()+'\nPersistent affixes: '+(', '.join(modifiers.get('active',[])) if modifiers.get('enabled') else 'OFF'))
-            if modifiers.get('enabled'):self.live.set(self.live.get()+f'\nSoul Debt: {modifiers.get("debt",0):.0f}% · Active revenants: {modifiers.get("revenants",0)} · Linked bosses: {modifiers.get("paired",0)}')
             unavailable=[]
             if not (item.get('income') or {}).get('supported'):unavailable.append('XP scaling')
             if population.get('supported') is False:unavailable.append('population controls')

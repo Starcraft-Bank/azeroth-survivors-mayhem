@@ -32,15 +32,6 @@ SCHEMA = {
     'affixesEnabled': (0, 0, 1), 'affixPreset': (1, 0, 3),
     'affixInterval': (90, 30, 300), 'affixMask': (7, 0, 7),
     'affixBonusPercent': (25, 0, 100),
-    'runAffixesEnabled': (0, 0, 1), 'runAffixMask': (31, 0, 63),
-    'runAffixPreset': (1, 0, 3), 'packRadius': (12, 4, 30),
-    'packReduction': (10, 1, 20), 'frenzyThreshold': (30, 10, 60),
-    'frenzyBoost': (40, 10, 150), 'revenantChance': (20, 0, 60),
-    'revenantHealth': (40, 10, 75), 'bondRage': (50, 10, 200),
-    'debtPerKill': (1, 1, 5), 'debtCap': (50, 10, 200),
-    'fissionPreset': (1, 0, 3), 'fissionHealth': (100, 10, 200), 'fissionDamage': (100, 25, 200),
-    'packPreset': (1, 0, 3), 'frenzyPreset': (1, 0, 3),
-    'revenantPreset': (1, 0, 3), 'bondPreset': (1, 0, 3), 'debtPreset': (1, 0, 3),
     'treasurePreset': (1, 0, 3), 'huntPreset': (1, 0, 3),
     'berserkerPreset': (1, 0, 3), 'stormPreset': (1, 0, 3), 'hastePreset': (1, 0, 3),
     'riftPreset': (1, 0, 3), 'echoPreset': (1, 0, 3), 'nemesisPreset': (1, 0, 3),
@@ -49,7 +40,7 @@ SCHEMA = {
     'idleEnabled': (1, 0, 1),
 }
 DEFAULTS = {key: spec[0] for key, spec in SCHEMA.items()}
-CONTROLS = dict(waves=True, events=True, hazards=True, fireworks=True, autoEndless=True, autoMap=True)
+CONTROLS = dict(waves=True, events=True, hazards=True, fireworks=True, autoEndless=True)
 
 def validate_settings(value):
     return (isinstance(value, dict) and set(value) == set(SCHEMA)
@@ -66,8 +57,6 @@ def migrate_settings(value):
         for key, (_, lo, hi) in SCHEMA.items():
             if type(value.get(key)) is int and lo <= value[key] <= hi:
                 result[key] = value[key]
-        for key in ['packPreset','frenzyPreset','revenantPreset','bondPreset','debtPreset']:
-            if key not in value and type(value.get('runAffixPreset')) is int and 0 <= value['runAffixPreset'] <= 3:result[key]=value['runAffixPreset']
         for prefix in ['rift','echo','nemesis']:
             if prefix+'Preset' not in value and type(value.get('affixPreset')) is int and 0 <= value['affixPreset'] <= 3:result[prefix+'Preset']=value['affixPreset']
             if prefix+'BonusPercent' not in value and type(value.get('affixBonusPercent')) is int and 0 <= value['affixBonusPercent'] <= 100:result[prefix+'BonusPercent']=value['affixBonusPercent']

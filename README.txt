@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.12.2
+# Azeroth Legendary Mayhem 0.12.3
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
@@ -27,28 +27,10 @@ Windows 10/11 x64; no Python or browser extension installation is required. Sett
 | Combat | Boss health/damage difficulties, boss movement, cross-map waves, arena hazards, arrival barrages and separate idle punishment. |
 | Population | Normal mob movement, spawn rate and living-mob density. |
 | Rewards | Legendary schedule, XP/gold rates, growth and caps, supplies, reroll cap and Luck filtering. |
-| Affixes | Persistent, timed and reward affixes; individual difficulties/settings and native affix selection. |
-| Session | Shared game speed, automatic map rotation, automatic Endless, sounds, fireworks and live status. |
+| Affixes | Timed and reward affixes; individual difficulties/settings and native affix selection. |
+| Session | Shared game speed, one manual map transfer, automatic Endless, reward sounds, fireworks and live status. |
 
 Each Mayhem affix shows its name, description and toggle. Its own difficulty and settings appear only while enabled; hiding them preserves your choices. Group master switches also hide their disabled settings. Combat hazard groups expand separately. Restore defaults selects defaults; Apply commits them. Existing preferences are preserved, including settings migrated from the former Events tab.
-
-## Six persistent Mayhem affixes
-
-These affect ordinary combat throughout a run. The master switch defaults OFF. Each affix has its own Easy / Normal / Heroic / Mythic difficulty and individual settings.
-
-- **Pack Tactics:** Nearby enemies reduce each other's incoming damage. Split packs apart to remove their protection. Set radius (4–30) and reduction per ally (1–20%); total reduction is capped at 60%.
-- **Blood Frenzy:** Wounded enemies gain damage and movement speed. Set the activation threshold (10–60% HP) and boost (10–150%).
-- **Revenant Legion:** Defeated normal mobs can spawn a weaker native creature from the current zone at their corpse. Set chance (0–60%) and health (10–75%). Revenants give bonus gold/XP when killed and cannot create another revenant. Existing native models are reused.
-- **Nemesis Bond:** Mayhem waves summon linked boss pairs when the living-boss limit permits. Killing one enrages its surviving partner. Set damage enrage (10–200%); the movement increase is half that amount.
-- **Soul Debt:** Ordinary kills increase enemy damage and bank a bounty. A boss kill pays out gold/XP and clears the debt; debt of at least 25 also gives a chest. Set debt per kill (1–5 percentage points) and cap (10–200%).
-
-- **Fission:** Eligible normal-mob deaths queue two enemies of the same native creature type at the corpse. Bosses never split. Children drop ordinary native rewards and cannot trigger Fission or Revenant Legion. Fission defaults OFF, even when an older persistent-affix selection is loaded. Set its own difficulty, child health (10–200%) and child damage (25–200%); both sliders default to 100%.
-
-Fission difficulty multiplies the child sliders: Easy uses 50% health / 75% damage; Normal uses 100% / 100%; Heroic uses 125% / 125%; Mythic uses 150% / 150%. At Normal with both sliders at 100%, children copy the parent’s base health and damage, excluding temporary affix boosts. Difficulty never changes the two-child count. While Fission is enabled, the normal-mob population cap is removed for both ordinary arrivals and Fission children. Normal spawning continues alongside the copies, using the configured spawn rate. Large birth queues drain over successive updates; valid births are not discarded because of a queue-size limit. Turning Fission off restores the configured population limit without deleting existing enemies.
-
-Fission and Revenant Legion remain independent: an original enemy can produce two Fission children plus one weaker revenant if the Revenant roll succeeds. All affix-created offspring are excluded from both birth mechanics, preventing multiplication chains.
-
-Each affix's difficulty scales its own configured effects. Turning combat buffs off removes their live temporary multipliers. Turning Fission off cancels queued births; existing offspring keep their birth stats and cannot multiply. New runs and map travel clear pending affix state; rewards already collected remain.
 
 ## Native and reward affixes
 
@@ -60,7 +42,7 @@ Native selection offers Game default, Disabled or Custom:
 
 Game default restores the run's original affix selection. The game's Heroic I–V rank and progression rewards remain tied to the game-lobby choice; Mayhem's preset names do not grant native rank rewards.
 
-These reward challenges now live under **Affixes**, alongside the persistent and timed affixes:
+These reward challenges live under **Affixes**, alongside the timed affixes:
 
 - **Rift Pulse:** Dodge telegraphed ground runes, then collect gold, XP and a power-up.
 - **Death Echo:** A defeated boss leaves corpse runes, followed by a bonus chest and bounty.
@@ -72,7 +54,7 @@ Each has its own difficulty and reward bonus. Rift Pulse and Nemesis Hunt have i
 
 Shared game speed is adjustable from 50–200% and defaults OFF. It changes player movement, combat timers, waves and hazards for the whole party. Network deadlines and menu animations keep normal timing. At 200%, two match minutes take about one real minute.
 
-Mob and boss movement are separately adjustable from 50–300%. Spawn rate and density range from 25–300%. With Fission OFF, ordinary population is capped at 500 living enemies; with Fission ON, the normal-mob population cap is removed. Lowering density never deletes existing enemies. Ordinary spawn rate does not change the Mayhem boss interval or scripted summons.
+Mob and boss movement are separately adjustable from 50–300%. Spawn rate and density range from 25–300%. Ordinary population is capped at 500 living enemies. Lowering density never deletes existing enemies. Ordinary spawn rate does not change the Mayhem boss interval or scripted summons.
 
 XP and gold each have an ON/OFF switch, starting rate (25–1,000%), growth per match minute (0–100 percentage points) and cap (25–2,000%). XP defaults to 100% without growth. Gold defaults to 125%, +15 points per minute, capped at 800%. Treasure Rush applies an additional 1.5 / 2 / 2.5 / 3× gold multiplier according to its own difficulty. Existing balances/levels are unchanged and native level caps remain.
 
@@ -105,16 +87,18 @@ Hazard base damage is 20% max HP (25–250), or 25% (35–350) during storms/bar
 
 ## Co-op, Endless and collection progress
 
-Only the host runs Mayhem. Host and guests must use game builds that can join one another normally. The INS panel is host-only; native announcements, mechanics and rewards are replicated through the game.
+Only the host runs Mayhem. Host and guests must use game builds that can join one another normally. The INS panel is host-only; game announcements, Mayhem mechanics and rewards are replicated through the game.
 
 Automatic Endless continues after native victory. Eligible cross-map Endless bosses grant the game's own permanent class Marks and gear rewards to host and guests under native rules. Spend Marks through the game's ordinary permanent progression menus. Public Mayhem has no cheat or Unlock All menu.
 
-Automatic map rotation is an ON/OFF control under Session. When enabled, it chooses a shuffled destination every three match minutes and keeps player levels/items, wave count and scaling. Turning it on starts a fresh countdown. Transfers pause during reward choices; a transfer already underway finishes. Completion rewards remain tied to the original run. Map travel now uses the available adapter fields instead of the stale build allowlist that prevented rotation on game 0.130.1. Delayed or unavailable transfers report their reason; temporary request errors retry after five match seconds without stopping the other Mayhem features.
+Automatic map rotation is disabled for game 0.139.2 because a second transfer in one match can crash the game. The Session tab allows one manual destination per match. It keeps player levels/items, wave count and scaling; completion rewards remain tied to the original run. Wait until all players finish reward choices before travelling.
 
 ## Startup and diagnostics
 
 Launching does not require a matching version or a successful hook-pattern scan. Hook installation failures are reported separately while other hooks remain active. If the shared extension runtime cannot initialize, partial hooks are unloaded before gameplay and the normal game opens instead.
 
-Unknown builds use a best-effort bundled layout, so changed game code or memory layouts may still require fixes. This release targets game 0.131.0. See the release notes for the checks completed on that build; earlier adapters remain available. Optional diagnostics do not block launch. Collection/save-format checks remain separate from launching.
+Unknown builds use a best-effort bundled layout, so changed game code or memory layouts may still require fixes. This release targets game 0.139.2. See the release notes for the checks completed on that build; earlier adapters remain available. Optional diagnostics do not block launch. Collection/save-format checks remain separate from launching.
+
+Custom Mayhem banners and their sound cues are disabled on 0.139.2 while native event ownership is reviewed. The game's own announcements and boss-reward sounds continue. Persistent combat affixes Pack Tactics, Blood Frenzy, Fission, Revenant Legion, Nemesis Bond and Soul Debt are also deferred; timed, reward and native affixes remain available.
 
 The launcher does not patch the game EXE or distribute game assets. It uses your ordinary native save. Game self-updating is disabled for its launched session; update the ordinary game separately between sessions. Source, licenses, checksums and a privacy audit accompany the public release.

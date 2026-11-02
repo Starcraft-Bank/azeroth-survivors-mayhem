@@ -31,7 +31,7 @@ globalThis.makeGuestTransfer127 = function ({base,profile}) {
     if(matches.length!==1)throw Error('Expected exactly one live recipient for context '+context);
     const row=matches[0].row,obj=row.add(C(0x4c8)).readPointer(),vt=row.add(C(0x4d0)).readPointer();
     if(obj.isNull()||vt.isNull())throw Error('Missing recipient transport');
-    flushPending(obj,vt,row.add(0x278));
+    flushPending(obj,vt,row.add(C(0x278)));
     const out=Memory.alloc(24);out.writeByteArray(new Uint8Array(24));
     encode(out,message); // Borrows enum and its payload; output Vec owns its buffer.
     const cap=out.readU64(),data=out.add(8).readPointer(),length=out.add(16).readU64();
@@ -120,6 +120,8 @@ globalThis.makeGuestTransfer127 = function ({base,profile}) {
  */
 globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
   const T=o=>profile.mapTravel?.runOffsets?.['0x'+o.toString(16)]??o,ps=profile.mapTravel?.partyStride??2584;
+  const R=o=>profile.mapTravel?.runLayout?.['0x'+o.toString(16)]??o,P=o=>profile.mapTravel?.partyLayout?.['0x'+o.toString(16)]??o;
+  const es=profile.enemyStride??504,hs=profile.hazardStride??128;
   const alloc=new NativeFunction(base.add(0x21c0),'pointer',['uint64','uint64']);
   const free=new NativeFunction(base.add(0x21d0),'void',['pointer','uint64','uint64']);
   const snapshotHook=AZS_HOOKS.attach(base.add(profile.mapTravelFunctions.buildSnapshot),{
@@ -155,22 +157,22 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
       const p=e.add(offset+8).readPointer();if(p.isNull())throw Error('Missing nested allocation');
       drops.push({p,bytes:n*stride,alignment});
     }
-    const enemy=vec(run,0x5b0,504,'enemies');
+    const enemy=vec(run,R(0x5b0),es,'enemies');
     for(let i=0;i<enemy.n;i++){
-      const e=enemy.p.add(i*504);inner(e,0x18,4,4,true);inner(e,0,56,8,false);inner(e,0x58,4,4,true);
+      const e=enemy.p.add(i*es);inner(e,0x18,4,4,true);inner(e,0,56,8,false);inner(e,0x58,4,4,true);
     }
-    vec(run,0x5e0,128,'area hazards');vec(run,0x5f8,64,'world effects64');vec(run,0x610,32,'world effects32');
+    vec(run,R(0x5e0),hs,'area hazards');vec(run,R(0x5f8),64,'world effects64');vec(run,R(0x610),32,'world effects32');
     vec(run,T(0x870),32,'native hazard indicators');
-    const loot=vec(run,0x658,72,'loot/chests/powerups');
+    const loot=vec(run,R(0x658),72,'loot/chests/powerups');
     for(let i=0;i<loot.n;i++)inner(loot.p.add(i*72),0,8,8,false);
-    vec(run,0x6b8,40,'guardian records');
-    vec(run,0x5c8,88,'host projectiles');vec(run,0x628,144,'host effects144');vec(run,0x640,120,'host effects120');
+    vec(run,R(0x6b8),40,'guardian records');
+    vec(run,R(0x5c8),88,'host projectiles');vec(run,R(0x628),144,'host effects144');vec(run,R(0x640),120,'host effects120');
     const count=run.add(T(0xa58)).readU64().toNumber(),party=run.add(T(0xa50)).readPointer();
     if(count>63)throw Error('Invalid party count');
     for(let i=0;i<count;i++){
       const p=party.add(i*ps);
       if(p.readU64().toString()==='2')continue;
-      vec(p,0x5e0,88,'guest projectiles');vec(p,0x5b0,144,'guest effects144');vec(p,0x5c8,120,'guest effects120');
+      vec(p,P(0x5e0),88,'guest projectiles');vec(p,P(0x5b0),144,'guest effects144');vec(p,P(0x5c8),120,'guest effects120');
     }
     return {vectors,drops};
   }
@@ -184,7 +186,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
   function hazardIds(run){
     const p=plan(run),ids=new Set();
     for(const v of p.vectors){
-      if(v.label==='area hazards')for(let i=0;i<v.n;i++){const e=v.p.add(i*128);if(e.add(0x7e).readU8()===1)ids.add(e.add(0x3c).readU32());}
+      if(v.label==='area hazards')for(let i=0;i<v.n;i++){const e=v.p.add(i*hs);if(e.add(0x7e).readU8()===1)ids.add(e.add(0x3c).readU32());}
       if(v.label==='native hazard indicators')for(let i=0;i<v.n;i++)ids.add(v.p.add(i*32+8).readU32());
     }
     return Array.from(ids);
@@ -204,6 +206,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
       return {request(){throw Error(reason);},tick(){},reset(){},catalog(){return [];},status(){return {supported:false,busy:false,canTravel:false,reason,currentZone:'',originZone:'',catalog:[]};}};
     }
     const T=o=>profile.mapTravel?.runOffsets?.['0x'+o.toString(16)]??o,G=o=>profile.mapTravel?.gameOffsets?.['0x'+o.toString(16)]??o,ps=profile.mapTravel?.partyStride??0xa18;
+    const R=o=>profile.mapTravel?.runLayout?.['0x'+o.toString(16)]??o;
     const fn=(r,result,args)=>new NativeFunction(base.add(r),result,args,{traps:'all'});
     const alloc=fn(0x21c0,'pointer',['uint64','uint64']),free=fn(0x21d0,'void',['pointer','uint64','uint64']);
     const load=fn(profile.mapTravelFunctions.loadWorld,'pointer',['pointer','pointer','uint64','pointer','float','pointer','uint64']);
@@ -237,7 +240,7 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
       damageCallbacks.push(original,callback);AZS_HOOKS.replace(address,callback);
     }
     const cleanup=makeTravelRewardsCleanup127({base,profile,getIdentity:r=>identityRun&&r.equals(identityRun)?{originalZone}:null});
-    const readKey=r=>r.add(0x2d0).readPointer().readUtf8String(r.add(0x2d8).readU64().toNumber());
+    const readKey=r=>r.add(R(0x2d0)).readPointer().readUtf8String(r.add(R(0x2d8)).readU64().toNumber());
     const catalog=()=>zones.map(({id,key,name,map})=>({id,key,name,map}));
     function reset(newMatch=false){queued=null;pending=null;lastError='';nextAt=0;if(newMatch){owner='';lastClock=-1;lastZone='';originalZone='';identityRun=null;completed=0;protectUntil=0;protectedHits=0;}}
     function state(r,g,requireLive){
@@ -260,10 +263,10 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
     // +0x2c8 contains gameplay stats and must never be interpreted or overwritten.
     // The destination keys live in the executable's static zone catalog.
     function keySnapshot(p,context){
-      const ptr=p.add(0x2d0).readPointer(),len=p.add(0x2d8).readU64();
+      const ptr=p.add(R(0x2d0)).readPointer(),len=p.add(R(0x2d8)).readU64();
       const n=len.toNumber();
       if(n<1||n>32||ptr.isNull()||!zones.some(z=>z.key===ptr.readUtf8String(n)))throw Error('Invalid zone reference for player '+context);
-      return {p,ptr,len,xyz:[0,4,8,12].map(o=>p.add(0x520+o).readU32())};
+      return {p,ptr,len,xyz:[0,4,8,12].map(o=>p.add(R(0x520)+o).readU32())};
     }
     function prepare(r,s,z){
       const result={arc:null,old:[],oldArc:r.add(T(0xc18)).readPointer(),committed:false};
@@ -284,9 +287,9 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
     function disposePrepared(p){if(p.committed)return;if(p.arc&&!p.arc.isNull()){if(p.loaded)dropArc(p.arc);else free(p.arc,0xd8,8);p.arc=null;}}
     function commit(r,p,z){
       try{
-        for(let i=0;i<p.old.length;i++){const target=p.old[i].p;target.add(0x2d0).writePointer(z.p.add(8).readPointer());target.add(0x2d8).writeU64(z.p.add(16).readU64());z.xyz.forEach((v,n)=>target.add(0x520+n*4).writeFloat(v));target.add(0x52c).writeFloat(z.facing);}
+        for(let i=0;i<p.old.length;i++){const target=p.old[i].p;target.add(R(0x2d0)).writePointer(z.p.add(8).readPointer());target.add(R(0x2d8)).writeU64(z.p.add(16).readU64());z.xyz.forEach((v,n)=>target.add(R(0x520)+n*4).writeFloat(v));target.add(R(0x52c)).writeFloat(z.facing);}
         r.add(T(0xc18)).writePointer(p.arc);
-      }catch(e){for(const old of p.old){old.p.add(0x2d0).writePointer(old.ptr);old.p.add(0x2d8).writeU64(old.len);old.xyz.forEach((v,n)=>old.p.add(0x520+n*4).writeU32(v));}r.add(T(0xc18)).writePointer(p.oldArc);disposePrepared(p);throw e;}
+      }catch(e){for(const old of p.old){old.p.add(R(0x2d0)).writePointer(old.ptr);old.p.add(R(0x2d8)).writeU64(old.len);old.xyz.forEach((v,n)=>old.p.add(R(0x520)+n*4).writeU32(v));}r.add(T(0xc18)).writePointer(p.oldArc);disposePrepared(p);throw e;}
       p.committed=true;
       dropArc(p.oldArc);
     }
@@ -298,21 +301,21 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
       try{for(const context of contexts)for(const id of ids){const text=JSON.stringify({type:'hzend',id}),p=alloc(text.length,1);if(p.isNull())throw Error('Hazard cleanup allocation failed');p.writeByteArray(Array.from(text,c=>c.charCodeAt(0)));owned.push({context,p,n:text.length,moved:false});}}
       catch(e){for(const item of owned)free(item.p,item.n,1);throw e;}
       const saved=r.add(T(0xc78)).readU64();
-      try{for(const context of contexts){r.add(T(0xc78)).writeU64(context);for(const item of owned){if(item.context!==context)continue;const n=r.add(0x698).readU64().toNumber();if(n>=r.add(0x688).readU64().toNumber())reserveUi(r.add(0x688));const target=r.add(0x690).readPointer().add(n*24);target.writeU64(item.n);target.add(8).writePointer(item.p);target.add(16).writeU64(item.n);r.add(0x698).writeU64(n+1);item.moved=true;}flush(r);}}
+      try{for(const context of contexts){r.add(T(0xc78)).writeU64(context);for(const item of owned){if(item.context!==context)continue;const n=r.add(R(0x698)).readU64().toNumber();if(n>=r.add(R(0x688)).readU64().toNumber())reserveUi(r.add(R(0x688)));const target=r.add(R(0x690)).readPointer().add(n*24);target.writeU64(item.n);target.add(8).writePointer(item.p);target.add(16).writeU64(item.n);r.add(R(0x698)).writeU64(n+1);item.moved=true;}flush(r);}}
       finally{r.add(T(0xc78)).writeU64(saved);for(const item of owned)if(!item.moved)free(item.p,item.n,1);}
     }
     const sendLocal=fn(profile.mapTravelFunctions.sendLocalPacket,'void',['pointer','uint64','uint64','pointer']);
     function sendLogin(g,s,packet){let consumed=false;const errors=[];try{for(const row of s.recipients){try{transport.sendPacket(g,row.context,packet);}catch(e){errors.push('Player '+row.context+': '+String(e.message||e));}}consumed=true;sendLocal(s.clients.p,s.clients.n,s.clients.active[0],packet);}finally{if(!consumed)free(packet.add(8).readPointer(),packet.readU64(),1);}return errors;}
     function cancelQueued(){const cancelled=queued!==null;queued=null;return {cancelled,finishing:!!pending};}
-    function request(zone){const z=typeof zone==='string'?zones.find(x=>x.key===zone):zones.find(x=>x.id===zone);if(!z)throw Error('Choose a valid destination');if(queued!==null||pending)throw Error('A map transfer is already in progress');if(Date.now()<nextAt)throw Error('Wait a few seconds between map transfers');state(getRun(),getGame(),true);queued=z.id;lastError='';return {queued:true,zone:z.name};}
+    function request(zone){const z=typeof zone==='string'?zones.find(x=>x.key===zone):zones.find(x=>x.id===zone);if(!z)throw Error('Choose a valid destination');if(completed>=1)throw Error('Only one map transfer is available per match in this version');if(queued!==null||pending)throw Error('A map transfer is already in progress');if(Date.now()<nextAt)throw Error('Wait a few seconds between map transfers');state(getRun(),getGame(),true);queued=z.id;lastError='';return {queued:true,zone:z.name};}
     function tick(r){
       const g=getGame();if(!r||r.isNull()||!g||g.isNull())return;
       if(g.add(G(0xd98)).readU32()===1)return;
       if(r.add(T(0xd83)).readU8()===0){reset(true);return;}
-      const clock=r.add(T(0xcc0)).readFloat(),key=String(r)+':'+r.add(0x4b0).readU64().toString();
+      const clock=r.add(T(0xcc0)).readFloat(),key=String(r)+':'+r.add(R(0x4b0)).readU64().toString();
       if(owner&&(key!==owner||clock<lastClock-1)){reset(true);}owner=key;lastClock=clock;
       try{
-        if(pending){if(Date.now()<pending.at)return;pending.attempts++;const s=state(r,g,false);const stillPresent=s.participants.filter(x=>pending.heroGuids.includes(x.p.add(0x4b0).readU64().toString()));const heroes=[0,...stillPresent.map(x=>x.context)];const recipients=s.recipients.filter(x=>stillPresent.some(p=>p.context===x.context));for(const h of heroes)transport.heroToLocal(g,r,h);for(const row of recipients)for(const h of heroes)transport.heroToGuest(g,r,row.context,h);lastZone=pending.zone.name;pending=null;completed++;nextAt=Date.now()+5000;notice('Arrived in '+lastZone);return;}
+        if(pending){if(Date.now()<pending.at)return;pending.attempts++;const s=state(r,g,false);const stillPresent=s.participants.filter(x=>pending.heroGuids.includes(x.p.add(R(0x4b0)).readU64().toString()));const heroes=[0,...stillPresent.map(x=>x.context)];const recipients=s.recipients.filter(x=>stillPresent.some(p=>p.context===x.context));for(const h of heroes)transport.heroToLocal(g,r,h);for(const row of recipients)for(const h of heroes)transport.heroToGuest(g,r,row.context,h);lastZone=pending.zone.name;pending=null;completed++;nextAt=Date.now()+5000;notice('Arrived in '+lastZone);return;}
         if(queued===null)return;
         const s=state(r,g,true),z=zones[queued];queued=null;
         if(readKey(r)===z.key)throw Error('Already in '+z.name);
@@ -324,10 +327,10 @@ globalThis.makeTravelRewardsCleanup127=function({base,profile,getIdentity}){
         originalZone=origin;identityRun=r;protectUntil=Date.now()+5000;
         try{cleanup.clearTransient(r);}catch(e){lastError='World moved, but old-entity cleanup reported: '+String(e.message||e);}
         if(api.onCommit){try{api.onCommit();}catch(e){lastError='World moved, but mode cleanup reported: '+String(e.message||e);}}
-        pending={at:Date.now()+1200,zone:z,attempts:0,heroGuids:s.participants.map(x=>x.p.add(0x4b0).readU64().toString())};const sendErrors=sendLogin(g,s,packet);if(sendErrors.length)lastError=sendErrors.join('; ');notice('Travelling to '+z.name+(sendErrors.length?' (a guest disconnected during transfer)':''));
+        pending={at:Date.now()+1200,zone:z,attempts:0,heroGuids:s.participants.map(x=>x.p.add(R(0x4b0)).readU64().toString())};const sendErrors=sendLogin(g,s,packet);if(sendErrors.length)lastError=sendErrors.join('; ');notice('Travelling to '+z.name+(sendErrors.length?' (a guest disconnected during transfer)':''));
       }catch(e){queued=null;lastError=String(e.message||e);notice('Map travel: '+lastError);if(pending){if(pending.attempts>=3)pending=null;else pending.at=Date.now()+1200;}}
     }
-    function status(){let reason='',currentZone='';const busy=queued!==null||!!pending;try{const r=getRun(),g=getGame();state(r,g,true);currentZone=readKey(r);if(busy)reason='A map transfer is in progress';else if(Date.now()<nextAt)reason='Wait a few seconds between transfers';}catch(e){reason=String(e.message||e);}return {supported:true,busy,canTravel:!reason,reason,currentZone,originZone:originalZone,catalog:catalog(),queued,completed,error:lastError,protectedHits,protectionSeconds:Math.max(0,(protectUntil-Date.now())/1000)};}
+    function status(){let reason='',currentZone='';const busy=queued!==null||!!pending;try{const r=getRun(),g=getGame();state(r,g,true);currentZone=readKey(r);if(busy)reason='A map transfer is in progress';else if(completed>=1)reason='One map transfer has already been used this match';else if(Date.now()<nextAt)reason='Wait a few seconds between transfers';}catch(e){reason=String(e.message||e);}return {supported:true,busy,canTravel:!reason,reason,currentZone,originZone:originalZone,catalog:catalog(),queued,completed,error:lastError,protectedHits,protectionSeconds:Math.max(0,(protectUntil-Date.now())/1000)};}
     // NativeFunction stores an address, not ownership of Memory.alloc storage.
     // Keep executable thunk memory explicitly rooted for the module's lifetime.
     return {request,cancelQueued,tick,status,catalog,reset,_nativeResources:[dropCode,dropArc,...damageCallbacks]};

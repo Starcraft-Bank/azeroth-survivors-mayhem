@@ -4,7 +4,7 @@ import ctypes,hashlib,json,os,queue,sys,threading,time
 from ctypes import wintypes
 
 ROOT=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))
-VERSION='0.12.2'
+VERSION='0.12.3'
 from settings import DEFAULTS, SCHEMA, validate_settings
 
 
@@ -82,7 +82,7 @@ class NativeGame:
                 self.session=self.device.attach(self.pid)
                 self.session.on('detached',self._detached)
                 self.events.put({'kind':'compatible','version':profile['version'],'stamp':profile['stamp'],'verified':not self.unverified})
-                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['income.js','tempo.js','population.js','affixes.js','patterns.js','rewards.js','effects.js','permanent-rewards.js','map_travel.js','run-affixes.js','resilience.js','agent.js'])
+                source='globalThis.MAYHEM_SCHEMA='+json.dumps(SCHEMA)+';\n'+'globalThis.MAYHEM_NATIVE_PROFILE='+json.dumps(profile)+';\nglobalThis.MAYHEM_SETTINGS='+json.dumps(settings)+';\n'+'\n'.join((ROOT/name).read_text(encoding='utf-8') for name in ['income.js','tempo.js','population.js','affixes.js','patterns.js','rewards.js','effects.js','permanent-rewards.js','map_travel.js','resilience.js','agent.js'])
                 try:
                     self.agent=self.session.create_script(source,name='LegendaryMayhemNative')
                     self.agent.on('message',self._message);self.agent.load()

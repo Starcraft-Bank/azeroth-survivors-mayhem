@@ -13,7 +13,6 @@
   const swapPlayer=native('partySwap','void',['pointer','pointer']);
   const flush=native('flushMessages','void',['pointer']);
   const reserveUi=native('reserveUi','void',['pointer']);
-  const emitEvent=native('emitEvent','void',['pointer','pointer']);
   const makePacket=native('packetMessage','void',['pointer','pointer']);
   const setField=native('setField','void',['pointer','uint16','uint32']);
   const writeGuid=native('writeGuid','void',['uint64','pointer']);
@@ -21,8 +20,6 @@
   const reserve=native('reserveMessages','void',['pointer']);
   const allocate=native('allocate','pointer',['uint64','uint64']);
   const deallocate=native('deallocate','void',['pointer','uint64','uint64']);
-  const bannerEvent=Memory.alloc(72),bannerKind=Memory.allocUtf8String('boss');
-  let deferredEvents=[];
   const NULL=ptr(0),nonePosition=Memory.alloc(16),message=Memory.alloc(32),packet=Memory.alloc(32);
   nonePosition.writeByteArray(new Uint8Array(16));
   const defs=[],zones=[];
@@ -44,10 +41,10 @@
   const definitionSet=new Set(defs.map(d=>String(d.pointer)));
   const schema=globalThis.MAYHEM_SCHEMA;
   let settings={...Object.fromEntries(Object.entries(schema).map(([k,v])=>[k,v[0]])),...globalThis.MAYHEM_SETTINGS};
-  let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true,autoMap:true};
+  let controls={waves:true,events:true,hazards:true,fireworks:true,autoEndless:true};
   let game=NULL,run=NULL,fault='',lastStatus=0,inMode=false,mayhemSpawning=false,batch=null;
-  let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),announcements=[],scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
-  let state,rewards=null,effects=null,permanentRewards=null,travel=null,income=null,population=null,tempo=null,affixes=null,runAffixes=null,fissionSpawning=0;
+  let scope=[],leases=new Map(),bossRegistry=new Map(),camp=new Map(),scaled=new Set(),bossDefinitions=new Map(),livingBossIds=new Set(),deadBossIds=new Set();
+  let state,rewards=null,effects=null,permanentRewards=null,travel=null,income=null,population=null,tempo=null,affixes=null;
   // Shuffle bags avoid a fixed sequence and repeats before a pool is exhausted.
   function shuffleBag(random=Math.random){
     let bag=[],last=null;
@@ -59,31 +56,16 @@
       let value=bag.pop();if(value===excluded)return this.take(pool,excluded);last=value;return value;
     }};
   }
-  const mapBag=shuffleBag(),bossBag=shuffleBag(),finalBag=shuffleBag();
+  const bossBag=shuffleBag(),finalBag=shuffleBag();
   const normalPool=defs.map((d,i)=>i).filter(i=>!defs[i].final),endlessPool=defs.map((d,i)=>i);
   function nextBoss(){const code=state.endless?finalBag.take(endlessPool,state.lastBossCode):bossBag.take(normalPool);state.lastBossCode=code;return code;}
-  function rotateMap(r,t){
-    if(!controls.autoMap){state.mapBlockedReason='';return false;}
-    const availability=travel?.status();
-    const blocked=reason=>{state.mapBlockedReason=reason;if(t>=state.nextMap&&t>=(state.mapDiagnosticAt||0)){notice('Map rotation waiting: '+reason,3);state.mapDiagnosticAt=t+30;}return false;};
-    if(!availability?.supported)return blocked(availability?.reason||'Map travel is unavailable');
-    if(t>=state.nextMap-10&&t<state.nextMap&&state.mapWarning!==state.nextMap){state.mapWarning=state.nextMap;notice('Map shift in '+Math.ceil(state.nextMap-t)+' seconds — collect your drops!',3);}
-    if(t<state.nextMap){state.mapBlockedReason='';return false;}
-    if(!availability.canTravel)return blocked(availability.reason||'Waiting for the party to resume');
-    if(t<state.mapRetryAt)return false;
-    const destination=mapBag.take(zones.map(z=>z.index),zoneIndex(r));
-    state.mapRetryAt=t+5;state.mapAttempts++;
-    try{travel.request(zones[destination].key);state.mapBlockedReason='';return true;}
-    catch(error){return blocked(String(error?.message||error));}
-  }
   function reset(){
-    mapBag.reset();bossBag.reset();finalBag.reset();
-    if(rewards?.reset)rewards.reset();if(effects?.reset)effects.reset();income?.reset();population?.reset();tempo?.reset();affixes?.onTravel();runAffixes?.onTravel();
-    for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];
+    bossBag.reset();finalBag.reset();
+    if(rewards?.reset)rewards.reset();if(effects?.reset)effects.reset();income?.reset();population?.reset();tempo?.reset();affixes?.onTravel();
     state={clock:0,wave:0,nextMap:180,mapChanges:0,mapWarning:0,mapRetryAt:0,mapBlockedReason:'',mapDiagnosticAt:0,mapAttempts:0,lastBoss:null,lastBossCode:-1,nextWave:settings.bossInterval,finalCursor:0,affix:0,endless:false,nextHazard:settings.hazardInterval,
       shapeNext:0,shapedBursts:0,stormNext:0,barrageUntil:0,barrageNext:0,event:0,eventUntil:0,nextEvent:settings.eventFirst,eventCount:0,
       lastEvent:0,killCount:0,hazardBursts:0,campBursts:0,cursor:0,noticeUntil:0,transitionAt:0,transitions:0,goldAwards:0,lastGold:null};
-    scope=[];leases.clear();bossRegistry.clear();camp.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();announcements=[];
+    scope=[];leases.clear();bossRegistry.clear();camp.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();
     definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
   }
   reset();
@@ -124,40 +106,13 @@
     this.context[site.amountRegister||'rax']=ptr(scaledAmount);
     state.goldAwards++;state.lastGold={native:amount,scaled:scaledAmount,factor:scales(r).gold};
   });});
-  function dropEvent(event){for(const offset of [0,24]){const capacity=event.add(offset).readU64().toNumber();if(capacity)deallocate(event.add(offset+8).readPointer(),capacity,1);}}
   function appendMessage(r,out){
     let n=number(r,F(0x650));if(n>=number(r,F(0x640)))reserve(r.add(F(0x640)));
     r.add(F(0x648)).readPointer().add(n*32).writeByteArray(out.readByteArray(32));r.add(F(0x650)).writeU64(n+1);
   }
-  function notice(text,priority=1){
-    if(announcements.some(a=>a.text===text))return;
-    announcements.push({text,priority,expires:state.clock+20});
-    announcements.sort((a,b)=>b.priority-a.priority);if(announcements.length>12)announcements.length=12;
-  }
-  function releaseNotice(r){
-    if(state.clock<state.noticeUntil)return;
-    announcements=announcements.filter(a=>a.expires>=state.clock);const a=announcements.shift();
-    if(!a){const pending=deferredEvents.shift();if(pending){emitEvent(pending.run,pending.event);state.noticeUntil=state.clock+3;}return;}
-    const text=Memory.allocUtf8String(a.text),length=Array.from(a.text).reduce((n,c)=>n+(c.codePointAt(0)<128?1:c.codePointAt(0)<2048?2:c.codePointAt(0)<65536?3:4),0);
-    const owned=allocate(length,1);if(owned.isNull())return;owned.writeByteArray(text.readByteArray(length));
-    bannerEvent.writeByteArray(new Uint8Array(72));bannerEvent.writeU64(length);bannerEvent.add(8).writePointer(owned);bannerEvent.add(16).writeU64(length);
-    bannerEvent.add(32).writePointer(ptr(1));bannerEvent.add(48).writePointer(bannerKind);bannerEvent.add(56).writeU64(4);bannerEvent.add(64).writeU8(1);
-    emitEvent(r,bannerEvent);
-    if(effects)effects.announcement(r,a.priority);
-    state.noticeUntil=state.clock+4;
-  }
-  const eventReplacement=new NativeCallback((r,event)=>{
-    try{
-      const kind=readString(event.add(48).readPointer(),number(event,56));
-      if(r.equals(run)&&!['death','defeat','disconnect','error'].includes(kind)&&state.clock<state.noticeUntil){
-        const copy=Memory.alloc(72);copy.writeByteArray(event.readByteArray(72));deferredEvents.push({run:r,event:copy});
-        if(deferredEvents.length>16)dropEvent(deferredEvents.shift().event);
-        return;
-      }
-    }catch(e){fail(e);}
-    emitEvent(r,event);
-  },'void',['pointer','pointer']);
-  AZS_HOOKS.replace(at('emitEvent'),eventReplacement);
+  // Native event ownership differs across builds. Keep game announcements
+  // untouched until custom banner lifetime can be verified for this version.
+  function notice(_text,_priority=1){}
   function syncHealth(r,e){
     const fields=Memory.alloc(24);fields.writeByteArray(new Uint8Array(24));
     setField(fields,22,Math.min(0xffffffff,Math.ceil(Math.max(0,e.add(E(0x160)).readFloat()))));
@@ -263,7 +218,6 @@
   }
   function bossDied(r,id,position,extra){
     if(deadBossIds.has(id))return;deadBossIds.add(id);livingBossIds.delete(id);bossRegistry.delete(id);state.killCount++;
-    runAffixes?.bossDied(r,id,position);
     if(position){if(rewards)rewards.bossReward(r,position,extra?'mayhem':'boss');affixes?.bossDied(r,id,position);if(controls.fireworks&&effects)effects.death(r,'0x'+id,position,2085+(state.killCount-1)%4);}
   }
   AZS_HOOKS.attach(at('enemyDamage'),{
@@ -397,18 +351,16 @@
       if((r.add(F(0xc9d)).readU8()?world:p)!==1)return;
       tempo?.tick(r);
       state.endless=!!r.add(F(0xc90)).readU8()&&!!r.add(F(0xb10)).readU32();
-      if(rotateMap(r,t))return;
       const v=enemies(r),bosses=[];for(let i=0;i<v.n;i++){const e=v.p.add(i*profile.enemyStride);if(isBoss(e)){if(alive(e))bosses.push(e);else if(livingBossIds.has(guid(e)))bossDied(r,guid(e),enemyPosition(r,e),bossRegistry.has(guid(e)));}}
-      runAffixes?.tick(r);population?.tick(r);affixes?.tick(r);events(r,bosses.length);hazards(r,v,bosses);if(rewards)rewards.tick(r);if(effects?.tick)effects.tick(r);
+      population?.tick(r);affixes?.tick(r);events(r,bosses.length);hazards(r,v,bosses);if(rewards)rewards.tick(r);if(effects?.tick)effects.tick(r);
       if(!controls.waves){state.nextWave=t+settings.bossInterval;return;}
       if(t<state.nextWave||bosses.length>=8)return;
-      const extra=state.wave%4===3,bonded=!!runAffixes?.wantsPair(),beforeWave=new Set(livingBossIds);state.affix=state.wave%4;
+      const extra=state.wave%4===3;state.affix=state.wave%4;
       const code=nextBoss();
       if(!summon(r,code))return;
       if(state.endless)state.finalCursor++;
-      if((extra||bonded)&&bosses.length<7){const second=nextBoss();
+      if(extra&&bosses.length<7){const second=nextBoss();
         if(summon(r,second)&&state.endless)state.finalCursor++;}
-      if(bonded)runAffixes.pair([...livingBossIds].filter(id=>!beforeWave.has(id)));
       state.lastBoss=defs[code].name;state.wave++;state.lastSpawn=t;state.nextWave=t+settings.bossInterval;state.barrageUntil=t+settings.barrageDuration;state.barrageNext=t;
       notice(['Crossroads','Frenzy','Spellstorm','Double Trouble'][state.affix]+' — '+defs[code].name+'! Dodge the arrival barrage.',3);
     }finally{inMode=false;}
@@ -422,13 +374,12 @@
       if(!state.transitionAt)state.transitionAt=Date.now()+750;
       if(Date.now()>=state.transitionAt)continueEndless(r);
     }else state.transitionAt=0;
-    releaseNotice(r);
   });}});
   if(globalThis.MAYHEM_PERMANENT_REWARDS)permanentRewards=globalThis.MAYHEM_PERMANENT_REWARDS.setup({profile,base,F,getState:()=>state,knownBoss:p=>bossDefinitions.get(String(p)),homeFinal:r=>{const z=zones[zoneIndex(r)];return z?z.bosses[4].pointer:null;}});
   if(globalThis.MAYHEM_REWARDS)rewards=globalThis.MAYHEM_REWARDS.setup({profile,base,F,native,guarded,notice,time,players,getSettings:()=>settings});
   if(globalThis.MAYHEM_EFFECTS)effects=globalThis.MAYHEM_EFFECTS.setup({base,profile,F,E,allocate,appendMessage,players,getSettings:()=>settings,guarded});
   income=MAYHEM_INCOME.setup({base,profile,getRun:()=>run,getSettings:()=>settings,time,guarded});
-  population=MAYHEM_POPULATION.setup({base,profile,F,E,getRun:()=>run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,guarded,notice,extraSpeed:e=>runAffixes?.speed(e)??1});
+  population=MAYHEM_POPULATION.setup({base,profile,F,E,getRun:()=>run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,guarded,notice,extraSpeed:()=>1});
   tempo=MAYHEM_TEMPO.setup({base,profile,getSettings:()=>settings,guarded,F,players,appendMessage,allocate,getGame:()=>game,canSync:()=>!travel?.status().busy});
   affixes=MAYHEM_AFFIXES.setup({base,profile,allocate,deallocate,appendMessage,enqueueUi,getSettings:()=>settings,time,enemies,guid,alive,isBoss,enemyPosition,notice,guarded,hunt,
     burst:affixBurst,bounty(r,position,amount){
@@ -437,47 +388,14 @@
       let sent=false;for(const [kind,n] of [[1,amount.gold],[0,amount.xp],...(amount.chest?[[2,1]]:[]),...(amount.powerup?[[3+Math.floor(Math.random()*4),1]]:[])])sent=rewards.queue(kind,n,centre)||sent;
       return sent;
     }});
-  runAffixes=MAYHEM_RUN_AFFIXES.setup({profile,base,F,E,getRun:()=>run.isNull()?null:run,getSettings:()=>settings,time,enemies,isBoss,guid,alive,enemyPosition,guarded,notice,
-    fissionInfo(r,e){
-      const zone=zoneIndex(r);if(zone<0||zone>=profile.zoneCount||isBoss(e))return null;
-      const entry=base.add(profile.zoneTable+zone*profile.zoneStride),defs=entry.add(0x78).readPointer(),count=number(entry,0x80),definition=e.add(E(0x100)).readPointer();
-      if(defs.isNull()||count<=0||count>4096||definition.compare(defs)<0||definition.compare(defs.add(count*80))>=0)return null;
-      const offset=definition.sub(defs).toUInt32();if(offset%80)return null;
-      return {zone,index:offset/80,pointer:String(definition)};
-    },
-    fissionBirth(r,item,mark){
-      const source=item.definition,zone=zoneIndex(r);if(zone!==source.zone||zone<0||zone>=profile.zoneCount)return -1;
-      const entry=base.add(profile.zoneTable+zone*profile.zoneStride),defs=entry.add(0x78).readPointer(),count=number(entry,0x80);
-      if(!Number.isInteger(source.index)||source.index<0||source.index>=count||String(defs.add(source.index*80))!==source.pointer)return -1;
-      if(!item.position?.every(Number.isFinite)||!Number.isFinite(item.health)||!Number.isFinite(item.damage))return -1;
-      const before=enemies(r),seen=new Set();for(let i=0;i<before.n;i++)seen.add(guid(before.p.add(i*profile.enemyStride)));
-      const where=Memory.alloc(16);where.writeU32(1);item.position.forEach((v,i)=>where.add(4+i*4).writeFloat(v));
-      fissionSpawning++;scope.push({r,boss:false,extra:false});try{population.withFission(r,()=>spawnMob(r,source.index,where));}finally{scope.pop();fissionSpawning--;}
-      const after=enemies(r);let created=0;for(let i=0;i<after.n;i++){const e=after.p.add(i*profile.enemyStride),id=guid(e);if(seen.has(id)||isBoss(e))continue;
-        mark([id]);created++;freshStats(r,e,false,false);const hp=Math.max(1,item.health);e.add(E(0x160)).writeFloat(hp);e.add(E(0x164)).writeFloat(hp);e.add(E(0x168)).writeFloat(Math.max(0,item.damage));syncHealth(r,e);}
-      return created;
-    },
-    revive(r,position,health){
-      const before=enemies(r),seen=new Set();for(let i=0;i<before.n;i++)seen.add(guid(before.p.add(i*profile.enemyStride)));
-      const where=Memory.alloc(16);where.writeU32(1);position.forEach((v,i)=>where.add(4+i*4).writeFloat(v));
-      scope.push({r,boss:false,extra:false});try{spawnMob(r,0,where);}finally{scope.pop();}
-      const after=enemies(r),ids=[];for(let i=0;i<after.n;i++){const e=after.p.add(i*profile.enemyStride),id=guid(e);if(seen.has(id)||isBoss(e))continue;
-        freshStats(r,e,false,false);const hp=Math.max(1,e.add(E(0x164)).readFloat()*health);e.add(E(0x160)).writeFloat(hp);e.add(E(0x164)).writeFloat(hp);syncHealth(r,e);ids.push(id);}
-      return ids;
-    },
-    bounty(r,position,amount){if(!rewards?.queue)return false;const group=players(r);if(!group.length)return false;
-      const centre=position||[0x4f0,0x4f4,0x4f8].map(o=>group[0].add(F(o)).readFloat());let sent=false;
-      for(const [kind,n]of [[1,amount.gold],[0,amount.xp],...(amount.chest?[[2,1]]:[])])if(n>0)sent=rewards.queue(kind,n,centre)||sent;
-      return sent;
-    }});
   travel=AZS_MAP_TRAVEL.setup({profile,base,F,getRun:()=>run.isNull()?null:run,getGame:()=>game.isNull()?null:game,notice,onCommit(){
     state.mapChanges++;state.nextMap=time(run)+180;state.mapBlockedReason='';state.mapDiagnosticAt=0;state.mapRetryAt=0;if(rewards?.onTravel)rewards.onTravel(run);
-    population?.reset();tempo?.reset();affixes?.onTravel();runAffixes?.onTravel();
-    for(const item of deferredEvents)dropEvent(item.event);deferredEvents=[];announcements=[];camp.clear();leases.clear();bossRegistry.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
+    population?.reset();tempo?.reset();affixes?.onTravel();
+    camp.clear();leases.clear();bossRegistry.clear();scaled.clear();bossDefinitions.clear();livingBossIds.clear();deadBossIds.clear();definitionSet.clear();for(const def of defs)definitionSet.add(String(def.pointer));
   }});
   function status(){
     let match=null;if(!run.isNull())guarded(()=>{match={clock:time(run),phase:run.add(F(0xca2)).readU8(),worldPhase:run.add(F(0xca3)).readU8(),coop:!!run.add(F(0xc9d)).readU8(),zone:zoneIndex(run)};});
-    return {ready:!fault,fault,travel:travel.status(),settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,income:income?.status?.()??null,population:population?.status?.()??null,tempo:tempo?.status?.()??null,affixes:affixes?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,runAffixes:runAffixes?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
+    return {ready:!fault,fault,travel:travel.status(),settings:{...settings},controls:{...controls},state:{...state},rewards:rewards?.status?.()??null,income:income?.status?.()??null,population:population?.status?.()??null,tempo:tempo?.status?.()??null,affixes:affixes?.status?.()??null,permanentRewards:permanentRewards?.status?.()??null,match,scaling:run.isNull()?null:scales(run),native:true};
   }
   rpc.exports={
     status,travel(zone){if(fault)return false;return travel.request(zone);},
@@ -492,15 +410,10 @@
       if(candidate.eventFirst!==settings.eventFirst&&state.eventCount===0)state.nextEvent=Math.max(t+1,candidate.eventFirst);
       if((candidate.eventGapMin!==settings.eventGapMin||candidate.eventGapMax!==settings.eventGapMax)&&!state.event&&state.eventCount>0)
         state.nextEvent=t+candidate.eventGapMin;
-      settings={...candidate};population?.configure();runAffixes?.configure();return true;},
+      settings={...candidate};population?.configure();return true;},
     control(name,enabled){
       if(!Object.hasOwn(controls,name))return false;
       enabled=!!enabled;
-      if(name==='autoMap'&&controls.autoMap!==enabled){
-        state.mapBlockedReason='';state.mapDiagnosticAt=0;
-        if(!enabled)travel?.cancelQueued?.();
-        else {state.nextMap=state.clock+180;state.mapWarning=0;state.mapRetryAt=0;}
-      }
       controls[name]=enabled;return true;
     }
   };

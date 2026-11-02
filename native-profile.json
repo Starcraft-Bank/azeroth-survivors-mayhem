@@ -1,107 +1,8 @@
 {
-  "schema": 1,
-  "version": "0.131.0",
-  "stamp": "e7d9dd47",
-  "exeName": "AzerothSurvivors.exe",
-  "sha256": "5dd6819d836748ccf809ab76fe6509c9ee793e087939b5d036c430d835a14e63",
-  "bytes": 147231744,
-  "functions": {
-    "gameUpdate": 96130352,
-    "runTick": 97235936,
-    "bossSpawn": 97361344,
-    "mobSpawn": 97280672,
-    "entitySpawn": 97274528,
-    "hazardCast": 97448832,
-    "hazardUpdate": 97407456,
-    "offer": 97662304,
-    "card": 97681584,
-    "enemyAi": 97317488,
-    "enemyDamage": 97284928,
-    "keepFighting": 97129232,
-    "banner": 95747552,
-    "packetMessage": 95722944,
-    "reserveMessages": 101472864,
-    "allocate": 8640,
-    "partySwap": 97397776,
-    "emitEvent": 97260864,
-    "deallocate": 8656,
-    "flushMessages": 97116800,
-    "reserveUi": 101472080,
-    "setField": 95734848,
-    "writeGuid": 95811216,
-    "writeFields": 95736000
-  },
-  "functionHeadSha256": {
-    "gameUpdate": "f62c70923df8d65aef18b79db7809f5c5fc5b821dc268b74ed955cdc73577b70",
-    "runTick": "4a0c05d2c9b11d48031bbe8a8afd2cf0a9a04580e7f54a17da92efd9febb6f50",
-    "bossSpawn": "567e07b20b12e00de45c6295ebc9e33346e080a2e89236029cbfb6da8fe9ad8f",
-    "mobSpawn": "1886f4f677b89ae706216917126621a76bc5cf8287c038abc4d04812ea0a3348",
-    "entitySpawn": "c52abe19710549796a2e1c710211bdaa3debc65cbe17c04be0c5b6ca233fc4d0",
-    "hazardCast": "9411dbf4f1f4935deaefeb74049e1599424e6b0db94baa488d2f374bef03f770",
-    "hazardUpdate": "27baaff7489256ce86007b683a591e3a4b5255032b4caa82b0437c65bb2f3453",
-    "offer": "00305913c9370d0ba73e97252e2f9e87fcd88c8ef65a647ac0104fa90ac7101b",
-    "card": "63b141ca96cfd87b55f7c7e1f11b73a5b902d2c36ad49ed36d36c4f1c37963b8",
-    "enemyAi": "35b1f6509e2542cc6b29ed70e0ea97ae93c4a99c70974e3fa5ea3702f3c59d4f",
-    "enemyDamage": "d7ca2d986d0cfef2637159acbc23b1c0126a879182481f9eb8292eb0e5cd3559",
-    "keepFighting": "a2befa265f230d78515592829b1855675f536ed1fc4aa3f9d56270937f20d03a",
-    "banner": "818f19c80997870758018f2c856f03b03900acaf2bdece9b04e588ca461db7a1",
-    "packetMessage": "d5b9e7a616d4a6b5ee3a66a3c322b41717637c332fdf7ddfde9859c129e9119d",
-    "reserveMessages": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
-    "allocate": "4e6a874298cf96414a6ab9cc222ed225fbbb11e251de0166bddc1b0596a8953d",
-    "partySwap": "b649a934b2ec804b30fa87e63f4cb9e4d9c84eeea7f39977563cc7ccdfb75174",
-    "emitEvent": "4b886e0352cd25b934bd6589dea23b8a3d5fa74b3177c5798d9acd45678a2b07",
-    "deallocate": "84832545788e32d50887b75c71d6dbb401a53cdb4c7b63b0b25545ce54f0014c",
-    "flushMessages": "aa34ab0cafb0c32a2cda096cfae0c651266f577e139f5647b1e2f896b5df6f41",
-    "reserveUi": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
-    "setField": "166e183424d34186de92d366583a6cad1d37def393681f71a642c9be74598633",
-    "writeGuid": "e080b55d93185a072ec447d3c35bcfa9b6c3c1362bbf60af8188ac85149de51b",
-    "writeFields": "5904d6f35e436aed59f69f08cfb305a6c621b82250f04c1bfa06f27ae996fae0"
-  },
-  "zoneTable": 118107656,
-  "zoneCount": 12,
-  "zoneStride": 240,
-  "bossStride": 104,
   "abilityStride": 56,
-  "hazardDefinition": 118060888,
-  "enemyStride": 504,
-  "hazardStride": 128,
-  "partyStride": 2616,
-  "fieldOffsets": {
-    "0x2b8": 720,
-    "0x2c0": 728,
-    "0x488": 1200,
-    "0x4a0": 1224,
-    "0x4f0": 1312,
-    "0x4f4": 1316,
-    "0x4f8": 1320,
-    "0x500": 1328,
-    "0x508": 1336,
-    "0x510": 1348,
-    "0x580": 1456,
-    "0x588": 1464,
-    "0x590": 1472,
-    "0x5b0": 1504,
-    "0x5b8": 1512,
-    "0x5c0": 1520,
-    "0x640": 1648,
-    "0x648": 1656,
-    "0x650": 1664,
-    "0x658": 1672,
-    "0x660": 1680,
-    "0x668": 1688,
-    "0x7bc": 2128,
-    "0x988": 2664,
-    "0x98c": 2612,
-    "0x990": 2672,
-    "0x998": 2680,
-    "0xb10": 3056,
-    "0xb98": 3224,
-    "0xbf4": 3296,
-    "0xc90": 3472,
-    "0xc9d": 3486,
-    "0xca2": 3491,
-    "0xca3": 3492
-  },
+  "bossSpawnHpArgument": true,
+  "bossStride": 104,
+  "bytes": 150793728,
   "enemyOffsets": {
     "0x160": 376,
     "0x164": 380,
@@ -136,149 +37,267 @@
     "0x1d8": 496,
     "0x1dc": 500
   },
-  "bossSpawnHpArgument": true,
-  "validation": "native-tested",
-  "runtimeTested": true,
-  "rewards": {
-    "spawnLoot": 97312176,
-    "reroll": 97719600,
-    "jewelryBuilder": 97693840,
-    "jewelryLoop": 97694720,
-    "jewelryTable": 125272456,
-    "jewelryStride": 72,
-    "jewelryCount": 23,
-    "jewelryStatOffset": 68,
-    "luckStat": 14,
-    "lootLengthOffset": 1640,
-    "lootPointerOffset": 1632,
-    "lootStride": 72,
-    "costSites": [
-      {
-        "rva": 97048730,
-        "costRegister": "rcx",
-        "overflowRegister": "r9",
-        "headSha256": "6bf44f152deac70f81b92f4793f3a75b0e072da18ab9d9e273bb9ac9f21069c6"
-      },
-      {
-        "rva": 97197848,
-        "costRegister": "rcx",
-        "overflowRegister": "r9",
-        "headSha256": "dc4efd97c6bd54e8373b7e76f40099e7b74d62064204a14f52d8394c191691b9"
-      },
-      {
-        "rva": 97671972,
-        "costRegister": "rcx",
-        "overflowRegister": "r9",
-        "headSha256": "10f3be7369e659fa16d63b1d45105c7c294ccd50215c651a04b5a74467fa9177"
-      },
-      {
-        "rva": 97676575,
-        "costRegister": "rcx",
-        "overflowRegister": "r9",
-        "headSha256": "ef47c8001f7d018d6fab372d77b30dcb162c5b6e74be40f5c07386031d67fbba"
-      },
-      {
-        "rva": 97719827,
-        "costRegister": "r8",
-        "overflowRegister": "r10",
-        "headSha256": "a76649a50662751e1d1636c68949847106900de5ee7cace24455b91bf254c7cf"
-      }
-    ],
-    "headSha256": {
-      "spawnLoot": "fda81edf5056cd85d4a0e2d9b3927491b302b42dff4e581b11368ec85e0e5dc7",
-      "reroll": "4cd19bb5c276f34a4eaecadb48ce3edec9f4317c53c05c05bd784b9334fe3def",
-      "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
-      "jewelryLoop": "00846715278ede257c5f507192d1c4ccf89e2d002a8a7e0ff5e67fd008ba4d64"
-    },
-    "chest": {
-      "purchase": 97395136,
-      "hud": 97049010,
-      "json": 97197118,
-      "priceOffset": 3392
-    }
+  "enemyStride": 520,
+  "exeName": "AzerothSurvivors.exe",
+  "fieldOffsets": {
+    "0x2b8": 856,
+    "0x2c0": 864,
+    "0x488": 1336,
+    "0x4a0": 1480,
+    "0x4f0": 1360,
+    "0x4f4": 1364,
+    "0x4f8": 1368,
+    "0x500": 1376,
+    "0x508": 1384,
+    "0x510": 1400,
+    "0x580": 1600,
+    "0x588": 1608,
+    "0x590": 1616,
+    "0x5b0": 1648,
+    "0x5b8": 1656,
+    "0x5c0": 1664,
+    "0x640": 1792,
+    "0x648": 1800,
+    "0x650": 1808,
+    "0x658": 1816,
+    "0x660": 1824,
+    "0x668": 1832,
+    "0x7bc": 2416,
+    "0x988": 2976,
+    "0x98c": 2924,
+    "0x990": 2984,
+    "0x998": 2992,
+    "0xb10": 3504,
+    "0xb98": 3672,
+    "0xbf4": 3744,
+    "0xc90": 3920,
+    "0xc9d": 3934,
+    "0xca2": 3939,
+    "0xca3": 3940
+  },
+  "functionHeadSha256": {
+    "allocate": "de78ff87cc01e2fee5e4935f9078e006a83f0dc8ef6fbc602d976de4da1c0c14",
+    "banner": "818f19c80997870758018f2c856f03b03900acaf2bdece9b04e588ca461db7a1",
+    "bossSpawn": "69fbf6f46f4f9581b4e38b0bbf1a9cc08ed5eb100a3f55190efbd3f6066e908e",
+    "card": "63b141ca96cfd87b55f7c7e1f11b73a5b902d2c36ad49ed36d36c4f1c37963b8",
+    "deallocate": "6422c175d543f2b3e7d6759bdc6f6c0cdc6e78ec1c63d9851af5bfb718ac43a3",
+    "emitEvent": "4b886e0352cd25b934bd6589dea23b8a3d5fa74b3177c5798d9acd45678a2b07",
+    "enemyAi": "35b1f6509e2542cc6b29ed70e0ea97ae93c4a99c70974e3fa5ea3702f3c59d4f",
+    "enemyDamage": "3c3a1e407cae28eb8dc98b171830494db9fa6563079c20ef4d622b7fae91819d",
+    "entitySpawn": "55c97b8d3aadb6085a27f75a69232e2ac6c07bb9bf0056a222e26f11e401c7cc",
+    "flushMessages": "c456a425ebb0acdeb7096a5c57c42bf9c5e18e9bd1c69a4a0af8b8587c5fa2db",
+    "gameUpdate": "8c98248a0397ddd5ed4e0642beb26b728202f2d5cbdcaaf9d971da5efc439513",
+    "hazardCast": "9411dbf4f1f4935deaefeb74049e1599424e6b0db94baa488d2f374bef03f770",
+    "hazardUpdate": "27baaff7489256ce86007b683a591e3a4b5255032b4caa82b0437c65bb2f3453",
+    "keepFighting": "55ccda254633ae7e824c3dd693550e28d9c892deaa838f8941d7a00826452722",
+    "mobSpawn": "888dab3dad06c99add87e191d71322dc97bcd92e3d88be6216b8575a5a29b91f",
+    "offer": "f3620031480da0a6f903bcd8214f7861baa31561d7d45f980d9cd2838fd962ba",
+    "packetMessage": "d5b9e7a616d4a6b5ee3a66a3c322b41717637c332fdf7ddfde9859c129e9119d",
+    "partySwap": "1477560020793a457adc90c378d0ff60c2d801b851581e631a4932556a17f4fc",
+    "reserveMessages": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+    "reserveUi": "46bd1763478608c57ac18e22ccc07376672276bf0beea17b18ec40182708c96d",
+    "runTick": "4a0c05d2c9b11d48031bbe8a8afd2cf0a9a04580e7f54a17da92efd9febb6f50",
+    "setField": "26fdc6968a16c5bd6f2e5fd7d785bc68182c4082ba416efeac77e20983f153b6",
+    "writeFields": "5904d6f35e436aed59f69f08cfb305a6c621b82250f04c1bfa06f27ae996fae0",
+    "writeGuid": "adab3ab4bd07b8ea641cad86a301635b40d2acdb9e3021607ca773c323f6b0d5"
+  },
+  "functions": {
+    "allocate": 8640,
+    "banner": 98144816,
+    "bossSpawn": 99750928,
+    "card": 100077744,
+    "deallocate": 8656,
+    "emitEvent": 99640672,
+    "enemyAi": 99706336,
+    "enemyDamage": 99662464,
+    "entitySpawn": 99652032,
+    "flushMessages": 99466752,
+    "gameUpdate": 98896656,
+    "hazardCast": 99840320,
+    "hazardUpdate": 99798912,
+    "keepFighting": 99485456,
+    "mobSpawn": 99658208,
+    "offer": 100058368,
+    "packetMessage": 99255792,
+    "partySwap": 99788672,
+    "reserveMessages": 104138512,
+    "reserveUi": 104119776,
+    "runTick": 99616320,
+    "setField": 99258704,
+    "writeFields": 99259072,
+    "writeGuid": 99267456
   },
   "goldAwards": [
     {
-      "rva": 96715023,
-      "runRegister": "rsi",
-      "amountRegister": "rax",
-      "headSha256": "c4a2f5aca7cf0888993f701ff5e33b5b6b5229bd7726e79d5e794159f7bac966"
-    },
-    {
-      "rva": 97081547,
+      "amountRegister": "rcx",
+      "headSha256": "967a8045c5d7e13139f36decedb2afcc35d061bae15879cd35b04f0858b9249e",
       "runRegister": "r13",
-      "amountRegister": "rcx",
-      "headSha256": "899a92a1e9bb9f5705f258b4f8965b854ed4b12740387100ab601cec266c0036"
+      "rva": 99429851
     },
     {
-      "rva": 97269624,
-      "runRegister": "rsi",
       "amountRegister": "rcx",
-      "headSha256": "5c614840760fb853823fe3958c2e65634afe36884ba55f6ae46c51a07934bb9e"
+      "headSha256": "c7657ee2c7712c1a115fd7c6291e661098d316930285f152e4af8b7aca8a1fb0",
+      "runRegister": "rsi",
+      "rva": 99649432
     }
   ],
-  "permanentRewards": {
-    "bossReward": 97272688,
-    "headSha256": "31b825124941cc53cb9d6bd09b1f72addd8b1de8bc7fe93d1f75d7f59e12bc67"
-  },
-  "mapTravelFunctions": {
-    "loadWorld": 96584240,
-    "worldDropSlow": 95870880,
-    "createHero": 97185312,
-    "sendLocalPacket": 96129696,
-    "encodeCoop": 97937744,
-    "flushPendingCoop": 95950560,
-    "buildSnapshot": 97945552,
-    "playerDamage": 97174784
+  "hazardDefinition": 120820864,
+  "hazardStride": 128,
+  "income": {
+    "xpAward": 99636864,
+    "xpOffset": 1380
   },
   "mapTravel": {
-    "runOffsets": {
-      "0x870": 2192,
-      "0xa14": 2612,
-      "0xa48": 2664,
-      "0xa50": 2672,
-      "0xa58": 2680,
-      "0xc18": 3128,
-      "0xc78": 3224,
-      "0xcc0": 3296,
-      "0xd83": 3491
-    },
-    "gameOffsets": {
-      "0xd98": 3512,
-      "0xdd0": 3568,
-      "0xdd8": 3576,
-      "0x11f8": 4656,
-      "0x1200": 4664
-    },
     "connectionOffsets": {
-      "0x4e5": 1877,
-      "0x4c8": 1840,
-      "0x4d0": 1848
+      "0x278": 912,
+      "0x4c8": 2120,
+      "0x4d0": 2128,
+      "0x4e5": 2157
     },
-    "connectionStride": 1880,
-    "partyStride": 2616,
-    "playerDamageExtraArgs": 2
+    "connectionStride": 2160,
+    "gameOffsets": {
+      "0x11f8": 5104,
+      "0x1200": 5112,
+      "0xd98": 3960,
+      "0xdd0": 4016,
+      "0xdd8": 4024
+    },
+    "partyLayout": {
+      "0x5b0": 1600,
+      "0x5c8": 1624,
+      "0x5e0": 1648
+    },
+    "partyStride": 2928,
+    "playerDamageExtraArgs": 2,
+    "runLayout": {
+      "0x2d0": 856,
+      "0x2d8": 864,
+      "0x4b0": 1336,
+      "0x520": 1360,
+      "0x52c": 1372,
+      "0x5b0": 1600,
+      "0x5c8": 1624,
+      "0x5e0": 1648,
+      "0x5f8": 1672,
+      "0x610": 1696,
+      "0x628": 1720,
+      "0x640": 1744,
+      "0x658": 1768,
+      "0x688": 1816,
+      "0x690": 1824,
+      "0x698": 1832,
+      "0x6b8": 1864
+    },
+    "runOffsets": {
+      "0x870": 2480,
+      "0xa14": 2924,
+      "0xa48": 2976,
+      "0xa50": 2984,
+      "0xa58": 2992,
+      "0xc18": 3576,
+      "0xc78": 3672,
+      "0xcc0": 3744,
+      "0xd83": 3939
+    }
   },
-  "income": {
-    "xpAward": 97256448,
-    "xpOffset": 1332
-  },
-  "population": {
-    "spawnBudgetBefore": 97370946,
-    "spawnBudgetAfter": 97370962,
-    "spawnBudgetOffset": 3356,
-    "mobCapCompare": 97281189,
-    "budgetRunRegister": "rsi"
+  "mapTravelFunctions": {
+    "buildSnapshot": 98349440,
+    "createHero": 99563920,
+    "encodeCoop": 98341344,
+    "flushPendingCoop": 98704976,
+    "loadWorld": 98122912,
+    "playerDamage": 99551872,
+    "sendLocalPacket": 98896000,
+    "worldDropSlow": 98363712
   },
   "nativeAffixes": {
-    "capacity": 2168,
-    "pointer": 2176,
-    "length": 2184,
-    "heroic": 879,
+    "capacity": 2456,
+    "heroic": 1015,
+    "length": 2472,
+    "pointer": 2464,
     "pools": {
-      "capacity": 2192,
-      "pointer": 2200,
-      "length": 2208
+      "capacity": 2480,
+      "length": 2496,
+      "pointer": 2488
     }
-  }
+  },
+  "partyStride": 2928,
+  "permanentRewards": {
+    "bossReward": 99650192,
+    "headSha256": "31b825124941cc53cb9d6bd09b1f72addd8b1de8bc7fe93d1f75d7f59e12bc67"
+  },
+  "population": {
+    "budgetRunRegister": "rsi",
+    "mobCapCompare": 99658725,
+    "spawnBudgetAfter": 99616594,
+    "spawnBudgetBefore": 99616574,
+    "spawnBudgetOffset": 3744
+  },
+  "rewards": {
+    "chest": {
+      "hud": 99396066,
+      "json": 99576170,
+      "priceOffset": 3840,
+      "purchase": 99786064
+    },
+    "costSites": [
+      {
+        "costRegister": "rcx",
+        "headSha256": "d2440d115c53f06b7cbc578bf5395a5e896ced25a2bd550d03207bca2fdf01ca",
+        "overflowRegister": "r9",
+        "rva": 99395786
+      },
+      {
+        "costRegister": "rcx",
+        "headSha256": "dc4efd97c6bd54e8373b7e76f40099e7b74d62064204a14f52d8394c191691b9",
+        "overflowRegister": "r9",
+        "rva": 99576904
+      },
+      {
+        "costRegister": "rcx",
+        "headSha256": "062f05b07a71261973a02f8b30d18ac432dc1f4b9a8f354dc55ace7fe3af7392",
+        "overflowRegister": "r9",
+        "rva": 100067956
+      },
+      {
+        "costRegister": "rcx",
+        "headSha256": "9ba0976c8371f24ae91c0e302914c615cf560a77673a2e38ae379edc9f52071c",
+        "overflowRegister": "r9",
+        "rva": 100072647
+      },
+      {
+        "costRegister": "r8",
+        "headSha256": "74da6978f41299cec32192678f004af2a37ac9437a4cd7a5b74a1bdb9013b40a",
+        "overflowRegister": "r10",
+        "rva": 100115779
+      }
+    ],
+    "headSha256": {
+      "jewelryBuilder": "042722957045f15081646e3717fcd6e92ee90e86f4ed964610521d3e9db97128",
+      "jewelryLoop": "5992a7ac6636ce67f9811096e1e354addda0b3615c1bd900590f4887f9c9d12d",
+      "reroll": "165774716b5289df074357f8348be6439161778ab84f149c2f1301de85e37f8d",
+      "spawnLoot": "fda81edf5056cd85d4a0e2d9b3927491b302b42dff4e581b11368ec85e0e5dc7"
+    },
+    "jewelryBuilder": 100090208,
+    "jewelryCount": 23,
+    "jewelryLoop": 100091088,
+    "jewelryStatOffset": 68,
+    "jewelryStride": 72,
+    "jewelryTable": 124453208,
+    "lootLengthOffset": 1784,
+    "lootPointerOffset": 1776,
+    "lootStride": 72,
+    "luckStat": 14,
+    "reroll": 100115552,
+    "spawnLoot": 99701072
+  },
+  "runtimeTested": false,
+  "schema": 1,
+  "sha256": "0bb6c557c5f6cfeea212761a33554f9a5647ce7cb7e03b8a163b95489496e908",
+  "stamp": "3176c633",
+  "validation": "automated-static-review",
+  "version": "0.139.2",
+  "zoneCount": 12,
+  "zoneStride": 240,
+  "zoneTable": 120867632
 }
