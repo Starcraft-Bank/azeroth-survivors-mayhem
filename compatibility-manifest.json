@@ -3336,13 +3336,6 @@
           "bossReward": 99650192,
           "headSha256": "31b825124941cc53cb9d6bd09b1f72addd8b1de8bc7fe93d1f75d7f59e12bc67"
         },
-        "population": {
-          "budgetRunRegister": "rsi",
-          "mobCapCompare": 99658725,
-          "spawnBudgetAfter": 99616594,
-          "spawnBudgetBefore": 99616574,
-          "spawnBudgetOffset": 3744
-        },
         "rewards": {
           "chest": {
             "hud": 99396066,
@@ -3544,24 +3537,6 @@
           "pattern": "5541574156415541545657534881ec98000000488dac2480000000440f294d00440f2945f00f297de00f2975d048c745c8feffffff4889d34889ce488b895803",
           "referenceCandidateCount": 1,
           "rva": 99650192
-        },
-        "population_mobCapCompare": {
-          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-          "pattern": "4939c6737c488b8e58030000488b9660030000e8a3fde9ff4869c0f00000004c",
-          "referenceCandidateCount": 1,
-          "rva": 99658725
-        },
-        "population_spawnBudgetAfter": {
-          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-          "pattern": "80be580f0000000f8489050000f30f108ec8050000f30f118e68050000c786b4",
-          "referenceCandidateCount": 1,
-          "rva": 99616594
-        },
-        "population_spawnBudgetBefore": {
-          "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-          "pattern": "f30f1086a00e0000f30f58c6f30f1186a00e000080be580f0000000f84890500",
-          "referenceCandidateCount": 1,
-          "rva": 99616574
         },
         "reserveMessages": {
           "mask": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",

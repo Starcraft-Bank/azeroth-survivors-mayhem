@@ -27,7 +27,7 @@
   if(key==='request')return ()=>({ok:false,error:name+' is unavailable.'});
   return ()=>false;
  }});}
- const labels={MAYHEM_RUN_AFFIXES:'Run affixes',AZS_TRAINER_COMBAT:'Combat controls',AZS_TRAINER_ECONOMY:'Economy controls',AZS_TRAINER_ACTIONS:'Spawn and match actions',AZS_MAP_TRAVEL:'Map travel',MAYHEM_INCOME:'XP scaling',MAYHEM_POPULATION:'Population controls',MAYHEM_TEMPO:'Game speed',MAYHEM_AFFIXES:'Affixes',MAYHEM_REWARDS:'Bonus rewards',MAYHEM_PERMANENT_REWARDS:'Permanent rewards',MAYHEM_EFFECTS:'Death effects'};
+ const labels={MAYHEM_RUN_AFFIXES:'Run affixes',AZS_TRAINER_COMBAT:'Combat controls',AZS_TRAINER_ECONOMY:'Economy controls',AZS_TRAINER_ACTIONS:'Spawn and match actions',AZS_MAP_TRAVEL:'Map travel',MAYHEM_INCOME:'XP scaling',MAYHEM_POPULATION:'Boss movement and Stampede',MAYHEM_TEMPO:'Game speed',MAYHEM_AFFIXES:'Affixes',MAYHEM_REWARDS:'Bonus rewards',MAYHEM_PERMANENT_REWARDS:'Permanent rewards',MAYHEM_EFFECTS:'Death effects'};
  for(const [key,name] of Object.entries(labels)){
   const object=globalThis[key];if(!object?.setup)continue;const setup=object.setup;
   object.setup=function(api){const parent=current,context={name,undo:[]},disabled=fallback(name);let failed=false,instance;

@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.12.4
+# Azeroth Legendary Mayhem 0.12.5
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
@@ -25,7 +25,6 @@ Windows 10/11 x64; no Python or browser extension installation is required. Sett
 | Category | Controls |
 | --- | --- |
 | Combat | Boss health/damage difficulties, boss movement, cross-map waves, arena hazards, arrival barrages and separate idle punishment. |
-| Population | Normal mob movement, spawn rate and living-mob density. |
 | Rewards | Legendary schedule, XP/gold rates, growth and caps, supplies, reroll cap and Luck filtering. |
 | Affixes | Timed and reward affixes; individual difficulties/settings and native affix selection. |
 | Session | Shared game speed, one manual map transfer, automatic Endless, reward sounds, fireworks and live status. |
@@ -54,7 +53,7 @@ Each has its own difficulty and reward bonus. Rift Pulse and Nemesis Hunt have i
 
 Shared game speed is adjustable from 50–200% and defaults OFF. It changes player movement, combat timers, waves and hazards for the whole party. Network deadlines and menu animations keep normal timing. At 200%, two match minutes take about one real minute.
 
-Mob and boss movement are separately adjustable from 50–300%. Spawn rate and density range from 25–300%. Ordinary population is capped at 500 living enemies. Lowering density never deletes existing enemies. Ordinary spawn rate does not change the Mayhem boss interval or scripted summons.
+Boss movement remains adjustable from 50–300%. Normal mob movement, spawn rate and density controls are paused because higher settings caused lag and desynchronization in public lobbies. Native mob spawning and its living-enemy limit are unchanged.
 
 XP and gold each have an ON/OFF switch, starting rate (25–1,000%), growth per match minute (0–100 percentage points) and cap (25–2,000%). XP defaults to 100% without growth. Gold defaults to 125%, +15 points per minute, capped at 800%. Treasure Rush applies an additional 1.5 / 2 / 2.5 / 3× gold multiplier according to its own difficulty. Existing balances/levels are unchanged and native level caps remain.
 

@@ -226,13 +226,6 @@
     "bossReward": 99650192,
     "headSha256": "31b825124941cc53cb9d6bd09b1f72addd8b1de8bc7fe93d1f75d7f59e12bc67"
   },
-  "population": {
-    "budgetRunRegister": "rsi",
-    "mobCapCompare": 99658725,
-    "spawnBudgetAfter": 99616594,
-    "spawnBudgetBefore": 99616574,
-    "spawnBudgetOffset": 3744
-  },
   "rewards": {
     "chest": {
       "hud": 99396066,

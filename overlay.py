@@ -116,7 +116,7 @@ class Overlay:
         self.events=[tk.BooleanVar(value=bool(settings['eventMask']&(1<<i))) for i in range(4)]
         self.affix_flags={key:[tk.BooleanVar(value=bool(settings[key]&(1<<i))) for i in range(3)] for key in ['affixMask','nativeAffixMask']}
         self.pages={};self.sections={};self.affix_settings_panels={}
-        for title in ['Combat','Population','Rewards','Affixes','Session']:
+        for title in ['Combat','Rewards','Affixes','Session']:
             outer=ttk.Frame(self.tabs);self.tabs.add(outer,text='  '+title+'  ')
             canvas=tk.Canvas(outer,bg=BG,highlightthickness=0)
             bar=ttk.Scrollbar(outer,orient='vertical',command=canvas.yview)
@@ -149,12 +149,6 @@ class Overlay:
         self.setting_toggle(p,'Idle-player punishment ON / OFF','idleEnabled')
         self.field(p,'Trigger after standing still · seconds','campSeconds')
         self.note(p,'Uses the obstacle count and damage settings above, with its own ON/OFF switch. It works even when arena hazards and affixes are OFF. Moving resets the timer; affix difficulty does not change idle punishment.')
-        p=self.pages['Population']
-        self.heading(p,'Normal enemies','Control how quickly mobs arrive, how many can be alive and how fast they move.')
-        self.field(p,'Normal mob movement · %','mobSpeedPercent')
-        self.field(p,'Mob spawn rate · %','spawnRatePercent')
-        self.field(p,'Mob density · %','mobDensityPercent')
-        self.note(p,'100% keeps the existing Mayhem rate. Spawn rate changes ordinary arrivals; boss waves keep their own schedules. Density is capped at 500 living mobs. Lowering the cap does not delete existing enemies.')
         p=self.pages['Rewards']
         self.heading(p,'Legendary choices','Up to three guaranteed Legendary choices at each level-up.')
         self.field(p,'First Legendary · minutes','legendaryStart')
@@ -346,7 +340,7 @@ class Overlay:
             self.live.set(self.live.get()+f'\nXP: ×{(item.get("scaling") or {}).get("xp",1):.2f} · Game speed: ×{tempo.get("factor",1):.2f}\nStampede: {"ACTIVE" if population.get("hasteActive") else "Waiting" if population.get("hasteEnabled") else "OFF"}\nNative affixes: {", ".join(affixes.get("nativeAffixes",[])) or "None"}\nReward affixes: {"ON" if affixes.get("enabled") else "OFF"} · Bonus bounties: {affixes.get("rewards",0)}')
             unavailable=[]
             if not (item.get('income') or {}).get('supported'):unavailable.append('XP scaling')
-            if population.get('supported') is False:unavailable.append('population controls')
+            if population.get('supported') is False:unavailable.append('boss movement and Stampede')
             if not affixes.get('supported'):unavailable.append('native affix selection')
             if tempo.get('movementSupported') is False:unavailable.append('player movement synchronization')
             if unavailable:self.live.set(self.live.get()+'\nUnavailable on this adapter: '+', '.join(unavailable))
