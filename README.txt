@@ -6,7 +6,7 @@ The launcher checks its project's public GitHub release metadata in the backgrou
 
 The request sends no game saves, settings, local paths or credentials. GitHub receives the ordinary connection metadata needed to serve the request.
 
-# Azeroth Legendary Mayhem 0.12.3
+# Azeroth Legendary Mayhem 0.12.4
 
 A host-run custom mode for the native Windows game. Only the host needs Mayhem; friends join using the ordinary game.
 
